@@ -1,0 +1,34 @@
+{
+  "name": "fastball-components",
+  "version": "0.1.0",
+  "description": "Fastball UI components",
+  "homepage": "https://github.com/fastball-projects/fastball-components",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "scripts": {
+    "start": "build-scripts start",
+    "build": "build-scripts build",
+    "lowcode:dev": "build-scripts start --config ./build.lowcode.js --port 5551",
+    "lowcode:build": "build-scripts build --config ./build.lowcode.js",
+    "prepublish": "build-scripts build && build-scripts build --config ./build.lowcode.js"
+  },
+  "files": [
+    "es/",
+    "lib/",
+    "dist/",
+    "build/",
+    "lowcode/"
+  ],
+  "keywords": ["fastball"],
+  "author": "gr@fastball.dev",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@alib/build-scripts": "^0.1.32",
+    "@alifd/build-plugin-lowcode": "^0.3.6",
+    "build-plugin-component-multiple": "^1.0.0-beta.5"
+  },
+  "dependencies": {
+    "@alilc/lowcode-engine": "^1.0.16",
+    "@types/react": "^18.0.25"
+  }
+}
