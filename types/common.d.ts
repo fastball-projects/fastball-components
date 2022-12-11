@@ -1,39 +1,26 @@
 export type Data = { [key: string]: unknown }
 
-export type FieldInfo = { 
+type Displayable = {
+    display?: boolean
+}
+
+export type FieldInfo = {
     dataIndex: string
     valueType: string
     tooltip?: string
-    valueEnum?: {[key: string]: unknown}
-    display: boolean
+    valueEnum?: { [key: string]: unknown }
     fieldProps: any
-}
+} & Displayable
 
-export type ActionInfo = { 
+export type ActionInfo = {
     actionKey: string
     actionName: string
     type: ActionType
-}
+} & Displayable
 
-export enum ActionType {
-    /**
-     * Rest API
-     */
-    Rest,
-    /**
-     * 调用标准 API
-     */
-    API,
-    /**
-     * 抽屉弹窗
-     */
-    Drawer,
-    /**
-     * 模态弹窗
-     */
-    Modal,
-    /**
-     * 跳转页面
-     */
-    Digit
-}
+
+export type ApiActionInfo = {
+    componentKey: string
+} & ActionInfo
+
+export type ActionType = 'API' | 'Rest' | 'Drawer' | 'Modal' | 'Digit'

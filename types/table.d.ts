@@ -1,4 +1,5 @@
 import { FieldInfo, ActionInfo } from './common'
+import { LowcodeComponentProps } from './component'
 
 export type ColumnInfo = {
     sortable?: boolean
@@ -7,11 +8,13 @@ export type ColumnInfo = {
 
 export type TableRecordActionInfo = {
     refresh?: boolean
-} & ActionInfo
+} & ApiActionInfo
 
 export type TableProps = {
-    headerTitle? : string
+    componentKey: string
+    headerTitle?: string
     columns: ColumnInfo[]
     query: FieldInfo[]
+    actions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
-}
+} & LowcodeComponentProps
