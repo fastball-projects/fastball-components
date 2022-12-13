@@ -14,14 +14,14 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
 
     columns.filter(({ display }) => display).map(column => {
         const proTableColumn: ProTableColumn = {}
-        Object.assign(column, proTableColumn, { hideInForm: true, hideInSearch: true });
+        Object.assign(proTableColumn, column, { hideInForm: true, hideInSearch: true });
         proTableColumns.push(proTableColumn);
     });
 
     if (query) {
         query.filter(({ display }) => display).map(field => {
-            const proTableColumn: ProTableColumn = {}
-            Object.assign(field, proTableColumn, { hideInForm: true, hideInSearch: true });
+            const proTableColumn: ProTableColumn = {};
+            Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
             proTableColumns.push(proTableColumn);
         });
     }
@@ -48,7 +48,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
                             ref.current?.reload()
                         }
                     }
-                    return (<a key={actionKey} onClick={execute}>{actionName || actionKey}</a>)
+                    return (<Button key={actionKey} type="link" onClick={execute}>{actionName || actionKey}</Button>)
                 }) : [];
             }
         })

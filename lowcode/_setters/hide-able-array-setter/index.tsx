@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Component, Fragment } from 'react';
 import { common, SettingField } from '@alilc/lowcode-engine';
-import { Button, Message, Icon } from '@alifd/next';
+import { Button, Message } from '@alifd/next';
 import { SetterType, FieldConfig, SetterConfig } from '@alilc/lowcode-types';
 import Sortable from './sortable';
+import CustomIcon from '../custom-icon';
 import './style.less';
 const { editorCabin, skeletonCabin } = common;
 const { Title } = editorCabin;
@@ -237,11 +238,11 @@ class ArrayItem extends Component<{
     console.log(field);
     if(field.getValue().display) {
       showButten = (<Button size="small" ghost="light" onClick={onHidden} className="lc-listitem-action">
-        <Icon size="small" type="eye" />
+        <CustomIcon type="icon-fastball-eye" size="small" />
       </Button>)
     } else {
       showButten = (<Button size="small" ghost="light" onClick={onShow} className="lc-listitem-action">
-        <Icon size="small" type="eye-close" />
+        <CustomIcon type="icon-fastball-eye-close" size="small" />
       </Button>)
     }
 
@@ -256,7 +257,7 @@ class ArrayItem extends Component<{
         <div className="lc-listitem-actions">
           {showButten}
           <Button draggable size="small" ghost="light" className="lc-listitem-handler">
-            <Icon size="small" type="sorting" />
+            <CustomIcon type="icon-fastball-sort" size="small" />
           </Button>
         </div>
       </div>
@@ -326,7 +327,7 @@ export default class ArraySetter extends Component<{
             this.pipe.show((e as any).target, field.id);
           }}
         >
-          <CustomIcon type="icon-bianji" size="small" />
+          <CustomIcon type="icon-fastball-edit" size="small" />
           {forceInline ? title : '编辑数组'}
         </Button>
       );
