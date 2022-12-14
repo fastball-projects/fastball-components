@@ -12,21 +12,21 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
     const proTableProps: ProTableProps<Data, Data> = {};
     const proTableColumns: ProTableColumn[] = [];
 
-    columns.filter(({ display }) => display).map(column => {
+    columns.filter(({ display }) => display !== false).forEach(column => {
         const proTableColumn: ProTableColumn = {}
         Object.assign(proTableColumn, column, { hideInForm: true, hideInSearch: true });
         proTableColumns.push(proTableColumn);
     });
 
     if (query) {
-        query.filter(({ display }) => display).map(field => {
+        query.filter(({ display }) => display !== false).forEach(field => {
             const proTableColumn: ProTableColumn = {};
             Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
             proTableColumns.push(proTableColumn);
         });
     }
     
-    const actionButtons = !actions ? [] : actions.filter(({ display }) => display).map(action => (
+    const actionButtons = !actions ? [] : actions.filter(({ display }) => display !== false).map(action => (
         <Button onClick={() => doAction(action)}>
             {action.actionName}
         </Button>
@@ -38,7 +38,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
             dataIndex: '__option',
             valueType: 'option',
             render: (_, record) => {
-                return recordActions ? recordActions.filter(({ display }) => display).map((action) => {
+                return recordActions ? recordActions.filter(({ display }) => display !== false).map((action) => {
                     const { actionKey, actionName, refresh } = action;
                     const execute = async () => {
                         const res = await doAction({ componentKey, ...action }, [record])

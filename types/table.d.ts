@@ -18,3 +18,10 @@ export type TableProps = {
     actions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
 } & LowcodeComponentProps
+
+export type FormProps = {
+    componentKey: string
+    headerTitle?: string
+    fields: FieldInfo[]
+    actions?: ActionInfo[]
+} & LowcodeComponentProps
