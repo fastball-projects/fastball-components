@@ -235,7 +235,6 @@ class ArrayItem extends Component<{
     const { onHidden, onShow, field } = this.props;
 
     let showButten;
-    console.log(field);
     if(field.getValue().display) {
       showButten = (<Button size="small" ghost="light" onClick={onHidden} className="lc-listitem-action">
         <CustomIcon type="icon-fastball-eye" size="small" />

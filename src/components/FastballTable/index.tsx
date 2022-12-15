@@ -3,7 +3,7 @@ import { ProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
 import { Button } from 'antd';
 import type { Data, MockDataComponent, TableProps } from '../../../types';
-import { doAction } from '../../common';
+import { doAction, doApiAction } from '../../common';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -42,9 +42,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
                     const { actionKey, actionName, refresh } = action;
                     const execute = async () => {
                         const res = await doAction({ componentKey, ...action }, [record])
-                        console.log(`do ${actionKey} done`, res, refresh)
                         if (refresh) {
-                            console.log('refresh')
                             ref.current?.reload()
                         }
                     }
@@ -59,15 +57,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
     proTableProps.columns = proTableColumns
     proTableProps.toolBarRender = () => actionButtons
     proTableProps.request = async (params, sort, filter) => {
-        console.log('do table request', params, sort, filter)
-        const resp = await fetch(`/api/fastball/frontend/component/${componentKey}/action/loadData`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify([params])
-        })
-        return await resp.json();
+        return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData' }, [params])
     }
 
     return <ProTable

@@ -13,14 +13,15 @@ export type FieldInfo = {
 } & Displayable
 
 export type ActionInfo = {
+    actionName?: string
+    componentKey?: string
     actionKey: string
-    actionName: string
     type: ActionType
 } & Displayable
 
-
 export type ApiActionInfo = {
     componentKey: string
+    type: 'API'
 } & ActionInfo
 
 export type ActionType = 'API' | 'Rest' | 'Drawer' | 'Modal' | 'Digit'

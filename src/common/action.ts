@@ -1,4 +1,4 @@
-import type { ActionInfo, ApiActionInfo, ActionType, Data } from '../../types'
+import type { ActionInfo, ApiActionInfo, Data } from '../../types'
 
 export const doAction = async (actionInfo: ActionInfo, data?: Data | Data[]) => {
     console.log('do action', actionInfo, data)
