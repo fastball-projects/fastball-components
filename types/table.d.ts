@@ -11,17 +11,9 @@ export type TableRecordActionInfo = {
 } & ApiActionInfo
 
 export type TableProps = {
-    componentKey: string
     headerTitle?: string
     columns: ColumnInfo[]
     query: FieldInfo[]
     actions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
-} & LowcodeComponentProps
-
-export type FormProps = {
-    componentKey: string
-    headerTitle?: string
-    fields: FieldInfo[]
-    actions?: ActionInfo[]
 } & LowcodeComponentProps

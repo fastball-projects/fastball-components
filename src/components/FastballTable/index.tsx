@@ -1,9 +1,8 @@
 import React, { useRef } from 'react'
 import { ProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
-import { Button } from 'antd';
 import type { Data, MockDataComponent, TableProps } from '../../../types';
-import { doAction, doApiAction } from '../../common';
+import { buildAction, doApiAction } from '../../common';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -25,12 +24,8 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
             proTableColumns.push(proTableColumn);
         });
     }
-    
-    const actionButtons = !actions ? [] : actions.filter(({ display }) => display !== false).map(action => (
-        <Button onClick={() => doAction(action)}>
-            {action.actionName}
-        </Button>
-    ))
+
+    const actionButtons = !actions ? [] : actions.filter(({ display }) => display !== false).map(action => buildAction({ componentKey, ...action }))
 
     if (recordActions.length > 0) {
         proTableColumns.push({
@@ -39,25 +34,22 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
             valueType: 'option',
             render: (_, record) => {
                 return recordActions ? recordActions.filter(({ display }) => display !== false).map((action) => {
-                    const { actionKey, actionName, refresh } = action;
-                    const execute = async () => {
-                        const res = await doAction({ componentKey, ...action }, [record])
+                    const { actionKey, actionName, type, refresh } = action;
+                    const callback = () => {
                         if (refresh) {
                             ref.current?.reload()
                         }
                     }
-                    return (<Button key={actionKey} type="link" onClick={execute}>{actionName || actionKey}</Button>)
+                    return buildAction({ componentKey, ...action, callback, data: record })
                 }) : [];
             }
         })
     }
 
-
-
     proTableProps.columns = proTableColumns
     proTableProps.toolBarRender = () => actionButtons
     proTableProps.request = async (params, sort, filter) => {
-        return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData' }, [params])
+        return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData' , data: params})
     }
 
     return <ProTable
