@@ -1,10 +1,18 @@
+import { ReactComponent } from "./component"
+
 export type Data = { [key: string]: unknown }
 
 type Displayable = {
     display?: boolean
 }
 
-
+export type ReferencedComponent = {
+    component?: ReactComponent
+    componentClass: string
+    componentPackage: string
+    componentPath: string
+    componentName: string
+}
 
 export type PopupType = 'Modal' | 'Drawer'
 
@@ -39,11 +47,8 @@ export type ApiActionInfo = {
 } & ActionInfo
 
 export type PopupActionInfo = {
-    componentClass: string
-    componentPackage: string
-    componentPath: string
-    componentName: string
     type: 'Popup'
+    popupComponent: ReferencedComponent
 } & ActionInfo
 
 export type LoadDataType = () => Data | Data[]

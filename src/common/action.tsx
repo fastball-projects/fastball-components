@@ -1,8 +1,7 @@
 import { ComponentClass, FC, ReactElement } from 'react'
 import { Button } from 'antd';
 import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data } from '../../types'
-
-const PreviewComponent: FC | ComponentClass = window.PreviewComponent
+import { loadRefComponent } from './'
 
 const buildRequestData = async (actionInfo: ActionInfo) => {
     let data: Data | Data[] | undefined = actionInfo.data
@@ -32,14 +31,12 @@ export const buildAction = (actionInfo: ActionInfo) => {
 }
 
 export const doPopupAction = (actionInfo: PopupActionInfo) => {
-    if (PreviewComponent) {
-        return (<PreviewComponent onClose={actionInfo.callback} componentClassName={actionInfo.componentClass} data={actionInfo.data} trigger={<a>{actionInfo.actionName || actionInfo.actionKey}</a>} />)
-    } else if (actionInfo.component) {
-        const PopupComponent = actionInfo.component;
-        return (<PopupComponent onClose={actionInfo.callback} data={actionInfo.data} trigger={<a>{actionInfo.actionName || actionInfo.actionKey}</a>} />)
-    } else {
-        return null
-    }
+    const popupComponent = loadRefComponent(actionInfo.popupComponent, {
+        onClose: actionInfo.callback,
+        data: actionInfo.data,
+        trigger: <a>{actionInfo.actionName || actionInfo.actionKey}</a>
+    })
+    return popupComponent;
 }
 
 export const doApiAction = async (actionInfo: ApiActionInfo) => {

@@ -1,4 +1,4 @@
-import { FieldInfo, ActionInfo } from './common'
+import { FieldInfo, ActionInfo, ReferencedComponent } from './common'
 import { LowcodeComponentProps } from './component'
 
 export type ColumnInfo = {
@@ -16,4 +16,5 @@ export type TableProps = {
     query: FieldInfo[]
     actions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
+    rowExpandedComponent?: ReferencedComponent
 } & LowcodeComponentProps
