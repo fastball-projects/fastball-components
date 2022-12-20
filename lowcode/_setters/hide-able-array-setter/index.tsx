@@ -283,7 +283,6 @@ export default class ArraySetter extends Component<{
   private pipe: any;
 
   render() {
-    console.log('array setter', this.props);
     const { mode, forceInline, ...props } = this.props;
     const { field, itemSetter } = props;
     let columns: FieldConfig[] | undefined;

@@ -1,5 +1,5 @@
 import { FieldInfo, ActionInfo, ReferencedComponent } from './common'
-import { LowcodeComponentProps } from './component'
+import { LowcodeComponentProps, MultiDataComponent } from './component'
 
 export type ColumnInfo = {
     sortable?: boolean
@@ -13,8 +13,8 @@ export type TableRecordActionInfo = {
 export type TableProps = {
     headerTitle?: string
     columns: ColumnInfo[]
-    query: FieldInfo[]
+    queryFields: FieldInfo[]
     actions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
     rowExpandedComponent?: ReferencedComponent
-} & LowcodeComponentProps
+} & LowcodeComponentProps & MultiDataComponent

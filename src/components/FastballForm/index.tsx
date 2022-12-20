@@ -49,8 +49,6 @@ const FastballForm: MockDataComponent<FormProps> = ({ trigger, componentKey, fie
         trigger.props.onClick = () => setVisit(true)
     }
     
-    console.log("FastballForm", proFormProps, props);
-    
     const form = <BetaSchemaForm formRef={ref} {...proFormProps} {...props} />
     return (
         <>

@@ -6,7 +6,7 @@ import { buildAction, doApiAction, loadRefComponent } from '../../common';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
-const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, columns, actions = [], recordActions = [], rowExpandedComponent, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, queryFields, columns, actions = [], recordActions = [], rowExpandedComponent, __designMode, query, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, Data> = {};
     const proTableColumns: ProTableColumn[] = [];
@@ -17,8 +17,8 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
         proTableColumns.push(proTableColumn);
     });
 
-    if (query) {
-        query.filter(({ display }) => display !== false).forEach(field => {
+    if (queryFields) {
+        queryFields.filter(({ display }) => display !== false).forEach(field => {
             const proTableColumn: ProTableColumn = {};
             Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
             proTableColumns.push(proTableColumn);
@@ -55,8 +55,19 @@ const FastballTable: MockDataComponent<TableProps> = ({ componentKey, query, col
         }
     }
 
+    if (onRecordClick) {
+        proTableProps.onRow = (record) => {
+            return {
+                onClick: () => {
+                    onRecordClick(record)
+                }
+            };
+        }
+    }
+
     proTableProps.request = async (params, sort, filter) => {
-        return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: params })
+        const data = Object.assign({}, params, query)
+        return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
     }
 
     return <ProTable

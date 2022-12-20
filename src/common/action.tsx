@@ -48,9 +48,7 @@ export const doApiAction = async (actionInfo: ApiActionInfo) => {
         }
     }
     const data = await buildRequestData(actionInfo);
-    if (data) {
-        requestInfo.body = JSON.stringify([data])
-    }
+    requestInfo.body = JSON.stringify([data])
     const resp = await window.fetch(`/api/fastball/component/${componentKey}/action/${actionKey}`, requestInfo)
     const json = await resp.text();
     if (json) {

@@ -7,7 +7,6 @@ const ICON_URL = '//at.alicdn.com/t/c/font_3823051_tzorhgcqqaa.js';
 let CustomIcon: any;
 
 document.addEventListener('DOMContentLoaded', function () {
-  // console.log('3 seconds passed');
   CustomIcon = Icon.createFromIconfontCN({
     scriptUrl: ICON_URL,
   });

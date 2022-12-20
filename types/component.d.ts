@@ -1,4 +1,4 @@
-import type { FC, Component } from 'react'
+import type { FC, Component, Ref, MutableRefObject } from 'react'
 
 type ReactComponent<P> = Component<P> | FC<P>
 
@@ -11,3 +11,7 @@ export type MockDataComponent<P> = {
     mockInterceptor?: Function<P>
 } & ReactComponent<P>
 
+export type MultiDataComponent = {
+    query?: any
+    onRecordClick?: Function<Record>
+}
