@@ -9,7 +9,7 @@ const ActionMetaSetter = {
                 config: {
                     items: [
                         {
-                            name: 'name',
+                            name: 'actionName',
                             title: { label: '按钮名称', tip: 'name | 按钮名称' },
                             propType: 'string',
                             setter: 'StringSetter',

@@ -20,7 +20,7 @@ const FastballTableMeta = {
   configure: {
     props: [
       {
-        name: 'query',
+        name: 'queryFields',
         title: { label: '搜索字段', tip: '表格搜索字段的配置描述，具体项见下表' },
         display: 'accordion',
         setter: FieldMetaSetter

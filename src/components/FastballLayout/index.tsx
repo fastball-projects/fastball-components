@@ -19,7 +19,7 @@ const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayo
                 overflow: 'hidden',
             }}
         >
-            <ProCard
+            <ProCard colSpan="30%"
                 style={{
                     height: '100vh',
                     overflow: 'auto',
@@ -72,7 +72,7 @@ const LeftAndTopBottom: React.FC<LeftAndTopBottomLayoutProps> = (props: LeftAndT
                 overflow: 'hidden',
             }}
         >
-            <ProCard
+            <ProCard colSpan="30%"
                 style={{
                     height: '100vh',
                     overflow: 'auto',

@@ -1,4 +1,4 @@
-import { ComponentClass, FC, ReactElement } from 'react'
+import React, { ComponentClass, FC, ReactElement } from 'react'
 import { Button } from 'antd';
 import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data } from '../../types'
 import { loadRefComponent } from './'
@@ -34,7 +34,7 @@ export const doPopupAction = (actionInfo: PopupActionInfo) => {
     const popupComponent = loadRefComponent(actionInfo.popupComponent, {
         onClose: actionInfo.callback,
         data: actionInfo.data,
-        trigger: <a>{actionInfo.actionName || actionInfo.actionKey}</a>
+        trigger: (<Button type="link">{actionInfo.actionName || actionInfo.actionKey}</Button>)
     })
     return popupComponent;
 }

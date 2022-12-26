@@ -19,7 +19,7 @@ const FastballForm: MockDataComponent<FormProps> = ({ trigger, componentKey, fie
 
     const close = () => {
         setVisit(false);
-        if(onClose) {
+        if (onClose) {
             onClose();
         }
     }
@@ -36,7 +36,7 @@ const FastballForm: MockDataComponent<FormProps> = ({ trigger, componentKey, fie
         return proTableColumn;
     })
     proFormProps.columns = columns;
-    
+
     let PopupComponent: React.FC | React.ComponentClass | null = null;
     if (popupType === 'Drawer') {
         PopupComponent = Drawer
@@ -44,15 +44,15 @@ const FastballForm: MockDataComponent<FormProps> = ({ trigger, componentKey, fie
         PopupComponent = Modal
     }
     proFormProps.submitter = PopupComponent ? false : { render: () => actionButtons }
-    
-    if (trigger) {
-        trigger.props.onClick = () => setVisit(true)
-    }
-    
+
+    // if (trigger) {
+    //     trigger.props.onClick = () => setVisit(true)
+    // }
+
     const form = <BetaSchemaForm formRef={ref} {...proFormProps} {...props} />
     return (
         <>
-            {trigger}
+            {trigger ? <div onClick={() => setVisit(true)}>{trigger}</div> : null}
             {PopupComponent ? <PopupComponent onCancel={close} open={visit} footer={actionButtons}>{form}</PopupComponent> : form}
         </>
     )
