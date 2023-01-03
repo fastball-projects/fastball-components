@@ -1,4 +1,5 @@
 import { ReactComponent } from "./component"
+import { ValidationRule } from './validation'
 
 export type Data = { [key: string]: unknown }
 
@@ -14,18 +15,20 @@ export type ReferencedComponent = {
     componentName: string
 }
 
-export type PopupType = 'Modal' | 'Drawer'
-
-export type PopupComponent = {
-    trigger?: JSX.Element
+export type PopupProps = {
+    popupTitle?: String
+    popupType: PopupType
+    drawerPlacementType: DrawerPlacementType
+    trigger: ReactComponent
+    popupActionInfo: PopupActionInfo
     onClose?: Function
-    popupType?: PopupType
 }
 
 export type FieldInfo = {
     dataIndex: string
     valueType: string
     tooltip?: string
+    validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: unknown }
     fieldProps: any
 } & Displayable
@@ -35,6 +38,7 @@ export type ActionInfo = {
     componentKey?: string
     closeOnSuccess?: boolean
     callback?: Function
+    trigger?: ReactComponent
     data?: Data | Data[]
     loadData?: LoadDataType
     actionKey: string
@@ -48,9 +52,16 @@ export type ApiActionInfo = {
 
 export type PopupActionInfo = {
     type: 'Popup'
+    popupTitle?: string
+    popupType: PopupType
+    drawerPlacementType: DrawerPlacementType
     popupComponent: ReferencedComponent
 } & ActionInfo
 
 export type LoadDataType = () => Data | Data[]
 
 export type ActionType = 'API' | 'Rest' | 'Popup' | 'Digit'
+
+export type PopupType = 'Modal' | 'Drawer'
+
+export type DrawerPlacementType = 'left' | 'right' | 'top' | 'bottom'

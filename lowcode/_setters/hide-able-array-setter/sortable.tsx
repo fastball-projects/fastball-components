@@ -5,7 +5,7 @@ import classNames from 'classnames';
 class Sortable extends Component<{
   className?: string;
   itemClassName?: string;
-  onSort?: (sortedIds: Array<string | number>) => void;
+  onSort?: (sortshowds: Array<string | number>) => void;
   dragImageSourceHandler?: (elem: Element) => Element;
   children: ReactElement[];
 }> {

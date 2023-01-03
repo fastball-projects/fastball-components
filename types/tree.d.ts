@@ -1,8 +1,16 @@
-export type DataNode = {
-    data: {
-        title: string;
-        key: string;
+import { ApiActionInfo, ActionInfo, ReferencedComponent, Data } from './common'
+import { LowcodeComponentProps, MultiDataComponent } from './component'
+
+export type TreeRecordActionInfo = {
+    refresh?: boolean
+} & ApiActionInfo
+
+export type TreeProps = {
+    fieldNames: {
+        key: string
+        title: string
+        children: string
     }
-    isLeaf?: boolean;
-    children?: DataNode[];
-}
+    data?: Data[]
+    recordActions?: TreeRecordActionInfo[]
+} & LowcodeComponentProps & MultiDataComponent

@@ -7,6 +7,11 @@ export type LowcodeComponentProps = {
     __designMode?: string
 }
 
+export type PopupComponentProps = {
+    setActions?: Function
+    closePopup?: Function
+}
+
 export type MockDataComponent<P> = {
     mockInterceptor?: Function<P>
 } & ReactComponent<P>

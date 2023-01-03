@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { ReactComponent, ReferencedComponent } from "../../types";
 
 const PreviewComponent: ReactComponent<any> | undefined = window.PreviewComponent || window.parent.PreviewComponent

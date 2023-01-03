@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
-import { Tree, Spin } from 'antd';
-import type { TreeProps } from 'antd';
+import { Tree, Spin, Dropdown } from 'antd';
+import type { TreeProps as AndDTreeProps, MenuProps } from 'antd';
+import { MoreOutlined } from "@ant-design/icons";
 
-import { doApiAction } from '../../common'
+import { buildAction, doApiAction } from '../../common'
+import type { TreeProps } from '../../../types'
 
 const mockData = [{
-    key: "1",
+    id: "1",
     title: "Test Root",
     children: [{
-        key: "1-1",
+        id: "1-1",
         title: "Test Node1",
         children: []
     }, {
-        key: "1-2",
+        id: "1-2",
         title: "Test Node2",
         children: [{
-            key: "1-2-1",
+            id: "1-2-1",
             title: "Test Sub Node1"
         }, {
-            key: "1-2-2",
+            id: "1-2-2",
             title: "Test Sub Node2"
         }]
     }]
 }]
 
-const App: React.FC = ({ componentKey, onRecordClick, __designMode, data }) => {
+const App: React.FC<TreeProps> = ({ componentKey, onRecordClick, __designMode, fieldNames, recordActions, data }) => {
     const initData = __designMode === 'design' ? mockData : data
     const [treeData, setTreeData] = useState(initData);
 
@@ -37,10 +39,28 @@ const App: React.FC = ({ componentKey, onRecordClick, __designMode, data }) => {
         loadData();
         return <Spin />
     }
-    const treeProps: TreeProps = { treeData }
+    const treeProps: AndDTreeProps = { treeData, fieldNames, blockNode: true }
     if (onRecordClick) {
         treeProps.onSelect = (_, { node }) => {
             onRecordClick(node)
+        }
+    }
+    if (recordActions) {
+        treeProps.titleRender = (node) => {
+            const items: MenuProps["items"] = recordActions.filter(({ display }) => display !== false).map(action => ({
+                key: action.actionKey,
+                label: buildAction({ trigger: action.actionName || action.actionKey, componentKey, ...action, data: node })
+            }))
+            return (
+                <>
+                    <span>{node[fieldNames.title]}</span>
+                    <span style={{ float: 'right' }}>
+                        <Dropdown menu={{ items }} trigger={["hover"]}>
+                            <MoreOutlined />
+                        </Dropdown>
+                    </span>
+                </>
+            )
         }
     }
 

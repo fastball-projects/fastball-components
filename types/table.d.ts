@@ -12,6 +12,7 @@ export type TableRecordActionInfo = {
 
 export type TableProps = {
     headerTitle?: string
+    childrenFieldName?: string
     columns: ColumnInfo[]
     queryFields: FieldInfo[]
     actions?: ActionInfo[]

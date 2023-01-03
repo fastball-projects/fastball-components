@@ -1,7 +1,8 @@
 import React, { ComponentClass, FC, ReactElement } from 'react'
 import { Button } from 'antd';
-import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data } from '../../types'
+import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps } from '../../types'
 import { loadRefComponent } from './'
+import FastballPopup from './Popup'
 
 const buildRequestData = async (actionInfo: ActionInfo) => {
     let data: Data | Data[] | undefined = actionInfo.data
@@ -21,7 +22,7 @@ export const buildAction = (actionInfo: ActionInfo) => {
                 actionInfo.callback()
             }
         }
-        return (<Button key={actionInfo.actionKey} type="link" onClick={execute}>{actionInfo.actionName || actionInfo.actionKey}</Button>)
+        return actionInfo.trigger ? <span key={actionInfo.actionKey} onClick={execute}>{actionInfo.trigger}</span> : (<Button key={actionInfo.actionKey} onClick={execute}>{actionInfo.actionName || actionInfo.actionKey}</Button>)
     } else if (actionInfo.type === 'Popup') {
         const popupActionInfo = actionInfo as PopupActionInfo
         return doPopupAction(popupActionInfo)
@@ -30,13 +31,16 @@ export const buildAction = (actionInfo: ActionInfo) => {
     }
 }
 
-export const doPopupAction = (actionInfo: PopupActionInfo) => {
-    const popupComponent = loadRefComponent(actionInfo.popupComponent, {
-        onClose: actionInfo.callback,
-        data: actionInfo.data,
-        trigger: (<Button type="link">{actionInfo.actionName || actionInfo.actionKey}</Button>)
-    })
-    return popupComponent;
+export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
+    const popupProps: PopupProps = {
+        popupType: popupActionInfo.popupType,
+        drawerPlacementType: popupActionInfo.drawerPlacementType,
+        onClose: popupActionInfo.callback,
+        trigger: popupActionInfo.trigger || <Button>{popupActionInfo.actionName || popupActionInfo.actionKey}</Button>,
+        popupActionInfo
+    }
+
+    return <FastballPopup {...popupProps} />;
 }
 
 export const doApiAction = async (actionInfo: ApiActionInfo) => {
