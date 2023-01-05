@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fastball-parent</artifactId>
+        <groupId>dev.fastball</groupId>
+        <version>0.1.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <version>0.0.124</version>
+
+    <artifactId>fastball-ui</artifactId>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>fastball-ui-api</module>
+        <module>fastball-ui-compiler</module>
+    </modules>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </distributionManagement>
+
+    <properties>
+        <javax.validation.version>2.0.1.Final</javax.validation.version>
+        <jakarta.validation.version>3.0.2</jakarta.validation.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- J2EE Jakarta start -->
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${javax.validation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${jakarta.validation.version}</version>
+            </dependency>
+            <!-- J2EE Jakarta end -->
+
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-ui-api</artifactId>
+                <version>0.0.124</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-ui-compiler</artifactId>
+                <version>0.0.124</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
