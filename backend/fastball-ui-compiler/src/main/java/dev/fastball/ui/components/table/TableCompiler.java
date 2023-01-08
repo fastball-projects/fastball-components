@@ -3,17 +3,22 @@ package dev.fastball.ui.components.table;
 
 import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
-import dev.fastball.compile.utils.CompileUtils;
+import dev.fastball.compile.utils.ElementCompileUtils;
+import dev.fastball.compile.utils.TypeCompileUtils;
+import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.RecordAction;
 import dev.fastball.core.component.Component;
-import dev.fastball.ui.annotation.Action;
-import dev.fastball.ui.annotation.RecordAction;
-import dev.fastball.ui.common.*;
-import dev.fastball.ui.util.TypeCompileUtils;
+import dev.fastball.core.info.action.ActionInfo;
+import dev.fastball.core.info.action.PopupActionInfo_AutoValue;
+import dev.fastball.core.info.action.RefreshApiActionInfo_AutoValue;
+import dev.fastball.core.info.action.RefreshPopupActionInfo_AutoValue;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -39,16 +44,16 @@ public class TableCompiler extends AbstractComponentCompiler<Table<?, ?>, TableP
     }
 
     private List<ColumnInfo> buildTableColumnsFromReturnType(TypeElement returnType, ProcessingEnvironment processingEnv) {
-        return TypeCompileUtils.compileTypeFields(returnType, processingEnv, ColumnInfo::new, (field, tableColumn) -> {
+        return TypeCompileUtils.compileTypeFields(returnType, processingEnv, ColumnInfo_AutoValue::new, (field, tableColumn) -> {
             Table.Sortable sortable = field.getAnnotation(Table.Sortable.class);
             if (sortable != null) {
-                tableColumn.setSortable(true);
+                ((ColumnInfo_AutoValue) tableColumn).sortable(true);
             }
         });
     }
 
     private void compileRecordActions(CompileContext compileContext, TableProps_AutoValue props) {
-        List<ActionInfo> recordActions = CompileUtils
+        List<ActionInfo> recordActions = ElementCompileUtils
                 .getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv()).values().stream()
                 .map(method -> {
                     RecordAction actionAnnotation = method.getAnnotation(RecordAction.class);
@@ -104,7 +109,7 @@ public class TableCompiler extends AbstractComponentCompiler<Table<?, ?>, TableP
         if (tableConfig == null) {
             return;
         }
-        TypeMirror rowExpandedComponent = CompileUtils.getTypeMirrorFromAnnotationValue(tableConfig::rowExpandedComponent);
+        TypeMirror rowExpandedComponent = ElementCompileUtils.getTypeMirrorFromAnnotationValue(tableConfig::rowExpandedComponent);
         if (rowExpandedComponent == null || !Component.class.getCanonicalName().equals(rowExpandedComponent.toString())) {
             TypeElement rowExpandedComponentElement = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(rowExpandedComponent);
             props.rowExpandedComponent(getReferencedComponentInfo(props, rowExpandedComponentElement));

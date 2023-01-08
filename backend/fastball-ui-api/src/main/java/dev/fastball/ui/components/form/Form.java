@@ -1,7 +1,7 @@
 package dev.fastball.ui.components.form;
 
+import dev.fastball.core.annotation.Action;
 import dev.fastball.core.component.Component;
-import dev.fastball.ui.annotation.Action;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

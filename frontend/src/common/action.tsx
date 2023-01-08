@@ -1,8 +1,15 @@
 import React, { ComponentClass, FC, ReactElement } from 'react'
 import { Button } from 'antd';
-import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps } from '../../types'
+import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo } from '../../types'
 import { loadRefComponent } from './'
 import FastballPopup from './Popup'
+
+const buildJsonRequestInfo = (): RequestInit => ({
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+})
 
 const buildRequestData = async (actionInfo: ActionInfo) => {
     let data: Data | Data[] | undefined = actionInfo.data
@@ -10,6 +17,17 @@ const buildRequestData = async (actionInfo: ActionInfo) => {
         data = await actionInfo.loadData()
     }
     return data;
+}
+
+export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data) => {
+    const requestInfo = buildJsonRequestInfo();
+    requestInfo.body = JSON.stringify([data])
+    const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
+    const json = await resp.text();
+    if (json) {
+        const lookupItems: Data[] = JSON.parse(json);
+        return lookupItems.map(item => ({ label: item[actionInfo.labelField], value: item[actionInfo.valueField] }))
+    }
 }
 
 export const buildAction = (actionInfo: ActionInfo) => {
@@ -45,13 +63,8 @@ export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
 
 export const doApiAction = async (actionInfo: ApiActionInfo) => {
     const { componentKey, actionKey } = actionInfo;
-    const requestInfo: RequestInit = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
     const data = await buildRequestData(actionInfo);
+    const requestInfo = buildJsonRequestInfo();
     requestInfo.body = JSON.stringify([data])
     const resp = await window.fetch(`/api/fastball/component/${componentKey}/action/${actionKey}`, requestInfo)
     const json = await resp.text();
@@ -59,3 +72,4 @@ export const doApiAction = async (actionInfo: ApiActionInfo) => {
         return JSON.parse(json);
     }
 }
+

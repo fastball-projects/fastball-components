@@ -7,18 +7,24 @@ if [ ! -n "$version" ]; then
     exit 1;
 fi
 
+if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
+    frontend_version=${version%-SNAPSHOT*}-$(date +%s)
+else
+    frontend_version=$version
+fi
+
 publish_frontend() {
     cd frontend
-    echo "change fastball component frontend version to $version"
-    pnpm version $version
+    echo "change fastball component frontend version to $frontend_version"
+    pnpm version $frontend_version
     echo "installing dependency..."
     pnpm i
     echo "build & publish fastball component frontend ..."
     npm run prepublish && npm publish
     echo "fastball component frontend published."
-    npm_version_line = grep -n 'npmVersion' ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml | cut -d ':' -f1
-    sed -i '' '$npm_version_lines/.*/npmVersion: 0.0.122/' ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml
-    echo "changed fastball component materail version to $version"
+    npm_version_line=$(grep -n 'npmVersion' ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml | cut -d ':' -f1)
+    sed -i '' "${npm_version_line}s/.*/npmVersion: $frontend_version/" ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml
+    echo "changed fastball component materail version to $frontend_version"
     cd ../
 }
 

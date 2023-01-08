@@ -1,10 +1,9 @@
 package dev.fastball.ui.components.tree;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.ui.common.ActionInfo;
-import dev.fastball.core.component.ComponentProps;
+import dev.fastball.core.info.action.ActionInfo;
+import dev.fastball.core.info.component.ComponentProps;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

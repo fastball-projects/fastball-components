@@ -1,8 +1,8 @@
 import React, { useRef } from 'react'
 import { ProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
-import type { Data, MockDataComponent, TableProps, ColumnInfo } from '../../../types';
-import { buildAction, doApiAction, loadRefComponent } from '../../common';
+import type { Data, MockDataComponent, TableProps, ColumnInfo, LookupActionInfo } from '../../../types';
+import { buildAction, doApiAction, loadRefComponent, doLookupAction } from '../../common';
 import { Button } from 'antd';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
@@ -26,7 +26,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
 }
 
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, queryFields, columns, actions = [], recordActions = [], rowExpandedComponent, childrenFieldName, __designMode, query, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, Data> = {};
     const proTableColumns: ProTableColumn[] = [];
@@ -35,13 +35,17 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         proTableProps.dataSource = buildMockData(columns);
     } else {
         proTableProps.request = async (params, sort, filter) => {
-            const data = Object.assign({}, params, query)
+            const data = Object.assign({}, params, input)
             return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
         }
     }
 
     columns.filter(({ display }) => display !== false).forEach(column => {
         const proTableColumn: ProTableColumn = {}
+        if (column.lookupAction) {
+            const lookupAction: LookupActionInfo = column.lookupAction;
+            proTableColumn.request = () => doLookupAction(lookupAction)
+        }
         Object.assign(proTableColumn, column, { hideInForm: true, hideInSearch: true });
         proTableColumns.push(proTableColumn);
     });
@@ -49,6 +53,10 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
     if (queryFields) {
         queryFields.filter(({ display }) => display !== false).forEach(field => {
             const proTableColumn: ProTableColumn = {};
+            if (field.lookupAction) {
+                const lookupAction: LookupActionInfo = field.lookupAction;
+                proTableColumn.request = () => doLookupAction(lookupAction)
+            }
             Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
             proTableColumns.push(proTableColumn);
         });
@@ -82,7 +90,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
 
 
     if (rowExpandedComponent) {
-        proTableProps.expandable.expandedRowRender = (record) => loadRefComponent(rowExpandedComponent, { data: record })
+        proTableProps.expandable.expandedRowRender = (record) => loadRefComponent(rowExpandedComponent, { input: record })
     }
 
 

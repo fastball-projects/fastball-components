@@ -16,7 +16,7 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupActionInfo, popupTi
     }
 
     const contentComponent = loadRefComponent(popupActionInfo.popupComponent, {
-        data: popupActionInfo.data,
+        input: popupActionInfo.data,
         closePopup,
         setActions
     })

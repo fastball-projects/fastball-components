@@ -30,6 +30,7 @@ export type FieldInfo = {
     tooltip?: string
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: unknown }
+    lookupAction?: LookupActionInfo
     fieldProps: any
 } & Displayable
 
@@ -45,6 +46,13 @@ export type ActionInfo = {
     type: ActionType
 } & Displayable
 
+export type LookupActionInfo = {
+    packageName?: string
+    lookupKey: string
+    labelField: string
+    valueField: string
+}
+
 export type ApiActionInfo = {
     componentKey: string
     type: 'API'
@@ -58,7 +66,7 @@ export type PopupActionInfo = {
     popupComponent: ReferencedComponent
 } & ActionInfo
 
-export type LoadDataType = () => Data | Data[]
+export type LoadDataType = () => any 
 
 export type ActionType = 'API' | 'Rest' | 'Popup' | 'Digit'
 

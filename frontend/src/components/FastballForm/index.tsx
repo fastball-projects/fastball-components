@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { BetaSchemaForm } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, FormInstance } from '@ant-design/pro-components';
-import type { Data, MockDataComponent, FormProps, ReactComponent } from '../../../types';
-import { buildAction } from '../../common';
+import type { ActionInfo, Data, FieldInfo, FormProps, LookupActionInfo } from '../../../types';
+import { buildAction, doLookupAction } from '../../common';
 import { Button } from 'antd';
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
@@ -20,12 +20,20 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     getActions() {
-        const { componentKey, actions, closePopup, showReset } = this.props;
+        const { componentKey, closePopup, showReset, input } = this.props;
+        const actions: ActionInfo[] = this.props.actions;
         const buttons = actions ? actions.filter(({ display }) => display !== false).map(action => {
-            if (action.closeOnSuccess) {
+            if (action.closeOnSuccess !== false) {
                 action.callback = closePopup
             }
-            return buildAction({ componentKey, ...action, loadData: () => this.ref.current?.validateFields() });
+            return buildAction({
+                componentKey, ...action, loadData: async () => {
+                    const data: Data = {}
+                    const formData = await this.ref.current?.validateFields()
+                    Object.assign(data, input, formData)
+                    return data;
+                }
+            });
         }) : []
         if (showReset !== false) {
             buttons.push(<Button onClick={() => this.ref.current?.resetFields()}>重置</Button>)
@@ -33,16 +41,10 @@ class FastballForm extends React.Component<FormProps, any> {
         return buttons;
     }
 
-    render(): React.ReactNode {
-        const { componentKey, fields = [], actions = [], data, setActions, ...props } = this.props;
+    getColumns(): ProFormColumnsType<any, 'text'>[] {
+        const fields: FieldInfo[] = this.props.fields;
 
-        const proFormProps: ProFormProps = {};
-        proFormProps.size = 'small'
-        proFormProps.grid = true
-        proFormProps.rowProps = { gutter: [16, 16] }
-        proFormProps.initialValues = data
-
-        const columns: ProFormColumnsType<any, 'text'>[] = fields.filter(({ display }) => display !== false).map(field => {
+        return fields.filter(({ display }) => display !== false).map(field => {
             const proTableColumn: ProFormColumnsType<Data> = {};
             Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
             if (field.validationRules) {
@@ -50,10 +52,26 @@ class FastballForm extends React.Component<FormProps, any> {
                     rules: field.validationRules
                 }
             }
+            if (field.lookupAction) {
+                const lookupAction: LookupActionInfo = field.lookupAction;
+                proTableColumn.request = () => doLookupAction(lookupAction)
+            }
             return proTableColumn;
         })
+    }
 
-        proFormProps.columns = columns;
+    render(): React.ReactNode {
+        const { componentKey, fields = [], actions = [], input, setActions, ...props } = this.props;
+
+        const proFormProps: ProFormProps = {};
+        proFormProps.size = 'small'
+        proFormProps.grid = true
+        proFormProps.rowProps = { gutter: [16, 16] }
+        if (input) {
+            proFormProps.initialValues = input
+        }
+
+        proFormProps.columns = this.getColumns();
 
         if (setActions) {
             proFormProps.submitter = false;

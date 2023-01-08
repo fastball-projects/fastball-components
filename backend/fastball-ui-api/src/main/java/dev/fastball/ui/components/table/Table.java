@@ -1,8 +1,8 @@
 package dev.fastball.ui.components.table;
 
+import dev.fastball.core.annotation.Action;
 import dev.fastball.core.annotation.UIApi;
 import dev.fastball.core.component.Component;
-import dev.fastball.ui.annotation.Action;
 
 import java.lang.annotation.*;
 

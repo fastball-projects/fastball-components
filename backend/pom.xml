@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <version>0.0.124</version>
+    <version>0.0.132-SNAPSHOT</version>
 
     <artifactId>fastball-ui</artifactId>
 
@@ -38,28 +38,17 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- J2EE Jakarta start -->
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>${javax.validation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-                <version>${jakarta.validation.version}</version>
-            </dependency>
-            <!-- J2EE Jakarta end -->
+
 
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-api</artifactId>
-                <version>0.0.124</version>
+                <version>0.0.132-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-compiler</artifactId>
-                <version>0.0.124</version>
+                <version>0.0.132-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

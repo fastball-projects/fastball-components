@@ -2,11 +2,11 @@ package dev.fastball.ui.components.form;
 
 import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
-import dev.fastball.compile.utils.CompileUtils;
-import dev.fastball.ui.annotation.RecordAction;
-import dev.fastball.ui.common.ActionInfo;
-import dev.fastball.ui.common.ApiActionInfo_AutoValue;
-import dev.fastball.ui.util.TypeCompileUtils;
+import dev.fastball.compile.utils.ElementCompileUtils;
+import dev.fastball.compile.utils.TypeCompileUtils;
+import dev.fastball.core.annotation.RecordAction;
+import dev.fastball.core.info.action.ActionInfo;
+import dev.fastball.core.info.action.ApiActionInfo_AutoValue;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -42,7 +42,7 @@ public class FormCompiler extends AbstractComponentCompiler<Form<?>, FormProps_A
     }
 
     protected void compileRecordActions(CompileContext compileContext, FormProps_AutoValue props) {
-        List<ActionInfo> actionInfoList = CompileUtils.getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv())
+        List<ActionInfo> actionInfoList = ElementCompileUtils.getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv())
                 .values().stream().map(this::buildActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
         props.actions(actionInfoList);
     }

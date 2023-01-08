@@ -5,6 +5,7 @@ type ReactComponent<P> = Component<P> | FC<P>
 export type LowcodeComponentProps = {
     componentKey: string
     __designMode?: string
+    input?: any
 }
 
 export type PopupComponentProps = {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tree, Spin, Dropdown } from 'antd';
+import { Tree as AntDTree, Spin, Dropdown } from 'antd';
 import type { TreeProps as AndDTreeProps, MenuProps } from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
@@ -26,20 +26,23 @@ const mockData = [{
     }]
 }]
 
-const App: React.FC<TreeProps> = ({ componentKey, onRecordClick, __designMode, fieldNames, recordActions, data }) => {
+const Tree: React.FC<TreeProps> = ({ componentKey, onRecordClick, __designMode, fieldNames, recordActions, data, input }) => {
     const initData = __designMode === 'design' ? mockData : data
     const [treeData, setTreeData] = useState(initData);
 
     const loadData = async () => {
-        const treeData = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
+        const treeData = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: input })
         setTreeData(treeData?.data || []);
     }
 
-    if (treeData == null) {
+    if (!treeData) {
         loadData();
         return <Spin />
     }
-    const treeProps: AndDTreeProps = { treeData, fieldNames, blockNode: true }
+    const treeProps: AndDTreeProps = { treeData, blockNode: true }
+    if (__designMode !== 'design') {
+        treeProps.fieldNames = fieldNames;
+    }
     if (onRecordClick) {
         treeProps.onSelect = (_, { node }) => {
             onRecordClick(node)
@@ -64,7 +67,7 @@ const App: React.FC<TreeProps> = ({ componentKey, onRecordClick, __designMode, f
         }
     }
 
-    return <Tree {...treeProps} />;
+    return <AntDTree {...treeProps} />;
 };
 
-export default App;
+export default Tree;
