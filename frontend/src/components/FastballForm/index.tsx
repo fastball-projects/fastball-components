@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { BetaSchemaForm } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, FormInstance } from '@ant-design/pro-components';
-import type { ActionInfo, Data, FieldInfo, FormProps, LookupActionInfo } from '../../../types';
-import { buildAction, doLookupAction } from '../../common';
+import type { Data, FieldInfo, FormProps, LookupActionInfo, TreeLookupActionInfo } from '../../../types';
+import { buildAction, doLookupAction, doApiAction, filterEnabled, filterVisibled } from '../../common';
 import { Button } from 'antd';
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
@@ -20,18 +20,20 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     getActions() {
-        const { componentKey, closePopup, showReset, input } = this.props;
-        const actions: ActionInfo[] = this.props.actions;
-        const buttons = actions ? actions.filter(({ display }) => display !== false).map(action => {
-            if (action.closeOnSuccess !== false) {
-                action.callback = closePopup
+        const { componentKey, closePopup, showReset, input, actions } = this.props;
+        const buttons = actions ? actions.filter(filterVisibled).map(action => {
+            if (action.closePopupOnSuccess !== false && closePopup) {
+                action.callback = () => {
+                    this.ref.current?.resetFields()
+                    closePopup()
+                }
             }
             return buildAction({
                 componentKey, ...action, loadData: async () => {
                     const data: Data = {}
                     const formData = await this.ref.current?.validateFields()
                     Object.assign(data, input, formData)
-                    return data;
+                    return [data];
                 }
             });
         }) : []
@@ -44,16 +46,27 @@ class FastballForm extends React.Component<FormProps, any> {
     getColumns(): ProFormColumnsType<any, 'text'>[] {
         const fields: FieldInfo[] = this.props.fields;
 
-        return fields.filter(({ display }) => display !== false).map(field => {
+        return fields.filter(filterEnabled).map(field => {
             const proTableColumn: ProFormColumnsType<Data> = {};
             Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
+            if (field.display === 'Hidden') {
+                proTableColumn.hideInForm = true;
+            }
             if (field.validationRules) {
                 proTableColumn.formItemProps = {
                     rules: field.validationRules
                 }
             }
             if (field.lookupAction) {
-                const lookupAction: LookupActionInfo = field.lookupAction;
+                let lookupAction: LookupActionInfo = field.lookupAction;
+                proTableColumn.fieldProps = Object.assign(proTableColumn.fieldProps || {}, {
+                    treeCheckable: lookupAction.multiple,
+                    fieldNames: {
+                        label: lookupAction.labelField,
+                        value: lookupAction.valueField,
+                        children: lookupAction.childrenField
+                    }
+                })
                 proTableColumn.request = () => doLookupAction(lookupAction)
             }
             return proTableColumn;
@@ -61,13 +74,12 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     render(): React.ReactNode {
-        const { componentKey, fields = [], actions = [], input, setActions, ...props } = this.props;
+        const { componentKey, fields = [], actions = [], input, size = 'small', variableForm, setActions, ...props } = this.props;
+        const proFormProps: ProFormProps = { size, grid: true, rowProps: { gutter: [16, 16] } };
 
-        const proFormProps: ProFormProps = {};
-        proFormProps.size = 'small'
-        proFormProps.grid = true
-        proFormProps.rowProps = { gutter: [16, 16] }
-        if (input) {
+        if (variableForm) {
+            proFormProps.request = async () => await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+        } else if (input) {
             proFormProps.initialValues = input
         }
 

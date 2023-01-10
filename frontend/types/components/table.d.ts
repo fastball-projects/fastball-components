@@ -1,14 +1,12 @@
-import { FieldInfo, ActionInfo, ReferencedComponent } from './common'
-import { LowcodeComponentProps, MultiDataComponent } from './component'
+import { FieldInfo, ActionInfo, ApiActionInfo, PopupActionInfo, ReferencedComponent } from '../common'
+import { LowcodeComponentProps, MultiDataComponent } from '../component'
 
 export type ColumnInfo = {
     sortable?: boolean
     copyable?: boolean
 } & FieldInfo
 
-export type TableRecordActionInfo = {
-    refresh?: boolean
-} & ApiActionInfo
+export type TableRecordActionInfo = ApiActionInfo & PopupActionInfo
 
 export type TableProps = {
     headerTitle?: string

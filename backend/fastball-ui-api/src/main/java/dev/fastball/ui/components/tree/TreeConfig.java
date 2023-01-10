@@ -21,5 +21,7 @@ public @interface TreeConfig {
 
     String childrenField() default "children";
 
+    boolean defaultExpandAll() default false;
+
     Action[] recordActions() default {};
 }

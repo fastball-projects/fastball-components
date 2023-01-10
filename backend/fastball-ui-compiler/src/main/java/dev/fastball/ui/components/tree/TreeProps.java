@@ -20,6 +20,8 @@ public interface TreeProps extends ComponentProps {
 
     TreeFieldNames fieldNames();
 
+    boolean defaultExpandAll();
+
     List<ActionInfo> recordActions();
 
     @Data

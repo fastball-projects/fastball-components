@@ -34,12 +34,16 @@
     <properties>
         <javax.validation.version>2.0.1.Final</javax.validation.version>
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
+        <auto-service.version>1.0.1</auto-service.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-
-
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${auto-service.version}</version>
+            </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-api</artifactId>

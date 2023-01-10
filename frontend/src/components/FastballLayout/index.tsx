@@ -6,7 +6,7 @@ import { LayoutProps, LeftAndRightLayoutProps, TopAndBottomLayoutProps, LeftAndT
 
 const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayoutProps) => {
     const [record, setRecord] = React.useState(null)
-    const left = loadRefComponent(props.left, { onRecordClick: setRecord, __designMode: props.__designMode })
+    const left = loadRefComponent(props.left, { onRecordClick: setRecord, __designMode: props.__designMode, input: props.input })
     const right = loadRefComponent(props.right, { key: MD5(record), __designMode: props.__designMode, input: record })
     return (
         <ProCard
@@ -36,7 +36,7 @@ const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayo
 
 const TopAndBottom: React.FC<TopAndBottomLayoutProps> = (props: TopAndBottomLayoutProps) => {
     const [record, setRecord] = React.useState(null)
-    const top = loadRefComponent(props.top, { onRecordClick: setRecord, __designMode: props.__designMode })
+    const top = loadRefComponent(props.top, { onRecordClick: setRecord, __designMode: props.__designMode, input: props.input})
     const bottom = loadRefComponent(props.bottom, { key: MD5(record), input: record, __designMode: props.__designMode })
     return (
         <ProCard
@@ -56,11 +56,10 @@ const TopAndBottom: React.FC<TopAndBottomLayoutProps> = (props: TopAndBottomLayo
 
 
 const LeftAndTopBottom: React.FC<LeftAndTopBottomLayoutProps> = (props: LeftAndTopBottomLayoutProps) => {
-    const [leftRecord, setLeftRecord] = React.useState(null)
-    const [topRecord, setTopRecord] = React.useState(null)
-    const left = loadRefComponent(props.left, { onRecordClick: setLeftRecord, __designMode: props.__designMode })
-    const top = loadRefComponent(props.top, { onRecordClick: setTopRecord, __designMode: props.__designMode, key: MD5(leftRecord), input: leftRecord })
-    const bottom = loadRefComponent(props.bottom, { key: MD5(topRecord), __designMode: props.__designMode, input: topRecord })
+    const [record, setRecord] = React.useState(null)
+    const left = loadRefComponent(props.left, { onRecordClick: setRecord, __designMode: props.__designMode, input: props.input })
+    const top = loadRefComponent(props.top, { __designMode: props.__designMode, key: MD5(record), input: record })
+    const bottom = loadRefComponent(props.bottom, { key: MD5(record), __designMode: props.__designMode, input: record })
     return (
         <ProCard
             split="vertical"

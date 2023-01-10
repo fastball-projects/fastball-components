@@ -1,9 +1,10 @@
 import React, { useRef } from 'react'
 import { ProTable } from '@ant-design/pro-components'
-import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
-import type { Data, MockDataComponent, TableProps, ColumnInfo, LookupActionInfo } from '../../../types';
-import { buildAction, doApiAction, loadRefComponent, doLookupAction } from '../../common';
+import type { ProTableProps, ProColumns, ActionType as AntDProActionType, ProConfigProvider } from '@ant-design/pro-components'
+import type { Data, MockDataComponent, TableProps, ColumnInfo, LookupActionInfo, ActionInfo } from '../../../types';
+import { buildAction, doApiAction, loadRefComponent, doLookupAction, filterEnabled, filterVisibled } from '../../common';
 import { Button } from 'antd';
+import FastballPopup from '../../common/Popup';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -28,49 +29,71 @@ const buildMockData = (columns: ColumnInfo[]) => {
 
 const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
-    const proTableProps: ProTableProps<Data, Data> = {};
+    const proTableProps: ProTableProps<Data, Data> = { size: 'small', search: { filterType: 'light' }, rowKey: 'id' };
     const proTableColumns: ProTableColumn[] = [];
 
     if (__designMode === 'design') {
         proTableProps.dataSource = buildMockData(columns);
     } else {
-        proTableProps.request = async (params, sort, filter) => {
-            const data = Object.assign({}, params, input)
+        proTableProps.request = async (params, sortFields, filter) => {
+            const data = [Object.assign({ sortFields }, filter, params), input]
             return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
         }
     }
 
-    columns.filter(({ display }) => display !== false).forEach(column => {
+    columns.filter(filterEnabled).forEach(column => {
         const proTableColumn: ProTableColumn = {}
         if (column.lookupAction) {
             const lookupAction: LookupActionInfo = column.lookupAction;
             proTableColumn.request = () => doLookupAction(lookupAction)
         }
         Object.assign(proTableColumn, column, { hideInForm: true, hideInSearch: true });
+        if (column.display === 'Hidden') {
+            proTableColumn.hideInTable = true;
+            proTableColumn.hideInSetting = true;
+        }
+        if (column.valueType === 'popup' && column.popupInfo) {
+            proTableColumn.render = (dom, record) => {
+                const { popupTitle, popupComponent, popupType, placementType, width } = column.popupInfo!;
+                return <FastballPopup width={width} title={popupTitle} trigger={<a>{dom}</a>} popupComponent={popupComponent} popupType={popupType} placementType={placementType} input={record} />;
+            }
+        }
         proTableColumns.push(proTableColumn);
     });
 
     if (queryFields) {
-        queryFields.filter(({ display }) => display !== false).forEach(field => {
+        queryFields.filter(filterEnabled).forEach(field => {
             const proTableColumn: ProTableColumn = {};
             if (field.lookupAction) {
                 const lookupAction: LookupActionInfo = field.lookupAction;
                 proTableColumn.request = () => doLookupAction(lookupAction)
             }
             Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
+            if (field.display === 'Hidden') {
+                proTableColumn.hideInForm = true;
+                proTableColumn.hideInSearch = true;
+            }
             proTableColumns.push(proTableColumn);
         });
+    } else {
+        proTableProps.search = false;
     }
 
-    const actionButtons = !actions ? [] : actions.filter(({ display }) => display !== false).map(action => buildAction({ componentKey, ...action }))
-
+    const actionButtons = !actions ? [] : actions.filter(filterVisibled).map(action => {
+        const actionInfo: ActionInfo = { componentKey, ...action, data: input };
+        if (action.refresh) {
+            actionInfo.callback = () => ref.current?.reload()
+        }
+        return buildAction(actionInfo)
+    })
     if (recordActions.length > 0) {
         proTableColumns.push({
             title: '操作',
             dataIndex: '__option',
             valueType: 'option',
+            align: 'left',
             render: (_, record) => {
-                return recordActions ? recordActions.filter(({ display }) => display !== false).map((action) => {
+                return recordActions ? recordActions.filter(filterVisibled).map((action) => {
                     const { actionKey, actionName, type, refresh } = action;
                     const callback = () => {
                         if (refresh) {

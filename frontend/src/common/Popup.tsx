@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Modal, Drawer } from 'antd';
+import { Modal, Drawer, Popover } from 'antd';
 
-import type { PopupProps, ReactComponent } from '../../types'
+import type { PopupProps } from '../../types'
 import { loadRefComponent } from './component'
 
-const FastballPopup: React.FC<PopupProps> = ({ trigger, popupActionInfo, popupTitle, popupType, onClose }) => {
+const FastballPopup: React.FC<PopupProps> = ({ trigger, placementType, popupType, popupComponent, title, onClose, width, input }) => {
     const [open, setOpen] = React.useState(false);
     const [actions, setActions] = React.useState([]);
 
@@ -15,27 +15,35 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupActionInfo, popupTi
         }
     }
 
-    const contentComponent = loadRefComponent(popupActionInfo.popupComponent, {
-        input: popupActionInfo.data,
+    const triggerComponent = <span onClick={() => setOpen(true)}>{trigger}</span>;
+    if (popupType === 'Popover') {
+        const contentComponent = loadRefComponent(popupComponent, {
+            input,
+            closePopup
+        })
+        const onPopoverOpenChange = (visible: boolean) => {
+            if (!visible) closePopup()
+        }
+        return <Popover overlayStyle={{ width }} placement={placementType} title={title} onOpenChange={onPopoverOpenChange} open={open} content={contentComponent}>{triggerComponent}</Popover>
+    }
+
+    let popupWrapperComponent;
+    const contentComponent = loadRefComponent(popupComponent, {
+        input,
         closePopup,
         setActions
     })
 
-    const title = popupTitle || popupActionInfo.popupTitle
-
-    let popupComponent;
-    if (popupType === 'Drawer') {
-        popupComponent = <Drawer title={title} onClose={closePopup} open={open} footer={actions}>{contentComponent}</Drawer>
-    } else {
-        popupComponent = <Modal title={title} onCancel={closePopup} open={open} footer={actions}>{contentComponent}</Modal>
+    if (popupType === 'Modal') {
+        popupWrapperComponent = <Modal title={title} width={width} onCancel={closePopup} open={open} footer={actions}>{contentComponent}</Modal>
+    } else if (popupType === 'Drawer') {
+        popupWrapperComponent = <Drawer title={title} width={width} onClose={closePopup} open={open} footer={actions} placement={placementType}>{contentComponent}</Drawer>
     }
-
-    const triggerComponent = <span onClick={() => setOpen(true)}>{trigger || popupActionInfo.actionName || popupActionInfo.actionKey}</span>;
 
     return (
         <>
             {triggerComponent}
-            {popupComponent}
+            {popupWrapperComponent}
         </>
     )
 }

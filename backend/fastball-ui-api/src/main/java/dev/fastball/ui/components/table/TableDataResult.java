@@ -13,6 +13,6 @@ import java.util.Collection;
 @Builder
 public class TableDataResult<T> {
 
-    private Integer total;
+    private Long total;
     private Collection<T> data;
 }

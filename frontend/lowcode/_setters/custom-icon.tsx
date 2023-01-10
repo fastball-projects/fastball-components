@@ -2,7 +2,7 @@ import { Icon } from '@alifd/next';
 import * as React from 'react';
 import { useEffect } from 'react';
 
-const ICON_URL = '//at.alicdn.com/t/c/font_3823051_tzorhgcqqaa.js';
+const ICON_URL = '//at.alicdn.com/t/c/font_3823051_94k7v25kzrc.js';
 
 let CustomIcon: any;
 

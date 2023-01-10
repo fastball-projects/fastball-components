@@ -1,19 +1,24 @@
-package dev.fastball.ui.components.layout;
+package dev.fastball.ui.components.layout.compiler;
 
+import com.google.auto.service.AutoService;
 import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
+import dev.fastball.compile.ComponentCompiler;
 import dev.fastball.compile.exception.CompilerException;
+import dev.fastball.ui.components.layout.*;
+
+import static dev.fastball.compile.utils.ElementCompileUtils.getReferencedComponentInfo;
 
 /**
  * @author gr@fastball.dev
  * @since 2022/12/19
  */
+@AutoService(value = ComponentCompiler.class)
 public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, LayoutProps> {
     private static final String COMPONENT_TYPE = "FastballLayout";
 
     @Override
-    protected LayoutProps compileProps(CompileContext compileContext) {
-
+    protected LayoutProps buildProps(CompileContext compileContext) {
         LayoutComponent.LeftAndRight leftAndRight = compileContext.getComponentElement().getAnnotation(LayoutComponent.LeftAndRight.class);
         if (leftAndRight != null) {
             LeftAndRightLayoutProps_AutoValue props = new LeftAndRightLayoutProps_AutoValue();

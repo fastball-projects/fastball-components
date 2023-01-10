@@ -1,10 +1,10 @@
-import { ApiActionInfo, Data } from './common'
-import { LowcodeComponentProps, MultiDataComponent } from './component'
+import { ApiActionInfo, Data } from '../common'
+import { LowcodeComponentProps, MultiDataComponent } from '../component'
 
 export type TimelineProps = {
     fieldNames: {
         key: string
-        text: string
+        title: string
         time?: string
         color?: string
     }

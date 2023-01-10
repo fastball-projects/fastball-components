@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Component, Fragment } from 'react';
 import { common, SettingField } from '@alilc/lowcode-engine';
-import { Button, Message } from '@alifd/next';
+import { Button, Message, Menu, Dropdown } from '@alifd/next';
 import { SetterType, FieldConfig, SetterConfig } from '@alilc/lowcode-types';
 import Sortable from './sortable';
 import CustomIcon from '../custom-icon';
@@ -22,7 +22,7 @@ interface ArraySetterProps {
   multiValue?: boolean;
   hideDescription?: boolean;
   onChange?: Function;
-  extraProps: {renderFooter?: (options: ArraySetterProps & {onAdd: (val?: {}) => any}) => any}
+  extraProps: { renderFooter?: (options: ArraySetterProps & { onAdd: (val?: {}) => any }) => any }
 }
 
 export class ListSetter extends Component<ArraySetterProps, ArraySetterState> {
@@ -69,8 +69,7 @@ export class ListSetter extends Component<ArraySetterProps, ArraySetterState> {
     const targetPath: Array<string | number> = target?.path;
     if (!targetPath || targetPath.length < 2) {
       console.warn(
-        `[ArraySetter] onItemChange 接收的 target.path <${
-          targetPath || 'undefined'
+        `[ArraySetter] onItemChange 接收的 target.path <${targetPath || 'undefined'
         }> 格式非法需为 [propName, arrayIndex, key?]`,
       );
       return;
@@ -113,7 +112,7 @@ export class ListSetter extends Component<ArraySetterProps, ArraySetterState> {
     this.setState({ items: newItems });
   }
 
-  onAdd(newValue?: {[key: string]: any}) {
+  onAdd(newValue?: { [key: string]: any }) {
     const { items = [] } = this.state;
     const { itemSetter, field } = this.props;
     const values = field.getValue() || [];
@@ -136,28 +135,16 @@ export class ListSetter extends Component<ArraySetterProps, ArraySetterState> {
     this.setState({ items });
   }
 
-  onShow(removed: SettingField) {
-    removed.setPropValue('display', true);
+  onShow(field: SettingField) {
+    field.setPropValue('display', 'Show');
   }
 
-  onHidden(removed: SettingField) {
-    removed.setPropValue('display', false);
-    // const { field } = this.props;
-    // const { items } = this.state;
-    // console.log("======", field, items)
-    // const values = field.getValue() || [];
-    // let i = items.indexOf(removed);
-    // items.splice(i, 1);
-    // values.splice(i, 1);
-    // const l = items.length;
-    // while (i < l) {
-    //   items[i].setKey(i);
-    //   i++;
-    // }
-    // removed.remove();
-    // const pureValues = values.map((item: any) => typeof(item) === 'object' ? Object.assign({}, item):item);
-    // field?.setValue(pureValues);
-    // this.setState({ items });
+  onHidden(field: SettingField) {
+    field.setPropValue('display', 'Hidden');
+  }
+
+  onDisable(field: SettingField) {
+    field.setPropValue('display', 'Disabled');
   }
 
   componentWillUnmount() {
@@ -191,6 +178,7 @@ export class ListSetter extends Component<ArraySetterProps, ArraySetterState> {
                 field={field}
                 onHidden={this.onHidden.bind(this, field)}
                 onShow={this.onShow.bind(this, field)}
+                onDisable={this.onDisable.bind(this, field)}
               />
             ))}
           </Sortable>
@@ -217,10 +205,12 @@ export class ListSetter extends Component<ArraySetterProps, ArraySetterState> {
     );
   }
 }
+
 class ArrayItem extends Component<{
   field: SettingField;
   onHidden: () => void;
   onShow: () => void;
+  onDisable: () => void;
   scrollIntoView: boolean;
 }> {
   private shell?: HTMLDivElement | null;
@@ -232,18 +222,45 @@ class ArrayItem extends Component<{
   }
 
   render() {
-    const { onHidden, onShow, field } = this.props;
+    const { onHidden, onShow, onDisable, field } = this.props;
 
-    let showButten;
-    if(field.getValue().display) {
-      showButten = (<Button size="small" ghost="light" onClick={onHidden} className="lc-listitem-action">
-        <CustomIcon type="icon-fastball-eye" size="small" />
-      </Button>)
+    const menu = (
+      <Menu>
+        <Menu.Item onClick={onShow}><CustomIcon type="icon-fastball-eye" size="small" />可见</Menu.Item>
+        <Menu.Item onClick={onHidden}><CustomIcon type="icon-fastball-eye-close" size="small" />隐藏</Menu.Item>
+        <Menu.Item onClick={onDisable}><CustomIcon type="icon-fastball-disabled" size="small" />禁用</Menu.Item>
+      </Menu>
+    );
+
+    let showDropdownTrigger;
+    if (field.getValue().display == 'Show') {
+      showDropdownTrigger = (
+        <Button size="small" ghost="light" onClick={onHidden} className="lc-listitem-action">
+          <i class="iconfont icon-fastball-eye"></i>
+        </Button>
+      )
+    } else if (field.getValue().display == 'Hidden') {
+      showDropdownTrigger = (
+        <Button size="small" ghost="light" onClick={onShow} className="lc-listitem-action">
+          <i class="iconfont icon-fastball-eye-close"></i>
+        </Button>
+      )
     } else {
-      showButten = (<Button size="small" ghost="light" onClick={onShow} className="lc-listitem-action">
-        <CustomIcon type="icon-fastball-eye-close" size="small" />
-      </Button>)
+      showDropdownTrigger = (
+        <Button size="small" ghost="light" onClick={onShow} className="lc-listitem-action">
+          <i class="iconfont icon-fastball-disabled"></i>
+        </Button>
+      ) 
     }
+
+    let showButten = <Dropdown
+      trigger={showDropdownTrigger}
+      onVisibleChange={console.log}
+      triggerType={["hover"]}
+      afterOpen={() => console.log("after open")}
+    >
+      {menu}
+    </Dropdown>
 
     return (
       <div

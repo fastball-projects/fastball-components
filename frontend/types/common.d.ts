@@ -4,7 +4,7 @@ import { ValidationRule } from './validation'
 export type Data = { [key: string]: unknown }
 
 type Displayable = {
-    display?: boolean
+    display?: DisplayType
 }
 
 export type ReferencedComponent = {
@@ -16,11 +16,13 @@ export type ReferencedComponent = {
 }
 
 export type PopupProps = {
-    popupTitle?: String
+    title?: string
+    width?: number
+    placementType?: PlacementType
     popupType: PopupType
-    drawerPlacementType: DrawerPlacementType
     trigger: ReactComponent
-    popupActionInfo: PopupActionInfo
+    popupComponent: ReferencedComponent
+    input?: any
     onClose?: Function
 }
 
@@ -30,6 +32,7 @@ export type FieldInfo = {
     tooltip?: string
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: unknown }
+    popupInfo?: PopupInfo
     lookupAction?: LookupActionInfo
     fieldProps: any
 } & Displayable
@@ -37,7 +40,8 @@ export type FieldInfo = {
 export type ActionInfo = {
     actionName?: string
     componentKey?: string
-    closeOnSuccess?: boolean
+    refresh?: boolean
+    closePopupOnSuccess?: boolean
     callback?: Function
     trigger?: ReactComponent
     data?: Data | Data[]
@@ -51,7 +55,12 @@ export type LookupActionInfo = {
     lookupKey: string
     labelField: string
     valueField: string
+    multiple: boolean
+    childrenField?: string
 }
+export type TreeLookupActionInfo = {
+    childrenField: string
+} & LookupActionInfo
 
 export type ApiActionInfo = {
     componentKey: string
@@ -60,16 +69,22 @@ export type ApiActionInfo = {
 
 export type PopupActionInfo = {
     type: 'Popup'
-    popupTitle?: string
-    popupType: PopupType
-    drawerPlacementType: DrawerPlacementType
-    popupComponent: ReferencedComponent
-} & ActionInfo
+} & ActionInfo & PopupInfo
 
-export type LoadDataType = () => any 
+export type PopupInfo = {
+    popupTitle?: string
+    width?: number
+    popupType: PopupType
+    placementType: PlacementType
+    popupComponent: ReferencedComponent
+}
+
+export type LoadDataType = () => any
 
 export type ActionType = 'API' | 'Rest' | 'Popup' | 'Digit'
 
-export type PopupType = 'Modal' | 'Drawer'
+export type PopupType = 'Modal' | 'Drawer' | 'Popover'
 
-export type DrawerPlacementType = 'left' | 'right' | 'top' | 'bottom'
+export type PlacementType = 'left' | 'right' | 'top' | 'bottom'
+
+export type DisplayType = 'Show' | 'Hidden' | 'Disabled'

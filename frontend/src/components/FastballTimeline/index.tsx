@@ -6,32 +6,32 @@ import { Data, TimelineProps } from '../../../types';
 
 const mockData: Data[] = [
     {
-        id: 1,
+        key: 1,
         color: 'green',
-        label: '2015-09-01',
-        content: 'Create a services site'
+        time: '2015-09-01',
+        title: 'Create a services site'
     }, {
-        id: 2,
+        key: 2,
         color: 'red',
-        label: '2016-01-01',
-        content: 'Solve initial network problems 1'
+        time: '2016-01-01',
+        title: 'Solve initial network problems 1'
     }, {
-        id: 3,
+        key: 3,
         color: 'gray',
-        label: '2016-12-31',
-        content: 'Technical testing 1\nTechnical testing 2\nTechnical testing 3'
+        time: '2016-12-31',
+        title: 'Technical testing 1\nTechnical testing 2\nTechnical testing 3'
     }, {
-        id: 4,
+        key: 4,
         color: '#00CCFF',
-        label: '2017-01-01',
-        content: 'Custom color testing'
+        time: '2017-01-01',
+        title: 'Custom color testing'
     }
 ]
 
 const defaultFieldNames: TimelineProps['fieldNames'] = {
     key: 'id',
-    content: 'content',
-    title: 'label',
+    title: 'title',
+    time: 'time',
     color: 'color'
 }
 
@@ -41,8 +41,8 @@ const Timeline: React.FC<TimelineProps> = ({ componentKey, onRecordClick, __desi
     const [timelineData, setTimelineData] = React.useState(initData);
 
     const loadData = async () => {
-        const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: input })
-        setTimelineData(res?.data || []);
+        const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+        setTimelineData(res || []);
     }
 
     if (timelineData == null) {
@@ -50,44 +50,19 @@ const Timeline: React.FC<TimelineProps> = ({ componentKey, onRecordClick, __desi
         return <Spin />
     }
     const treeProps: AntDTimelineProps = {}
-    if (onRecordClick) {
-        treeProps.onSelect = (_, { node }) => {
-            onRecordClick(node)
-        }
-    }
-    if (recordActions) {
-        treeProps.titleRender = (node) => {
-            const items: MenuProps["items"] = recordActions.filter(({ display }) => display !== false).map(action => ({
-                key: action.actionKey,
-                label: buildAction({ trigger: action.actionName || action.actionKey, componentKey, ...action, data: node })
-            }))
-            return (
-                <>
-                    <span>{node[fieldNames.title]}</span>
-                    <span style={{ float: 'right' }}>
-                        <Dropdown menu={{ items }} trigger={["hover"]}>
-                            <MoreOutlined />
-                        </Dropdown>
-                    </span>
-                </>
-            )
-        }
-    }
 
-    
-
-    const renderItem = (record: Data) => {
-        const { key, time, text, color } = timeLineFieldNames;
+    const items = timelineData.map((record: Data) => {
+        const { key, time, title, color } = timeLineFieldNames;
 
         return <AntDTimeline.Item
             color={color && record?.[color] as string || undefined}
             label={time ? record[time] as string : null}
-        >{record[text] as string}</AntDTimeline.Item>
-    }
+        >{record[title] as string}</AntDTimeline.Item>
+    })
 
     return (
-        <AntDTimeline>
-
+        <AntDTimeline mode='left' {...treeProps}>
+            {items}
         </AntDTimeline>
     )
 };
