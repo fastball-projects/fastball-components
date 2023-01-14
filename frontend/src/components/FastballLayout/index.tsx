@@ -45,7 +45,6 @@ const TopAndBottom: React.FC<TopAndBottomLayoutProps> = (props: TopAndBottomLayo
             headerBordered
             style={{
                 height: '100vh',
-                overflow: 'hidden',
             }}
         >
             <ProCard>{top}</ProCard>
@@ -82,7 +81,6 @@ const LeftAndTopBottom: React.FC<LeftAndTopBottomLayoutProps> = (props: LeftAndT
                 headerBordered
                 style={{
                     height: '100vh',
-                    overflow: 'hidden',
                 }}
             >
                 <ProCard>{top}</ProCard>

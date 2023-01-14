@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { BetaSchemaForm } from '@ant-design/pro-components'
+import { BetaSchemaForm, ProSchema } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, FormInstance } from '@ant-design/pro-components';
-import type { Data, FieldInfo, FormProps, LookupActionInfo, TreeLookupActionInfo } from '../../../types';
-import { buildAction, doLookupAction, doApiAction, filterEnabled, filterVisibled } from '../../common';
+import type { Data, FieldInfo, FormProps } from '../../../types';
+import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField } from '../../common';
 import { Button } from 'antd';
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
@@ -44,40 +44,50 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     getColumns(): ProFormColumnsType<any, 'text'>[] {
-        const fields: FieldInfo[] = this.props.fields;
+        return this.buildColumns(this.props.fields)
+    }
 
-        return fields.filter(filterEnabled).map(field => {
-            const proTableColumn: ProFormColumnsType<Data> = {};
-            Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
-            if (field.display === 'Hidden') {
-                proTableColumn.hideInForm = true;
+    buildColumns(fields: FieldInfo[], parentDataIndex?: string[]): ProFormColumnsType<any, 'text'>[] {
+        const { readonly } = this.props;
+        return fields.filter(filterEnabled).filter(field => field.valueType).map(field => {
+            const formColumn: ProFormColumnsType = {};
+            Object.assign(formColumn, field);
+            processingField(field, formColumn as ProSchema, this.props.__designMode);
+            if (parentDataIndex) {
+                formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
             if (field.validationRules) {
-                proTableColumn.formItemProps = {
+                formColumn.formItemProps = Object.assign(formColumn.formItemProps || {}, {
                     rules: field.validationRules
+                })
+            }
+            if (field.valueType === 'SubFields' && field.subFields) {
+                formColumn.valueType = 'group'
+                formColumn.columns = this.buildColumns(field.subFields, field.dataIndex)
+            }
+            if (field.valueType === 'Array' && field.subFields) {
+                formColumn.valueType = 'formList'
+                const subFieldColumn: ProFormColumnsType = {};
+                subFieldColumn.valueType = 'group'
+                subFieldColumn.columns = this.buildColumns(field.subFields);
+                formColumn.columns = [subFieldColumn]
+                if (readonly ||field.readonly) {
+                    formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                        copyIconProps: false,
+                        deleteIconProps: false,
+                        creatorButtonProps: false
+                    })
                 }
             }
-            if (field.lookupAction) {
-                let lookupAction: LookupActionInfo = field.lookupAction;
-                proTableColumn.fieldProps = Object.assign(proTableColumn.fieldProps || {}, {
-                    treeCheckable: lookupAction.multiple,
-                    fieldNames: {
-                        label: lookupAction.labelField,
-                        value: lookupAction.valueField,
-                        children: lookupAction.childrenField
-                    }
-                })
-                proTableColumn.request = () => doLookupAction(lookupAction)
-            }
-            return proTableColumn;
+            return formColumn;
         })
     }
 
     render(): React.ReactNode {
-        const { componentKey, fields = [], actions = [], input, size = 'small', variableForm, setActions, ...props } = this.props;
+        const { componentKey, fields = [], actions = [], input, size = 'small', variableForm, setActions, __designMode, ...props } = this.props;
         const proFormProps: ProFormProps = { size, grid: true, rowProps: { gutter: [16, 16] } };
 
-        if (variableForm) {
+        if (variableForm && __designMode !== 'design') {
             proFormProps.request = async () => await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
         } else if (input) {
             proFormProps.initialValues = input

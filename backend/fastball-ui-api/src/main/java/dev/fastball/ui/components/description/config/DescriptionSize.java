@@ -1,4 +1,4 @@
-package dev.fastball.ui.components.description;
+package dev.fastball.ui.components.description.config;
 
 /**
  * @author gr@fastball.dev

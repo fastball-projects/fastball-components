@@ -1,6 +1,6 @@
-package dev.fastball.ui.components.timeline;
+package dev.fastball.ui.components.timeline.config;
 
-import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.ViewAction;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,5 +23,5 @@ public @interface TimelineConfig {
 
     String colorField() default "";
 
-    Action[] recordActions() default {};
+    ViewAction[] recordActions() default {};
 }

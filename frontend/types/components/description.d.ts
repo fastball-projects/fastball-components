@@ -1,5 +1,5 @@
 import { FieldInfo, ActionInfo, Data } from '../common'
-import { LowcodeComponentProps, PopupComponentProps } from '../component'
+import { BasicComponentProps, PopupComponentProps } from '../component'
 
 export type DescriptionProps = {
     headerTitle?: string
@@ -9,6 +9,6 @@ export type DescriptionProps = {
     fields: FieldInfo[]
     actions?: ActionInfo[]
     data?: Data
-} & LowcodeComponentProps & PopupComponentProps
+} & BasicComponentProps & PopupComponentProps
 
 export type DescriptionSize = 'default' | 'middle' | 'small'

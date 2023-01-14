@@ -1,6 +1,6 @@
-package dev.fastball.ui.components.table;
+package dev.fastball.ui.components.table.config;
 
-import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.component.Component;
 
 import java.lang.annotation.ElementType;
@@ -26,7 +26,7 @@ public @interface TableConfig {
 
     Class<? extends Component> rowExpandedComponent() default Component.class;
 
-    Action[] actions() default {};
+    ViewAction[] actions() default {};
 
-    Action[] recordActions() default {};
+    ViewAction[] recordActions() default {};
 }

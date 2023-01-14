@@ -6,13 +6,12 @@ import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.ComponentCompiler;
 import dev.fastball.compile.utils.ElementCompileUtils;
-import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.info.action.ActionInfo;
-import dev.fastball.core.info.action.PopupActionInfo;
 import dev.fastball.ui.components.tree.Tree;
-import dev.fastball.ui.components.tree.TreeConfig;
 import dev.fastball.ui.components.tree.TreeProps;
 import dev.fastball.ui.components.tree.TreeProps_AutoValue;
+import dev.fastball.ui.components.tree.config.TreeConfig;
 
 import java.util.List;
 import java.util.Objects;
@@ -52,12 +51,12 @@ public class TreeCompiler extends AbstractComponentCompiler<Tree<?, ?>, TreeProp
     private void compileRecordActions(CompileContext compileContext, TreeProps_AutoValue props) {
         List<ActionInfo> recordActions = ElementCompileUtils
                 .getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv()).values().stream()
-                .map(this::buildActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
+                .map(this::buildRecordActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
         TreeConfig config = compileContext.getComponentElement().getAnnotation(TreeConfig.class);
         if (config != null) {
             int index = 1;
-            for (Action action : config.recordActions()) {
-                PopupActionInfo actionInfo = buildPopupActionInfo(action, props, "button" + index++);
+            for (ViewAction action : config.recordActions()) {
+                ActionInfo actionInfo = buildViewActionInfo(action, props, "button" + index++);
                 recordActions.add(actionInfo);
             }
         }

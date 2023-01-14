@@ -1,4 +1,4 @@
-package dev.fastball.ui.components.table;
+package dev.fastball.ui.components.table.config;
 
 import java.lang.annotation.*;
 
@@ -9,5 +9,5 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableColumnSortable {
+public @interface SortableColumn {
 }

@@ -1,8 +1,9 @@
-import React, { ComponentClass, FC, ReactElement } from 'react'
+import React from 'react'
 import { Button } from 'antd';
+import { MD5 } from 'object-hash'
 import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo } from '../../types'
-import { loadRefComponent } from './'
-import FastballPopup from './Popup'
+import FastballPopup from './components/Popup'
+import FastballActionButton from './components/ActionButton';
 
 const buildJsonRequestInfo = (): RequestInit => ({
     method: 'POST',
@@ -19,23 +20,32 @@ const buildRequestData = async (actionInfo: ActionInfo) => {
     return data;
 }
 
-export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data) => {
-    const requestInfo = buildJsonRequestInfo();
-    requestInfo.body = JSON.stringify([data])
-    const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
-    const json = await resp.text();
-    if (json) {
-        return JSON.parse(json);
+// TODO use cache
+const lookupActionCache: Record<string, any[]> = {}
+
+export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data, __designMode?: string) => {
+    if (__designMode === 'design') {
+        return [];
     }
+    const actionRequest = { actionInfo, data }
+    const actionCacheHash = MD5(actionRequest);
+    if (!lookupActionCache[actionCacheHash]) {
+        const requestInfo = buildJsonRequestInfo();
+        requestInfo.body = JSON.stringify([data])
+        const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
+        const json = await resp.text();
+        if (json) {
+            const lookupItems = JSON.parse(json);
+            lookupActionCache[actionCacheHash] = lookupItems;
+        }
+    }
+    return lookupActionCache[actionCacheHash]
 }
 
 export const buildAction = (actionInfo: ActionInfo) => {
     if (actionInfo.type === 'API') {
         const apiActionInfo = actionInfo as ApiActionInfo
-        const execute = async () => {
-            const res = await doApiAction(apiActionInfo);
-        }
-        return actionInfo.trigger ? <span key={actionInfo.actionKey} onClick={execute}>{actionInfo.trigger}</span> : (<Button key={actionInfo.actionKey} onClick={execute}>{actionInfo.actionName || actionInfo.actionKey}</Button>)
+        return <FastballActionButton {...apiActionInfo} />
     } else if (actionInfo.type === 'Popup') {
         const popupActionInfo = actionInfo as PopupActionInfo
         return doPopupAction(popupActionInfo)
@@ -46,6 +56,8 @@ export const buildAction = (actionInfo: ActionInfo) => {
 
 export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
     const popupProps: PopupProps = {
+        key: popupActionInfo.actionKey,
+        ref: popupActionInfo.ref,
         width: popupActionInfo.width,
         title: popupActionInfo.popupTitle,
         popupType: popupActionInfo.popupType,

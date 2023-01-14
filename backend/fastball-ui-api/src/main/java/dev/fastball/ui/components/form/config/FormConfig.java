@@ -1,6 +1,6 @@
-package dev.fastball.ui.components.description;
+package dev.fastball.ui.components.form.config;
 
-import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.ViewAction;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,10 +13,10 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DescriptionConfig {
-    int column() default 2;
+public @interface FormConfig {
+    boolean showReset() default true;
 
-    DescriptionSize size() default DescriptionSize.Default;
+    boolean readonly() default false;
 
-    Action[] buttons() default {};
+    ViewAction[] buttons() default {};
 }

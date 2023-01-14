@@ -18,6 +18,8 @@ public interface FormProps extends ComponentProps {
 
     boolean variableForm();
 
+    boolean readonly();
+
     Boolean showReset();
 
     PopupType popupType();

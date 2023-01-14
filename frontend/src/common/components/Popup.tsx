@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Modal, Drawer, Popover } from 'antd';
 
-import type { PopupProps } from '../../types'
-import { loadRefComponent } from './component'
+import type { PopupProps } from '../../../types'
+import { loadRefComponent } from '../component'
 
-const FastballPopup: React.FC<PopupProps> = ({ trigger, placementType, popupType, popupComponent, title, onClose, width, input }) => {
+const FastballPopup: React.FC<PopupProps> = ({ trigger, triggerType, placementType, popupType, popupComponent, title, onClose, width, input, __designMode }) => {
     const [open, setOpen] = React.useState(false);
     const [actions, setActions] = React.useState([]);
 
@@ -15,22 +15,34 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, placementType, popupType
         }
     }
 
-    const triggerComponent = <span onClick={() => setOpen(true)}>{trigger}</span>;
+    let triggerComponent: React.ReactElement;
+    if (triggerType === 'Hover') {
+        triggerComponent = <span onMouseEnter={() => setOpen(true)} onMouseLeave={() => closePopup()} >{trigger}</span>;
+    } else if (triggerType === 'ContextMenu') {
+        triggerComponent = <span onContextMenu={(e) => {
+            e.preventDefault();
+            setOpen(true)
+        }}>{trigger}</span>;
+    } else {
+        triggerComponent = <span onClick={() => setOpen(true)}>{trigger}</span>;
+    }
     if (popupType === 'Popover') {
         const contentComponent = loadRefComponent(popupComponent, {
             input,
-            closePopup
+            closePopup,
+            __designMode
         })
         const onPopoverOpenChange = (visible: boolean) => {
             if (!visible) closePopup()
         }
-        return <Popover overlayStyle={{ width }} placement={placementType} title={title} onOpenChange={onPopoverOpenChange} open={open} content={contentComponent}>{triggerComponent}</Popover>
+        return <Popover overlayStyle={{ width }} arrowPointAtCenter={true} forceRender={triggerType === 'Hover'} placement={placementType} title={title} onOpenChange={onPopoverOpenChange} open={open} content={contentComponent}>{triggerComponent}</Popover>
     }
 
     let popupWrapperComponent;
     const contentComponent = loadRefComponent(popupComponent, {
         input,
         closePopup,
+        __designMode,
         setActions
     })
 

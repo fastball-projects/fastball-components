@@ -1,5 +1,5 @@
 import { ApiActionInfo, ActionInfo, ReferencedComponent, Data } from '../common'
-import { LowcodeComponentProps, MultiDataComponent } from '../component'
+import { BasicComponentProps, MultiDataComponent } from '../component'
 
 export type TreeProps = {
     fieldNames: {
@@ -10,4 +10,4 @@ export type TreeProps = {
     defaultExpandAll: boolean
     data?: Data[]
     recordActions?: ApiActionInfo[]
-} & LowcodeComponentProps & MultiDataComponent
+} & BasicComponentProps & MultiDataComponent

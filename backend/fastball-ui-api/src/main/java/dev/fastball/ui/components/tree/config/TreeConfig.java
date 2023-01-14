@@ -1,6 +1,6 @@
-package dev.fastball.ui.components.tree;
+package dev.fastball.ui.components.tree.config;
 
-import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.ViewAction;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,5 +23,5 @@ public @interface TreeConfig {
 
     boolean defaultExpandAll() default false;
 
-    Action[] recordActions() default {};
+    ViewAction[] recordActions() default {};
 }

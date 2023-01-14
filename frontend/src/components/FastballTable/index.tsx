@@ -1,10 +1,9 @@
 import React, { useRef } from 'react'
 import { ProTable } from '@ant-design/pro-components'
-import type { ProTableProps, ProColumns, ActionType as AntDProActionType, ProConfigProvider } from '@ant-design/pro-components'
-import type { Data, MockDataComponent, TableProps, ColumnInfo, LookupActionInfo, ActionInfo } from '../../../types';
-import { buildAction, doApiAction, loadRefComponent, doLookupAction, filterEnabled, filterVisibled } from '../../common';
+import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
+import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo } from '../../../types';
+import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField } from '../../common';
 import { Button } from 'antd';
-import FastballPopup from '../../common/Popup';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -26,11 +25,27 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-
 const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, Data> = { size: 'small', search: { filterType: 'light' }, rowKey: 'id' };
     const proTableColumns: ProTableColumn[] = [];
+
+    const buildTableColumns = (field: FieldInfo, parentDataIndex?: string[]) => {
+        if (field.valueType === 'Array') {
+            return;
+        }
+        const column: ProTableColumn = {}
+        Object.assign(column, field, { hideInSearch: true });
+        processingField(field, column, __designMode);
+        if (parentDataIndex) {
+            column.dataIndex = [...parentDataIndex, ...field.dataIndex]
+        }
+        if (field.valueType === 'SubFields' && field.subFields) {
+            field.subFields.forEach(subField => buildTableColumns(subField, field.dataIndex))
+            return;
+        }
+        proTableColumns.push(column);
+    }
 
     if (__designMode === 'design') {
         proTableProps.dataSource = buildMockData(columns);
@@ -41,38 +56,13 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         }
     }
 
-    columns.filter(filterEnabled).forEach(column => {
-        const proTableColumn: ProTableColumn = {}
-        if (column.lookupAction) {
-            const lookupAction: LookupActionInfo = column.lookupAction;
-            proTableColumn.request = () => doLookupAction(lookupAction)
-        }
-        Object.assign(proTableColumn, column, { hideInForm: true, hideInSearch: true });
-        if (column.display === 'Hidden') {
-            proTableColumn.hideInTable = true;
-            proTableColumn.hideInSetting = true;
-        }
-        if (column.valueType === 'popup' && column.popupInfo) {
-            proTableColumn.render = (dom, record) => {
-                const { popupTitle, popupComponent, popupType, placementType, width } = column.popupInfo!;
-                return <FastballPopup width={width} title={popupTitle} trigger={<a>{dom}</a>} popupComponent={popupComponent} popupType={popupType} placementType={placementType} input={record} />;
-            }
-        }
-        proTableColumns.push(proTableColumn);
-    });
+    columns.filter(filterEnabled).forEach(field => buildTableColumns(field));
 
     if (queryFields) {
         queryFields.filter(filterEnabled).forEach(field => {
             const proTableColumn: ProTableColumn = {};
-            if (field.lookupAction) {
-                const lookupAction: LookupActionInfo = field.lookupAction;
-                proTableColumn.request = () => doLookupAction(lookupAction)
-            }
+            processingField(field, proTableColumn, __designMode);
             Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
-            if (field.display === 'Hidden') {
-                proTableColumn.hideInForm = true;
-                proTableColumn.hideInSearch = true;
-            }
             proTableColumns.push(proTableColumn);
         });
     } else {
@@ -95,13 +85,12 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
             render: (_, record) => {
                 return recordActions ? recordActions.filter(filterVisibled).map((action) => {
                     const { actionKey, actionName, type, refresh } = action;
-                    const callback = () => {
-                        if (refresh) {
-                            ref.current?.reload()
-                        }
-                    }
                     const trigger = <Button type='link'>{actionName || actionKey}</Button>
-                    return buildAction({ trigger, componentKey, ...action, callback, data: record })
+                    const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
+                    if (refresh) {
+                        actionInfo.callback = () => ref.current?.reload()
+                    }
+                    return buildAction(actionInfo)
                 }) : [];
             }
         })
@@ -113,7 +102,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
 
 
     if (rowExpandedComponent) {
-        proTableProps.expandable.expandedRowRender = (record) => loadRefComponent(rowExpandedComponent, { input: record })
+        proTableProps.expandable.expandedRowRender = (record) => loadRefComponent(rowExpandedComponent, { input: record, __designMode })
     }
 
 

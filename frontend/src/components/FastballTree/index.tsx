@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Tree as AntDTree, Spin, Dropdown } from 'antd';
 import type { TreeProps as AndDTreeProps, MenuProps } from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { buildAction, doApiAction, filterVisibled } from '../../common'
-import type { ActionInfo, TreeProps } from '../../../types'
+import type { ActionInfo, ActionRef, TreeProps } from '../../../types'
 
 const mockData = [{
-    id: "1",
+    key: "1",
     title: "Test Root",
     children: [{
-        id: "1-1",
+        key: "1-1",
         title: "Test Node1",
         children: []
     }, {
-        id: "1-2",
+        key: "1-2",
         title: "Test Node2",
         children: [{
-            id: "1-2-1",
+            key: "1-2-1",
             title: "Test Sub Node1"
         }, {
-            id: "1-2-2",
+            key: "1-2-2",
             title: "Test Sub Node2"
         }]
     }]
@@ -29,6 +29,7 @@ const mockData = [{
 const Tree: React.FC<TreeProps> = ({ componentKey, onRecordClick, __designMode, fieldNames, defaultExpandAll, recordActions, data, input }) => {
     const initData = __designMode === 'design' ? mockData : data
     const [treeData, setTreeData] = useState(initData);
+    const ref = useRef<ActionRef>(null)
 
     const loadData = async () => {
         const treeData = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
@@ -51,7 +52,7 @@ const Tree: React.FC<TreeProps> = ({ componentKey, onRecordClick, __designMode, 
     if (recordActions) {
         treeProps.titleRender = (node) => {
             const items: MenuProps["items"] = recordActions.filter(filterVisibled).map(action => {
-                const actionInfo: ActionInfo = { trigger: action.actionName || action.actionKey, componentKey, ...action, data: node };
+                const actionInfo: ActionInfo = { trigger: <div>{action.actionName || action.actionKey}</div>, componentKey, ...action, data: node };
                 if (action.refresh) {
                     actionInfo.callback = () => loadData()
                 }

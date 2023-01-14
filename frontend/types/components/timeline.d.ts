@@ -1,5 +1,5 @@
 import { ApiActionInfo, Data } from '../common'
-import { LowcodeComponentProps, MultiDataComponent } from '../component'
+import { BasicComponentProps, MultiDataComponent } from '../component'
 
 export type TimelineProps = {
     fieldNames: {
@@ -10,4 +10,4 @@ export type TimelineProps = {
     }
     data?: Data[]
     recordActions?: ApiActionInfo[]
-} & LowcodeComponentProps & MultiDataComponent
+} & BasicComponentProps & MultiDataComponent

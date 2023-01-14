@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { ProDescriptions } from '@ant-design/pro-components'
-import type { ProCoreActionType, ProDescriptionsProps, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import type { FieldInfo, DescriptionProps, LookupActionInfo } from '../../../types';
-import { buildAction, doLookupAction, doApiAction, filterEnabled, filterVisibled } from '../../common';
-import FastballPopup from '../../common/Popup';
+import { ProDescriptions, ProSchema, ProTable } from '@ant-design/pro-components'
+import type { ProTableProps, ProCoreActionType, ProDescriptionsProps, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import type { FieldInfo, DescriptionProps } from '../../../types';
+import { buildAction, doApiAction, filterEnabled, filterFormOnlyField, filterVisibled, getByPaths, processingField } from '../../common';
 
 class FastballDescription extends React.Component<DescriptionProps, any> {
     ref = React.createRef<ProCoreActionType>();
@@ -34,40 +33,54 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
         return buttons;
     }
 
-    getColumns(): ProDescriptionsItemProps[] {
-        const fields: FieldInfo[] = this.props.fields;
-
+    buildTableColumns(fields: FieldInfo[]): ProSchema[] {
         return fields.filter(filterEnabled).map(field => {
+            const column: ProSchema = {};
+            processingField(field, column, this.props.__designMode);
+            Object.assign(column, field);
+            return column;
+        })
+    }
+
+    buildColumns(fields: FieldInfo[], parentDataIndex?: string[]): ProDescriptionsItemProps[] {
+        return fields.filter(filterEnabled).flatMap(field => {
             const column: ProDescriptionsItemProps = {};
             Object.assign(column, field, { hideInTable: true, hideInSetting: true });
-            if (field.display === 'Hidden') {
-                column.hideInDescriptions = true;
-            }
+            processingField(field, column, this.props.__designMode);
             if (field.validationRules) {
                 column.formItemProps = {
                     rules: field.validationRules
                 }
             }
-            if (field.lookupAction) {
-                const lookupAction: LookupActionInfo = field.lookupAction;
-                column.request = () => doLookupAction(lookupAction)
+            if (parentDataIndex) {
+                column.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
-            if (field.valueType === 'popup' && field.popupInfo) {
-                column.render = (dom, record) => {
-                    const { popupTitle, popupComponent, popupType, placementType, width } = field.popupInfo!;
-                    return <FastballPopup width={width} title={popupTitle} trigger={<a>{dom}</a>} popupComponent={popupComponent} popupType={popupType} placementType={placementType} input={record} />;
+            if (field.valueType === 'SubFields' && field.subFields) {
+                return this.buildColumns(field.subFields!, field.dataIndex)
+            }
+            if (field.valueType === 'Array' && field.subFields) {
+                column.span = this.props.column
+                column.render = (_, record) => {
+                    const records: Record<string, any> = getByPaths(record, field.dataIndex)
+                    if (records && Array.isArray(records)) {
+                        return <ProTable size='small' pagination={false} toolBarRender={false} search={false} dataSource={records} columns={this.buildTableColumns(field.subFields!)} />
+                    }
                 }
             }
             return column;
         })
     }
 
+    getColumns(): ProDescriptionsItemProps[] {
+        return this.buildColumns(this.props.fields);
+    }
+
     render(): React.ReactNode {
-        const { componentKey, fields = [], actions = [], input, column, variableDescription, setActions, ...props } = this.props;
+        const { componentKey, fields = [], actions = [], input, column, variableDescription, setActions, __designMode, ...props } = this.props;
 
         const proDescriptionsProps: ProDescriptionsProps = { column };
         proDescriptionsProps.size = 'small'
-        if (variableDescription) {
+        if (variableDescription && __designMode !== 'design') {
             proDescriptionsProps.request = async () => await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
         } else if (input) {
             proDescriptionsProps.dataSource = input
@@ -83,7 +96,7 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
             });
         }
 
-        return <ProDescriptions actionRef={this.ref} {...proDescriptionsProps} {...props} />
+        return <ProDescriptions layout="vertical" actionRef={this.ref} {...proDescriptionsProps} {...props} />
     }
 }
 

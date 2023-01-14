@@ -1,15 +1,17 @@
 package dev.fastball.ui.components.table;
 
-import dev.fastball.auto.value.annotation.AutoValue;
 import dev.fastball.core.info.basic.FieldInfo;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author gr@fastball.dev
  * @since 2022/12/9
  */
-@AutoValue
-public interface ColumnInfo extends FieldInfo {
-    boolean sortable();
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class ColumnInfo extends FieldInfo {
+    private boolean sortable;
 
-    boolean copyable();
+    private boolean copyable;
 }

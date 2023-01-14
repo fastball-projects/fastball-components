@@ -5,11 +5,14 @@ import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
-import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.component.Component;
 import dev.fastball.core.info.action.ActionInfo;
-import dev.fastball.core.info.action.PopupActionInfo;
-import dev.fastball.ui.components.table.*;
+import dev.fastball.ui.components.table.ColumnInfo;
+import dev.fastball.ui.components.table.TableProps_AutoValue;
+import dev.fastball.ui.components.table.config.CopyableColumn;
+import dev.fastball.ui.components.table.config.SortableColumn;
+import dev.fastball.ui.components.table.config.TableConfig;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
@@ -51,10 +54,12 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
     }
 
     private List<ColumnInfo> buildTableColumnsFromReturnType(TypeElement returnType, ProcessingEnvironment processingEnv, TableProps_AutoValue props) {
-        return TypeCompileUtils.compileTypeFields(returnType, processingEnv, props, ColumnInfo_AutoValue::new, (field, tableColumn) -> {
-            TableColumnSortable sortable = field.getAnnotation(TableColumnSortable.class);
-            if (sortable != null) {
-                ((ColumnInfo_AutoValue) tableColumn).sortable(true);
+        return TypeCompileUtils.compileTypeFields(returnType, processingEnv, props, ColumnInfo::new, (field, tableColumn) -> {
+            if (field.getAnnotation(SortableColumn.class) != null) {
+                tableColumn.setSortable(true);
+            }
+            if (field.getAnnotation(CopyableColumn.class) != null) {
+                tableColumn.setCopyable(true);
             }
         });
     }
@@ -62,12 +67,12 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
     private void compileRecordActions(CompileContext compileContext, TableProps_AutoValue props) {
         List<ActionInfo> recordActions = ElementCompileUtils
                 .getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv()).values().stream()
-                .map(this::buildActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
+                .map(this::buildRecordActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
         TableConfig tableConfig = compileContext.getComponentElement().getAnnotation(TableConfig.class);
         if (tableConfig != null) {
             int index = 1;
-            for (Action action : tableConfig.recordActions()) {
-                recordActions.add(buildPopupActionInfo(action, props, "button" + index++));
+            for (ViewAction action : tableConfig.recordActions()) {
+                recordActions.add(buildViewActionInfo(action, props, "button" + index++));
             }
         }
         props.recordActions(recordActions);
@@ -78,13 +83,13 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         if (tableConfig == null) {
             return;
         }
-        List<ActionInfo> actionInfoList = new ArrayList<>();
+        List<ActionInfo> viewActionInfoList = new ArrayList<>();
         int index = 1;
-        for (Action action : tableConfig.actions()) {
-            PopupActionInfo popupActionInfo = buildPopupActionInfo(action, props, "button" + index++);
-            actionInfoList.add(popupActionInfo);
+        for (ViewAction action : tableConfig.actions()) {
+            ActionInfo viewActionInfo = buildViewActionInfo(action, props, "button" + index++);
+            viewActionInfoList.add(viewActionInfo);
         }
-        props.actions(actionInfoList);
+        props.actions(viewActionInfoList);
     }
 
     private void compileBasicConfig(CompileContext compileContext, TableProps_AutoValue props) {

@@ -2,7 +2,7 @@ import type { FC, Component, Ref, MutableRefObject } from 'react'
 
 type ReactComponent<P> = Component<P> | FC<P>
 
-export type LowcodeComponentProps = {
+export type BasicComponentProps = {
     componentKey: string
     __designMode?: string
     input?: any

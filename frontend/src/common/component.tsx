@@ -19,13 +19,3 @@ export const loadRefComponent = (refComponent: ReferencedComponent, props?: Reco
     }
     return component;
 }
-
-export const customValueTypeMap: Record<string, ProRenderFieldPropsType> = {
-    popup: {
-        render: (value, props, dom) => {
-            console.log(value, props, dom)
-            
-            return dom;
-        }
-    }
-}

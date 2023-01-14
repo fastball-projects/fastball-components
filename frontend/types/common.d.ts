@@ -1,43 +1,76 @@
+import { MutableRefObject } from 'react'
 import { ReactComponent } from "./component"
 import { ValidationRule } from './validation'
 
 export type Data = { [key: string]: unknown }
 
-type Displayable = {
+export type Displayable = {
     display?: DisplayType
 }
+
+export declare type CustomTagProps = {
+    label: React.ReactNode;
+    value: any;
+    disabled: boolean;
+    onClose: (event?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+    closable: boolean;
+};
 
 export type ReferencedComponent = {
     component?: ReactComponent
     componentClass: string
     componentPackage: string
     componentPath: string
-    componentName: string
+}
+
+export type MainFieldComponent = ReferencedComponent & {
+    componentClass: 'MainFieldComponent'
+    mainField: string[]
+}
+
+export type EnumItem = {
+    text: string
+    color?: string
 }
 
 export type PopupProps = {
+    key?: string
+    ref?: MutableRefObject
     title?: string
     width?: number
     placementType?: PlacementType
     popupType: PopupType
     trigger: ReactComponent
+    triggerType: TriggerType
     popupComponent: ReferencedComponent
     input?: any
     onClose?: Function
+    __designMode?: string
 }
 
 export type FieldInfo = {
-    dataIndex: string
+    dataIndex: string[]
     valueType: string
+    fieldType: string
     tooltip?: string
     validationRules?: ValidationRule[]
-    valueEnum?: { [key: string]: unknown }
-    popupInfo?: PopupInfo
-    lookupAction?: LookupActionInfo
+    valueEnum?: { [key: string]: EnumItem }
+    lookup?: LookupActionInfo
+    popup?: PopupInfo
+    editModeComponent?: UseComponentInfo
+    displayModeComponent?: UseComponentInfo
+    subFields?: FieldInfo[]
+    readonly: boolean
     fieldProps: any
+    formItemProps: any
 } & Displayable
 
+export type ActionRef = {
+    onClick: Function
+}
+
 export type ActionInfo = {
+    ref?: MutableRefObject
     actionName?: string
     componentKey?: string
     refresh?: boolean
@@ -74,9 +107,17 @@ export type PopupActionInfo = {
 export type PopupInfo = {
     popupTitle?: string
     width?: number
+    dataPath?: string[]
     popupType: PopupType
+    triggerType: TriggerType
     placementType: PlacementType
     popupComponent: ReferencedComponent
+}
+
+export type UseComponentInfo = {
+    componentInfo: ReferencedComponent
+    valueKey: string
+    recordKey: string
 }
 
 export type LoadDataType = () => any
@@ -84,6 +125,8 @@ export type LoadDataType = () => any
 export type ActionType = 'API' | 'Rest' | 'Popup' | 'Digit'
 
 export type PopupType = 'Modal' | 'Drawer' | 'Popover'
+
+export type TriggerType = 'Click' | 'Hover' | 'ContextMenu'
 
 export type PlacementType = 'left' | 'right' | 'top' | 'bottom'
 

@@ -4,13 +4,12 @@ import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
-import dev.fastball.core.annotation.Action;
+import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.component.Component;
 import dev.fastball.core.info.action.ActionInfo;
-import dev.fastball.core.info.action.PopupActionInfo;
-import dev.fastball.ui.components.description.DescriptionConfig;
 import dev.fastball.ui.components.description.DescriptionProps_AutoValue;
-import dev.fastball.ui.components.description.DescriptionSize;
+import dev.fastball.ui.components.description.config.DescriptionConfig;
+import dev.fastball.ui.components.description.config.DescriptionSize;
 
 import javax.lang.model.element.TypeElement;
 import java.util.List;
@@ -51,13 +50,13 @@ public abstract class AbstractDescriptionCompiler<T extends Component> extends A
 
     protected void compileRecordActions(CompileContext compileContext, DescriptionProps_AutoValue props) {
         List<ActionInfo> actionInfoList = ElementCompileUtils.getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv())
-                .values().stream().map(this::buildActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
+                .values().stream().map(this::buildRecordActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
         props.actions(actionInfoList);
         DescriptionConfig config = compileContext.getComponentElement().getAnnotation(DescriptionConfig.class);
         if (config != null) {
             int index = 1;
-            for (Action action : config.buttons()) {
-                PopupActionInfo actionInfo = buildPopupActionInfo(action, props, "button" + index++);
+            for (ViewAction action : config.buttons()) {
+                ActionInfo actionInfo = buildViewActionInfo(action, props, "button" + index++);
                 actionInfoList.add(actionInfo);
             }
         }
