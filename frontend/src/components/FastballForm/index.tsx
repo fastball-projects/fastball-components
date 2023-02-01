@@ -20,8 +20,8 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     getActions() {
-        const { componentKey, closePopup, showReset, input, actions } = this.props;
-        const buttons = actions ? actions.filter(filterVisibled).map(action => {
+        const { componentKey, closePopup, showReset, input, recordActions } = this.props;
+        const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
             if (action.closePopupOnSuccess !== false && closePopup) {
                 action.callback = () => {
                     this.ref.current?.resetFields()
@@ -33,7 +33,7 @@ class FastballForm extends React.Component<FormProps, any> {
                     const data: Data = {}
                     const formData = await this.ref.current?.validateFields()
                     Object.assign(data, input, formData)
-                    return [data];
+                    return data;
                 }
             });
         }) : []
@@ -71,7 +71,7 @@ class FastballForm extends React.Component<FormProps, any> {
                 subFieldColumn.valueType = 'group'
                 subFieldColumn.columns = this.buildColumns(field.subFields);
                 formColumn.columns = [subFieldColumn]
-                if (readonly ||field.readonly) {
+                if (readonly || field.readonly) {
                     formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
                         copyIconProps: false,
                         deleteIconProps: false,
@@ -84,7 +84,7 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     render(): React.ReactNode {
-        const { componentKey, fields = [], actions = [], input, size = 'small', variableForm, setActions, __designMode, ...props } = this.props;
+        const { componentKey, input, size = 'small', variableForm, setActions, __designMode, ...props } = this.props;
         const proFormProps: ProFormProps = { size, grid: true, rowProps: { gutter: [16, 16] } };
 
         if (variableForm && __designMode !== 'design') {

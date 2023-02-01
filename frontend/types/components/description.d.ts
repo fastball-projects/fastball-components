@@ -7,7 +7,7 @@ export type DescriptionProps = {
     variableDescription: boolean
     size?: DescriptionSize
     fields: FieldInfo[]
-    actions?: ActionInfo[]
+    recordActions?: ActionInfo[]
     data?: Data
 } & BasicComponentProps & PopupComponentProps
 

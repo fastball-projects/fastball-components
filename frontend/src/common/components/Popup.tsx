@@ -1,10 +1,26 @@
 import * as React from 'react'
-import { Modal, Drawer, Popover } from 'antd';
+import { Modal, Drawer, Popover, PopoverProps, ModalProps, DrawerProps } from 'antd';
 
-import type { PopupProps } from '../../../types'
+import type { PopupProps, RefComponentInfo } from '../../../types'
 import { loadRefComponent } from '../component'
+import { getByPaths } from '../utils';
 
-const FastballPopup: React.FC<PopupProps> = ({ trigger, triggerType, placementType, popupType, popupComponent, title, onClose, width, input, __designMode }) => {
+const buildPopupComponent = ({ propsKey, dataPath, componentInfo }: RefComponentInfo, props: Record<string, any>, input?: any) => {
+    const popupProps: Record<string, any> = {
+        ...props
+    }
+    if (input) {
+        if (dataPath && dataPath.length > 0) {
+            popupProps[propsKey] = getByPaths(input, dataPath)
+        } else {
+            popupProps[propsKey] = input
+        }
+    }
+    return loadRefComponent(componentInfo, popupProps);
+}
+
+const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, input, __designMode }) => {
+    const { triggerType, placementType, popupType, popupComponent, title, width } = popupInfo;
     const [open, setOpen] = React.useState(false);
     const [actions, setActions] = React.useState([]);
 
@@ -13,6 +29,22 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, triggerType, placementTy
         if (onClose) {
             onClose();
         }
+    }
+
+    if (popupType === 'Popover') {
+        const content = buildPopupComponent(popupComponent, { closePopup, __designMode }, input)
+        const onOpenChange = (visible: boolean) => visible ? setOpen(true) : closePopup()
+        // const forceRender = triggerType === 'Hover'
+        const popoverProps: PopoverProps = { title, onOpenChange, open, content, placement: placementType, arrowPointAtCenter: true }
+        if (width) {
+            popoverProps.overlayStyle = { width }
+        }
+        if (triggerType === 'Click') {
+            popoverProps.trigger = 'click'
+        } else if (triggerType === 'ContextMenu') {
+            popoverProps.trigger = 'contextMenu'
+        }
+        return <Popover {...popoverProps}>{trigger}</Popover>
     }
 
     let triggerComponent: React.ReactElement;
@@ -26,30 +58,17 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, triggerType, placementTy
     } else {
         triggerComponent = <span onClick={() => setOpen(true)}>{trigger}</span>;
     }
-    if (popupType === 'Popover') {
-        const contentComponent = loadRefComponent(popupComponent, {
-            input,
-            closePopup,
-            __designMode
-        })
-        const onPopoverOpenChange = (visible: boolean) => {
-            if (!visible) closePopup()
-        }
-        return <Popover overlayStyle={{ width }} arrowPointAtCenter={true} forceRender={triggerType === 'Hover'} placement={placementType} title={title} onOpenChange={onPopoverOpenChange} open={open} content={contentComponent}>{triggerComponent}</Popover>
-    }
 
     let popupWrapperComponent;
-    const contentComponent = loadRefComponent(popupComponent, {
-        input,
-        closePopup,
-        __designMode,
-        setActions
-    })
-
+    const content = buildPopupComponent(popupComponent, { closePopup, setActions, __designMode }, input)
+    const popupProps: ModalProps = { title, open, footer: actions }
+    if (width) {
+        popupProps.width = width
+    }
     if (popupType === 'Modal') {
-        popupWrapperComponent = <Modal title={title} width={width} onCancel={closePopup} open={open} footer={actions}>{contentComponent}</Modal>
+        popupWrapperComponent = <Modal onCancel={closePopup} {...popupProps}>{content}</Modal>
     } else if (popupType === 'Drawer') {
-        popupWrapperComponent = <Drawer title={title} width={width} onClose={closePopup} open={open} footer={actions} placement={placementType}>{contentComponent}</Drawer>
+        popupWrapperComponent = <Drawer onClose={closePopup} placement={placementType} {...popupProps}>{content}</Drawer>
     }
 
     return (

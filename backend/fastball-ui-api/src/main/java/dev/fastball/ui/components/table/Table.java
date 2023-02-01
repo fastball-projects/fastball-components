@@ -2,6 +2,7 @@ package dev.fastball.ui.components.table;
 
 import dev.fastball.core.annotation.UIApi;
 import dev.fastball.core.component.Component;
+import dev.fastball.core.component.DataResult;
 
 /**
  * @author gr@fastball.dev
@@ -14,6 +15,6 @@ public interface Table<T> extends Component {
      *
      * @return 返回的数据
      */
-    @UIApi
-    TableDataResult<T> loadData();
+    @UIApi(needRecordFilter = true)
+    DataResult<T> loadData();
 }

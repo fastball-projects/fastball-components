@@ -16,6 +16,13 @@ export declare type CustomTagProps = {
     closable: boolean;
 };
 
+export type RefComponentInfo = {
+    componentInfo: ReferencedComponent;
+    currentFieldInput: boolean;
+    dataPath: string[];
+    propsKey: string
+}
+
 export type ReferencedComponent = {
     component?: ReactComponent
     componentClass: string
@@ -36,15 +43,10 @@ export type EnumItem = {
 export type PopupProps = {
     key?: string
     ref?: MutableRefObject
-    title?: string
-    width?: number
-    placementType?: PlacementType
-    popupType: PopupType
-    trigger: ReactComponent
-    triggerType: TriggerType
-    popupComponent: ReferencedComponent
     input?: any
     onClose?: Function
+    trigger: ReactComponent
+    popupInfo: PopupInfo
     __designMode?: string
 }
 
@@ -56,9 +58,9 @@ export type FieldInfo = {
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: EnumItem }
     lookup?: LookupActionInfo
-    popup?: PopupInfo
-    editModeComponent?: UseComponentInfo
-    displayModeComponent?: UseComponentInfo
+    popupInfo?: PopupInfo
+    editModeComponent?: RefComponentInfo
+    displayModeComponent?: RefComponentInfo
     subFields?: FieldInfo[]
     readonly: boolean
     fieldProps: any
@@ -96,28 +98,23 @@ export type TreeLookupActionInfo = {
 } & LookupActionInfo
 
 export type ApiActionInfo = {
+    needArrayWrapper?: boolean
     componentKey: string
     type: 'API'
 } & ActionInfo
 
 export type PopupActionInfo = {
     type: 'Popup'
-} & ActionInfo & PopupInfo
+    popupInfo: PopupInfo
+} & ActionInfo
 
 export type PopupInfo = {
-    popupTitle?: string
+    title?: string
     width?: number
-    dataPath?: string[]
     popupType: PopupType
     triggerType: TriggerType
     placementType: PlacementType
-    popupComponent: ReferencedComponent
-}
-
-export type UseComponentInfo = {
-    componentInfo: ReferencedComponent
-    valueKey: string
-    recordKey: string
+    popupComponent: RefComponentInfo
 }
 
 export type LoadDataType = () => any

@@ -1,7 +1,5 @@
 package dev.fastball.ui.components.timeline.config;
 
-import dev.fastball.core.annotation.ViewAction;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,6 +20,4 @@ public @interface TimelineConfig {
     String timeField() default "";
 
     String colorField() default "";
-
-    ViewAction[] recordActions() default {};
 }

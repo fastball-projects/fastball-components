@@ -7,5 +7,5 @@ import java.util.Map;
  * @since 2023/1/10
  */
 public interface SortableSearch {
-    Map<String, SortOrder> sortFields();
+    Map<String, SortOrder> getSortFields();
 }

@@ -11,9 +11,14 @@ export type TableRecordActionInfo = ApiActionInfo & PopupActionInfo
 export type TableProps = {
     headerTitle?: string
     childrenFieldName?: string
+    wrappedSearch: boolean
+    keywordSearch: boolean
+    size: TableSize
     columns: ColumnInfo[]
     queryFields: FieldInfo[]
     actions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
     rowExpandedComponent?: ReferencedComponent
 } & BasicComponentProps & MultiDataComponent
+
+export type TableSize = 'small' | 'middle' | 'large'

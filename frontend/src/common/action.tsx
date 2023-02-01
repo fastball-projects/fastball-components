@@ -12,10 +12,13 @@ const buildJsonRequestInfo = (): RequestInit => ({
     }
 })
 
-const buildRequestData = async (actionInfo: ActionInfo) => {
+const buildRequestData = async (actionInfo: ApiActionInfo) => {
     let data: Data | Data[] | undefined = actionInfo.data
     if (actionInfo.loadData) {
         data = await actionInfo.loadData()
+    }
+    if (actionInfo.needArrayWrapper) {
+        return [data];
     }
     return data;
 }
@@ -45,7 +48,8 @@ export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data, 
 export const buildAction = (actionInfo: ActionInfo) => {
     if (actionInfo.type === 'API') {
         const apiActionInfo = actionInfo as ApiActionInfo
-        return <FastballActionButton {...apiActionInfo} />
+        apiActionInfo.needArrayWrapper = true;
+        return <FastballActionButton key={apiActionInfo.actionKey} {...apiActionInfo} />
     } else if (actionInfo.type === 'Popup') {
         const popupActionInfo = actionInfo as PopupActionInfo
         return doPopupAction(popupActionInfo)
@@ -58,13 +62,9 @@ export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
     const popupProps: PopupProps = {
         key: popupActionInfo.actionKey,
         ref: popupActionInfo.ref,
-        width: popupActionInfo.width,
-        title: popupActionInfo.popupTitle,
-        popupType: popupActionInfo.popupType,
-        placementType: popupActionInfo.placementType,
+        popupInfo: popupActionInfo.popupInfo,
         onClose: popupActionInfo.callback,
         trigger: popupActionInfo.trigger || <Button>{popupActionInfo.actionName || popupActionInfo.actionKey}</Button>,
-        popupComponent: popupActionInfo.popupComponent,
         input: popupActionInfo.data
     }
     return <FastballPopup {...popupProps} />;

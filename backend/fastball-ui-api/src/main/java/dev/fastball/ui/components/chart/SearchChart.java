@@ -1,20 +1,22 @@
-package dev.fastball.ui.components.tree;
+package dev.fastball.ui.components.chart;
 
 import dev.fastball.core.annotation.UIApi;
 import dev.fastball.core.component.Component;
 
+import java.util.Collection;
+
 /**
  * @author gr@fastball.dev
- * @since 2022/12/20
+ * @since 2023/1/29
  */
-public interface SearchableTree<T, S> extends Component {
+public interface SearchChart<T, S> extends Component {
 
     /**
-     * 树形组件获取数据的接口
+     * 图表组件获取数据的接口
      *
      * @param search 用于搜索的条件
      * @return 返回的数据
      */
     @UIApi
-    TreeDataResult<T> loadData(S search);
+    Collection<T> loadData(S search);
 }

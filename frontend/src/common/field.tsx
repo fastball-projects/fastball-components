@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { ProSchema } from "@ant-design/pro-components";
-import { Select, Tag } from "antd";
+import { ProSchema, ProSchemaComponentTypes, ProFormField } from "@ant-design/pro-components";
+import { Tag } from "antd";
 import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem } from "../../types";
 import { doLookupAction } from "./action";
 import FastballPopup from "./components/Popup";
 import { loadRefComponent } from './component';
+import { getByPaths } from './utils';
 
 const formOnlyField: Record<string, boolean> = {
     group: true, formList: true, formSet: true, divider: true, dependency: true,
@@ -15,17 +16,6 @@ export const filterFormOnlyField = (field: FieldInfo) => formOnlyField[field.val
 export const filterEnabled = (item: Displayable) => item.display !== 'Disabled'
 
 export const filterVisibled = (item: Displayable) => item.display !== 'Disabled' && item.display !== 'Hidden'
-
-export const getByPaths = (record: Record<string, any>, dataPath: string[]) => {
-    let temp: Record<string, any> = record;
-    dataPath.forEach(path => {
-        if (!temp) {
-            return null;
-        }
-        temp = temp[path];
-    })
-    return temp;
-}
 
 export const processingField = (field: FieldInfo, column: ProSchema, __designMode?: string) => {
     if (field.display === 'Hidden') {
@@ -49,12 +39,14 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
     if (field.lookup) {
         const lookupAction: LookupActionInfo = field.lookup;
         const fieldProps = {
-            treeCheckable: lookupAction.multiple,
             fieldNames: {
                 label: lookupAction.labelField,
                 value: lookupAction.valueField,
                 children: lookupAction.childrenField
             }
+        }
+        if (field.valueType == 'treeSelect') {
+            fieldProps.treeCheckable = lookupAction.multiple
         }
         if (lookupAction.multiple) {
             column.fieldProps = Object.assign(fieldProps, { mode: "multiple" })
@@ -64,14 +56,28 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
             return doLookupAction(lookupAction, undefined, __designMode);
         }
     }
-    if (field.fieldType === 'popup' && field.popup) {
-        column.render = (dom, record) => {
-            const { popupTitle, popupComponent, popupType, triggerType, placementType, width, dataPath } = field.popup!;
-            const props: PopupProps = { width, title: popupTitle, trigger: <a>{dom}</a>, popupComponent, popupType, triggerType, placementType }
-            if (dataPath) {
-                props.input = getByPaths(record, dataPath)
+    if (field.fieldType === 'popup' && field.popupInfo) {
+        column.render = (dom, record, index, action?, schema?: ProSchema & { type: ProSchemaComponentTypes }) => {
+            if (schema?.type === 'descriptions' && schema.valueType && ['select', 'treeSelect'].includes(schema.valueType.toString())) {
+                const fieldConfig = {
+                    ignoreFormItem: true,
+                    valueEnum: schema.valueEnum,
+                    valueType: schema.valueType,
+                    fieldProps: schema.fieldProps,
+                    params: schema.params,
+                    request: schema.request,
+                    text: dom,
+                    renderFormItem: undefined,
+                    record,
+                }
+                dom = <ProFormField mode="read" {...fieldConfig} />
+            }
+            const popupInfo = field.popupInfo!;
+            const props: PopupProps = { trigger: <a>{dom}</a>, popupInfo }
+            if (popupInfo.popupComponent.currentFieldInput) {
+                props.input = getByPaths(record, field.dataIndex)
             } else {
-                props.input = record;
+                props.input = getByPaths(record, popupInfo.popupComponent.dataPath)
             }
             return <FastballPopup {...props} />;
         }
@@ -79,19 +85,24 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
     if (field.fieldType === 'component') {
         const { editModeComponent, displayModeComponent, dataIndex } = field;
         if (displayModeComponent) {
-            column.render = (value, record) => {
+            column.render = (_, record) => {
                 const refProps: Record<string, any> = { __designMode }
-                refProps[displayModeComponent.recordKey] = record
-                // render 没有提供 value 的参数, 被换成了 Dom, 但是试了一下基本都还是 value, 否则只能叠加一下 field dataIndex 用 json path 取一下了
-                refProps[displayModeComponent.valueKey] = value
+                if (displayModeComponent.currentFieldInput) {
+                    refProps[displayModeComponent.propsKey] = getByPaths(record, dataIndex)
+                } else {
+                    refProps[displayModeComponent.propsKey] = getByPaths(record, displayModeComponent.dataPath)
+                }
                 return loadRefComponent(displayModeComponent.componentInfo, refProps);
             }
         }
         if (editModeComponent) {
             column.renderFormItem = (_, config) => {
                 const refProps: Record<string, any> = { __designMode }
-                refProps[editModeComponent.valueKey] = config.value
-                refProps[editModeComponent.recordKey] = config.record
+                if (editModeComponent.currentFieldInput) {
+                    refProps[editModeComponent.propsKey] = config.value
+                } else {
+                    refProps[editModeComponent.propsKey] = getByPaths(config.record, editModeComponent.dataPath)
+                }
                 return loadRefComponent(editModeComponent.componentInfo, refProps);
             }
         }

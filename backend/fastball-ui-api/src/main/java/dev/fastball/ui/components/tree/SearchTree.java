@@ -1,0 +1,21 @@
+package dev.fastball.ui.components.tree;
+
+import dev.fastball.core.annotation.UIApi;
+import dev.fastball.core.component.Component;
+import dev.fastball.core.component.DataResult;
+
+/**
+ * @author gr@fastball.dev
+ * @since 2022/12/20
+ */
+public interface SearchTree<T> extends Component {
+
+    /**
+     * 树形组件获取数据的接口
+     *
+     * @param search 用于搜索的关键字
+     * @return 返回的数据
+     */
+    @UIApi
+    DataResult<T> loadData(String search);
+}

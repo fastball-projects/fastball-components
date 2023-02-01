@@ -5,22 +5,20 @@ import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
-import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.component.Component;
-import dev.fastball.core.info.action.ActionInfo;
 import dev.fastball.ui.components.table.ColumnInfo;
 import dev.fastball.ui.components.table.TableProps_AutoValue;
 import dev.fastball.ui.components.table.config.CopyableColumn;
 import dev.fastball.ui.components.table.config.SortableColumn;
 import dev.fastball.ui.components.table.config.TableConfig;
+import dev.fastball.ui.components.table.param.TableSearchParam;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static dev.fastball.compile.utils.ElementCompileUtils.getReferencedComponentInfo;
 
@@ -43,9 +41,35 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
 
     @Override
     protected void compileProps(TableProps_AutoValue props, CompileContext compileContext) {
-        compileBasicConfig(compileContext, props);
-        compileButtons(compileContext, props);
-        compileRecordActions(compileContext, props);
+        List<? extends TypeMirror> genericTypes = getGenericTypes(compileContext);
+
+        TypeElement returnType = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(genericTypes.get(0));
+        props.columns(buildTableColumnsFromReturnType(returnType, compileContext.getProcessingEnv(), props));
+        if (searchable()) {
+            TypeElement searchType = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(genericTypes.get(1));
+            if (Objects.equals(searchType.getQualifiedName().toString(), TableSearchParam.class.getCanonicalName())) {
+                TypeMirror realSearchType = ((DeclaredType) genericTypes.get(1)).getTypeArguments().get(0);
+                searchType = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(realSearchType);
+                props.wrappedSearch(true);
+            }
+            props.queryFields(TypeCompileUtils.compileTypeFields(searchType, compileContext.getProcessingEnv(), props));
+        }
+
+        TableConfig tableConfig = compileContext.getComponentElement().getAnnotation(TableConfig.class);
+        if (tableConfig == null) {
+            return;
+        }
+        TypeMirror rowExpandedComponent = ElementCompileUtils.getTypeMirrorFromAnnotationValue(tableConfig::rowExpandedComponent);
+        if (rowExpandedComponent == null || !Component.class.getCanonicalName().equals(rowExpandedComponent.toString())) {
+            TypeElement rowExpandedComponentElement = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(rowExpandedComponent);
+            props.rowExpandedComponent(getReferencedComponentInfo(props, rowExpandedComponentElement));
+        }
+
+        if (!tableConfig.childrenFieldName().isEmpty()) {
+            props.childrenFieldName(tableConfig.childrenFieldName());
+        }
+        props.size(tableConfig.size());
+        props.keywordSearch(tableConfig.keywordSearch());
     }
 
     @Override
@@ -62,56 +86,5 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 tableColumn.setCopyable(true);
             }
         });
-    }
-
-    private void compileRecordActions(CompileContext compileContext, TableProps_AutoValue props) {
-        List<ActionInfo> recordActions = ElementCompileUtils
-                .getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv()).values().stream()
-                .map(this::buildRecordActionInfo).filter(Objects::nonNull).collect(Collectors.toList());
-        TableConfig tableConfig = compileContext.getComponentElement().getAnnotation(TableConfig.class);
-        if (tableConfig != null) {
-            int index = 1;
-            for (ViewAction action : tableConfig.recordActions()) {
-                recordActions.add(buildViewActionInfo(action, props, "button" + index++));
-            }
-        }
-        props.recordActions(recordActions);
-    }
-
-    private void compileButtons(CompileContext compileContext, TableProps_AutoValue props) {
-        TableConfig tableConfig = compileContext.getComponentElement().getAnnotation(TableConfig.class);
-        if (tableConfig == null) {
-            return;
-        }
-        List<ActionInfo> viewActionInfoList = new ArrayList<>();
-        int index = 1;
-        for (ViewAction action : tableConfig.actions()) {
-            ActionInfo viewActionInfo = buildViewActionInfo(action, props, "button" + index++);
-            viewActionInfoList.add(viewActionInfo);
-        }
-        props.actions(viewActionInfoList);
-    }
-
-    private void compileBasicConfig(CompileContext compileContext, TableProps_AutoValue props) {
-        List<TypeElement> genericTypes = getGenericTypes(compileContext);
-
-        props.columns(buildTableColumnsFromReturnType(genericTypes.get(0), compileContext.getProcessingEnv(), props));
-        if (searchable()) {
-            props.queryFields(TypeCompileUtils.compileTypeFields(genericTypes.get(1), compileContext.getProcessingEnv(), props));
-        }
-
-        TableConfig tableConfig = compileContext.getComponentElement().getAnnotation(TableConfig.class);
-        if (tableConfig == null) {
-            return;
-        }
-        TypeMirror rowExpandedComponent = ElementCompileUtils.getTypeMirrorFromAnnotationValue(tableConfig::rowExpandedComponent);
-        if (rowExpandedComponent == null || !Component.class.getCanonicalName().equals(rowExpandedComponent.toString())) {
-            TypeElement rowExpandedComponentElement = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(rowExpandedComponent);
-            props.rowExpandedComponent(getReferencedComponentInfo(props, rowExpandedComponentElement));
-        }
-
-        if (tableConfig.childrenFieldName().isEmpty()) {
-            props.childrenFieldName(tableConfig.childrenFieldName());
-        }
     }
 }

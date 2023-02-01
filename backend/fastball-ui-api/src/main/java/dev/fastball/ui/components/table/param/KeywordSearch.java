@@ -5,5 +5,5 @@ package dev.fastball.ui.components.table.param;
  * @since 2023/1/10
  */
 public interface KeywordSearch {
-    String keyword();
+    String getKeyword();
 }

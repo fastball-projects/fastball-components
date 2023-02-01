@@ -1,0 +1,5 @@
+theme: default
+menus:
+  ShowCaseTable:
+    title: 表格示例
+    component: ${package}.ShowCaseTable

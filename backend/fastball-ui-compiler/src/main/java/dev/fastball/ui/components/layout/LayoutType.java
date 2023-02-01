@@ -5,6 +5,7 @@ package dev.fastball.ui.components.layout;
  * @since 2022/12/19
  */
 public enum LayoutType {
+    Grid,
     LeftAndRight,
     TopAndBottom,
     LeftAndTopBottom

@@ -2,6 +2,7 @@ package dev.fastball.ui.components.tree;
 
 import dev.fastball.core.annotation.UIApi;
 import dev.fastball.core.component.Component;
+import dev.fastball.core.component.DataResult;
 
 /**
  * @author gr@fastball.dev
@@ -16,5 +17,5 @@ public interface VariableTree<T, P> extends Component {
      * @return 返回的数据
      */
     @UIApi
-    TreeDataResult<T> loadData(P param);
+    DataResult<T> loadData(P param);
 }

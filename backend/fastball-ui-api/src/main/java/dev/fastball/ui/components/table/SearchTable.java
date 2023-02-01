@@ -2,6 +2,7 @@ package dev.fastball.ui.components.table;
 
 import dev.fastball.core.annotation.UIApi;
 import dev.fastball.core.component.Component;
+import dev.fastball.core.component.DataResult;
 
 /**
  * @author gr@fastball.dev
@@ -15,6 +16,6 @@ public interface SearchTable<T, S> extends Component {
      * @param search 用于搜索的条件
      * @return 返回的数据
      */
-    @UIApi
-    TableDataResult<T> loadData(S search);
+    @UIApi(needRecordFilter = true)
+    DataResult<T> loadData(S search);
 }

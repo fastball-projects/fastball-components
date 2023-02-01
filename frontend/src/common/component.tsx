@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import type { ProRenderFieldPropsType } from '@ant-design/pro-components'
-
 import { ReactComponent, ReferencedComponent } from "../../types";
 
 const PreviewComponent: ReactComponent<any> | undefined = window.PreviewComponent || window.parent.PreviewComponent

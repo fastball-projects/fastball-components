@@ -4,12 +4,29 @@ import dev.fastball.auto.value.annotation.AutoValue;
 import dev.fastball.core.info.component.ComponentProps;
 import dev.fastball.core.info.component.ReferencedComponentInfo;
 
+import java.util.List;
+
 /**
  * @author gr@fastball.dev
  * @since 2022/12/19
  */
 public interface LayoutProps extends ComponentProps {
     LayoutType layoutType();
+}
+
+@AutoValue
+interface GridLayoutProps extends LayoutProps {
+    LayoutType layoutType = LayoutType.Grid;
+
+    int cols();
+
+    int rowHeight();
+
+    boolean resizable();
+
+    boolean draggable();
+
+    List<GridCellProps_AutoValue> cells();
 }
 
 @AutoValue

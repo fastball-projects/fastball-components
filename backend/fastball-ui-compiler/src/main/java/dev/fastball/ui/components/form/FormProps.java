@@ -1,7 +1,6 @@
 package dev.fastball.ui.components.form;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.action.ActionInfo;
 import dev.fastball.core.info.basic.FieldInfo;
 import dev.fastball.core.info.basic.PopupType;
 import dev.fastball.core.info.component.ComponentProps;
@@ -25,6 +24,4 @@ public interface FormProps extends ComponentProps {
     PopupType popupType();
 
     List<FieldInfo> fields();
-
-    List<ActionInfo> actions();
 }

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Timeline as AntDTimeline, MenuProps, Spin } from 'antd';
+import { Timeline as AntDTimeline, Spin } from 'antd';
 import type { TimelineProps as AntDTimelineProps } from 'antd';
-import { buildAction, doApiAction } from '../../common'
+import { doApiAction } from '../../common'
 import { Data, TimelineProps } from '../../../types';
 
 const mockData: Data[] = [

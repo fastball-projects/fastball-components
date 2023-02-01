@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <fastball.version>0.1.1-SNAPSHOT</fastball.version>
+        <fastball-ui.version>0.0.132-SNAPSHOT</fastball-ui.version>
+        <spring-boot.version>2.7.7</spring-boot.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>dev.fastball</groupId>
+            <artifactId>fastball-ui-api</artifactId>
+            <version>${fastball-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.fastball</groupId>
+            <artifactId>spring-boot-starter-fastball</artifactId>
+            <version>${fastball.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.fastball</groupId>
+            <artifactId>fastball-runtime-spring-devtools</artifactId>
+            <version>${fastball.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>dev.fastball</groupId>
+            <artifactId>fastball-ui-compiler</artifactId>
+            <version>${fastball-ui.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-maven-plugin</artifactId>
+                <version>${fastball.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <attach>false</attach>
+                    <mainClass>${package}.Application</mainClass>
+                    <layout>JAR</layout>
+                    <excludes>
+                        <exclude>
+                            <groupId>dev.fastball</groupId>
+                            <artifactId>fastball-runtime-spring-devtools</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

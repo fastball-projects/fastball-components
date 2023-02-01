@@ -1,7 +1,5 @@
 package dev.fastball.ui.components.form.config;
 
-import dev.fastball.core.annotation.ViewAction;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,6 +15,4 @@ public @interface FormConfig {
     boolean showReset() default true;
 
     boolean readonly() default false;
-
-    ViewAction[] buttons() default {};
 }

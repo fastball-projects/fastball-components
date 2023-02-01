@@ -1,10 +1,10 @@
 package dev.fastball.ui.components.table;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.action.ActionInfo;
 import dev.fastball.core.info.basic.FieldInfo;
 import dev.fastball.core.info.component.ComponentProps;
 import dev.fastball.core.info.component.ReferencedComponentInfo;
+import dev.fastball.ui.components.table.param.TableSize;
 
 import java.util.List;
 
@@ -19,13 +19,15 @@ public interface TableProps extends ComponentProps {
 
     String childrenFieldName();
 
+    boolean wrappedSearch();
+
+    boolean keywordSearch();
+
+    TableSize size();
+
     ReferencedComponentInfo rowExpandedComponent();
 
     List<ColumnInfo> columns();
 
     List<FieldInfo> queryFields();
-
-    List<ActionInfo> actions();
-
-    List<ActionInfo> recordActions();
 }

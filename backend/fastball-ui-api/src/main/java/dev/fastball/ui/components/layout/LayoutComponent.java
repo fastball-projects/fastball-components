@@ -12,29 +12,9 @@ import java.lang.annotation.Target;
  * @since 2022/12/19
  */
 public interface LayoutComponent extends Component {
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface LeftAndRight {
-        Class<? extends Component> left();
 
-        Class<? extends Component> right();
-    }
 
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface TopAndBottom {
-        Class<? extends Component> top();
 
-        Class<? extends Component> bottom();
-    }
 
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface LeftAndTopBottom {
-        Class<? extends Component> left();
 
-        Class<? extends Component> top();
-
-        Class<? extends Component> bottom();
-    }
 }

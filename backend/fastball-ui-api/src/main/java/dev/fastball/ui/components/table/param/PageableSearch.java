@@ -5,7 +5,7 @@ package dev.fastball.ui.components.table.param;
  * @since 2023/1/10
  */
 public interface PageableSearch {
-    Long pageSize();
+    Long getPageSize();
 
-    Long current();
+    Long getCurrent();
 }

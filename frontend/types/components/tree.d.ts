@@ -7,7 +7,13 @@ export type TreeProps = {
         title: string
         children: string
     }
+    asyncTree: boolean
     defaultExpandAll: boolean
     data?: Data[]
     recordActions?: ApiActionInfo[]
 } & BasicComponentProps & MultiDataComponent
+
+export type TreeState = {
+    treeData?: Data[]
+    loading?: boolean
+}

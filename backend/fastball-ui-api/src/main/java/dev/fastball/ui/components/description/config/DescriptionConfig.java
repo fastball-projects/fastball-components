@@ -1,7 +1,5 @@
 package dev.fastball.ui.components.description.config;
 
-import dev.fastball.core.annotation.ViewAction;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,6 +15,4 @@ public @interface DescriptionConfig {
     int column() default 2;
 
     DescriptionSize size() default DescriptionSize.Default;
-
-    ViewAction[] buttons() default {};
 }

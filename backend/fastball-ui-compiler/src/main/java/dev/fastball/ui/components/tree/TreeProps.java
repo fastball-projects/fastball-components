@@ -1,13 +1,10 @@
 package dev.fastball.ui.components.tree;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.action.ActionInfo;
 import dev.fastball.core.info.component.ComponentProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * @author gr@fastball.dev
@@ -22,7 +19,9 @@ public interface TreeProps extends ComponentProps {
 
     boolean defaultExpandAll();
 
-    List<ActionInfo> recordActions();
+    boolean searchable();
+
+    boolean asyncTree();
 
     @Data
     @NoArgsConstructor

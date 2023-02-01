@@ -2,6 +2,7 @@ package dev.fastball.ui.components.table;
 
 import dev.fastball.core.annotation.UIApi;
 import dev.fastball.core.component.Component;
+import dev.fastball.core.component.DataResult;
 
 /**
  * @author gr@fastball.dev
@@ -16,6 +17,6 @@ public interface VariableSearchTable<T, S, P> extends Component {
      * @param param 传入该组件的入参, 可用于组件间联动传递
      * @return 返回的数据
      */
-    @UIApi
-    TableDataResult<T> loadData(S search, P param);
+    @UIApi(needRecordFilter = true)
+    DataResult<T> loadData(S search, P param);
 }

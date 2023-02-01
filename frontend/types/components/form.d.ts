@@ -8,7 +8,7 @@ export type FormProps = {
     readonly: boolean
     size?: FormSize
     fields: FieldInfo[]
-    actions?: ActionInfo[]
+    recordActions?: ActionInfo[]
     data?: Data
     initialValues?: Data
 } & BasicComponentProps & PopupComponentProps

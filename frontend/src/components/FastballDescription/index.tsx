@@ -17,8 +17,8 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
     }
 
     getActions() {
-        const { componentKey, closePopup, input, actions } = this.props;
-        const buttons = actions ? actions.filter(filterVisibled).map(action => {
+        const { componentKey, closePopup, input, recordActions } = this.props;
+        const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
             if (action.closePopupOnSuccess !== false && closePopup) {
                 action.callback = () => {
                     closePopup()
@@ -76,12 +76,19 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
     }
 
     render(): React.ReactNode {
-        const { componentKey, fields = [], actions = [], input, column, variableDescription, setActions, __designMode, ...props } = this.props;
+        const { componentKey, input, column, variableDescription, setActions, __designMode, ...props } = this.props;
 
         const proDescriptionsProps: ProDescriptionsProps = { column };
         proDescriptionsProps.size = 'small'
         if (variableDescription && __designMode !== 'design') {
-            proDescriptionsProps.request = async () => await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+            proDescriptionsProps.request = async () => {
+                try {
+                    const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+                    return { data, success: true }
+                } catch (e) {
+                    return { success: false }
+                }
+            }
         } else if (input) {
             proDescriptionsProps.dataSource = input
         }

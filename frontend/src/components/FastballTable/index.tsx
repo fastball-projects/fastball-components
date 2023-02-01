@@ -25,12 +25,12 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
-    const proTableProps: ProTableProps<Data, Data> = { size: 'small', search: { filterType: 'light' }, rowKey: 'id' };
+    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id' };
     const proTableColumns: ProTableColumn[] = [];
 
-    const buildTableColumns = (field: FieldInfo, parentDataIndex?: string[]) => {
+    const buildTableColumns = (field: ColumnInfo, parentDataIndex?: string[]) => {
         if (field.valueType === 'Array') {
             return;
         }
@@ -44,6 +44,11 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
             field.subFields.forEach(subField => buildTableColumns(subField, field.dataIndex))
             return;
         }
+        if (field.valueType === 'textarea') {
+            column.ellipsis = true
+        }
+        column.width = 120
+        column.sorter = field.sortable
         proTableColumns.push(column);
     }
 
@@ -51,7 +56,15 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         proTableProps.dataSource = buildMockData(columns);
     } else {
         proTableProps.request = async (params, sortFields, filter) => {
-            const data = [Object.assign({ sortFields }, filter, params), input]
+            const { pageSize, current, keyword, ...searchFields } = params
+            const searchParam = { sortFields, pageSize, current, keyword };
+            if (wrappedSearch) {
+                const search = Object.assign({}, searchFields, filter);
+                Object.assign(searchParam, { search });
+            } else {
+                Object.assign(searchParam, searchFields, filter);
+            }
+            const data = [searchParam, input]
             return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
         }
     }
@@ -84,27 +97,34 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
             align: 'left',
             render: (_, record) => {
                 return recordActions ? recordActions.filter(filterVisibled).map((action) => {
-                    const { actionKey, actionName, type, refresh } = action;
+                    const { actionKey, actionName, refresh } = action;
+                    const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
+                    if (recordActionAvailableFlags[actionKey] === false) {
+                        return null;
+                    }
                     const trigger = <Button type='link'>{actionName || actionKey}</Button>
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
                     if (refresh) {
                         actionInfo.callback = () => ref.current?.reload()
                     }
                     return buildAction(actionInfo)
-                }) : [];
+                }).filter(action => action != null) : [];
             }
         })
     }
 
     proTableProps.columns = proTableColumns
-    proTableProps.toolBarRender = () => actionButtons
-    proTableProps.expandable = {}
+    proTableProps.toolbar = { actions: actionButtons }
+    proTableProps.options = {}
+    if (keywordSearch) {
+        proTableProps.options.search = true
+    }
 
+    proTableProps.expandable = {}
 
     if (rowExpandedComponent) {
         proTableProps.expandable.expandedRowRender = (record) => loadRefComponent(rowExpandedComponent, { input: record, __designMode })
     }
-
 
     if (childrenFieldName) {
         proTableProps.expandable.childrenColumnName = childrenFieldName
@@ -113,6 +133,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         proTableProps.expandable.childrenColumnName = "__Fastball__Children__Column__"
     }
 
+    proTableProps.cardProps = false
     if (onRecordClick) {
         proTableProps.onRow = (record) => {
             return {
