@@ -11,6 +11,11 @@ const formOnlyField: Record<string, boolean> = {
     group: true, formList: true, formSet: true, divider: true, dependency: true,
 }
 
+const setDateRangeFieldProps = (column: ProSchema, fieldProps: Record<string, any>) => {
+    column.valueType = 'dateRange'
+    column.fieldProps = Object.assign(column.fieldProps || {}, fieldProps)
+}
+
 export const filterFormOnlyField = (field: FieldInfo) => formOnlyField[field.valueType] !== true
 
 export const filterEnabled = (item: Displayable) => item.display !== 'Disabled'
@@ -27,6 +32,14 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
     if (field.valueType == 'multiSelect') {
         column.valueType = 'select'
         column.fieldProps = Object.assign(column.fieldProps || {}, { mode: "multiple" })
+    } else if (field.valueType == 'dateWeekRange') {
+        setDateRangeFieldProps(column, { picker: "week", format: "YYYY-WW" })
+    } else if (field.valueType == 'dateMonthRange') {
+        setDateRangeFieldProps(column, { picker: "month", format: "YYYY-MM" })
+    } else if (field.valueType == 'dateQuarterRange') {
+        setDateRangeFieldProps(column, { picker: "quarter", format: "YYYY-Q" })
+    } else if (field.valueType == 'dateYearRange') {
+        setDateRangeFieldProps(column, { picker: "year", format: "YYYY" })
     }
     if (field.valueType == 'select' || field.valueType == 'multiSelect') {
         const tagRender = ({ label, value, closable, onClose }: CustomTagProps) => (

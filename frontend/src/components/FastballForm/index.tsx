@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { BetaSchemaForm, ProSchema } from '@ant-design/pro-components'
-import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, FormInstance } from '@ant-design/pro-components';
+import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import type { Data, FieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField } from '../../common';
 import { Button } from 'antd';
@@ -8,7 +8,7 @@ import { Button } from 'antd';
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
 
 class FastballForm extends React.Component<FormProps, any> {
-    ref = React.createRef<FormInstance>();
+    ref = React.createRef<ProFormInstance>();
 
     constructor(props: FormProps) {
         super(props)
@@ -31,7 +31,7 @@ class FastballForm extends React.Component<FormProps, any> {
             return buildAction({
                 componentKey, ...action, loadData: async () => {
                     const data: Data = {}
-                    const formData = await this.ref.current?.validateFields()
+                    const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
                     Object.assign(data, input, formData)
                     return data;
                 }
@@ -101,6 +101,7 @@ class FastballForm extends React.Component<FormProps, any> {
             proFormProps.submitter = { render: () => this.getActions() }
         }
 
+        console.log(proFormProps)
         return <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
     }
 }
