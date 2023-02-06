@@ -24,11 +24,11 @@ public interface TimelineProps extends ComponentProps {
     @NoArgsConstructor
     @AllArgsConstructor
     final class TimelineFieldNames {
-        public static final TimelineFieldNames DEFAULT = new TimelineFieldNames("id", "title", "time", "color");
+        public static final TimelineFieldNames DEFAULT = new TimelineFieldNames("id", "left", "right", "color");
 
         private String key;
-        private String title;
-        private String time;
+        private String left;
+        private String right;
         private String color;
     }
 }

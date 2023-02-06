@@ -11,10 +11,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ChartConfig {
-
-    ChartType type();
-
+public @interface ColumnChartConfig {
     String xField();
 
     String yField();

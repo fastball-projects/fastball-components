@@ -4,8 +4,8 @@ import { BasicComponentProps, MultiDataComponent } from '../component'
 export type TimelineProps = {
     fieldNames: {
         key: string
-        title: string
-        time?: string
+        left: string
+        right: string
         color?: string
     }
     data?: Data[]

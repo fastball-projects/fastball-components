@@ -47,7 +47,6 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         if (field.valueType === 'textarea') {
             column.ellipsis = true
         }
-        column.width = 120
         column.sorter = field.sortable
         proTableColumns.push(column);
     }

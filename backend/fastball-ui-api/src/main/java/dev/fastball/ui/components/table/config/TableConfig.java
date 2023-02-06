@@ -29,6 +29,11 @@ public @interface TableConfig {
      */
     String childrenFieldName() default "";
 
+    /**
+     * 是否支持关键字搜索, 如开启, 入参需要使用 {@link dev.fastball.ui.components.table.param.TableSearchParam} 包装
+     *
+     * @return 是否支持关键字搜索
+     */
     boolean keywordSearch() default false;
 
     Class<? extends Component> rowExpandedComponent() default Component.class;

@@ -13,13 +13,29 @@ import java.lang.annotation.Target;
 @Target({})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GridCell {
-    int x();
+    /**
+     * @return 格子在网格中的 X 轴坐标
+     */
+    int x() default 0;
 
-    int y();
+    /**
+     * @return 格子在网格中的 Y 轴坐标
+     */
+    int y() default 0;
 
+    /**
+     * @return 格子在网格中的宽度, 即占几列
+     */
     int width() default 6;
 
+
+    /**
+     * @return 格子在网格中的高度, 即占几行
+     */
     int height() default 6;
 
+    /**
+     * @return 格子内的组件
+     */
     Class<? extends Component> component();
 }

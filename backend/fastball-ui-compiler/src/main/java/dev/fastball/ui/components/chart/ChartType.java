@@ -1,4 +1,4 @@
-package dev.fastball.ui.components.chart.config;
+package dev.fastball.ui.components.chart;
 
 /**
  * @author gr@fastball.dev

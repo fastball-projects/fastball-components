@@ -12,13 +12,29 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GridLayout {
+
+    /**
+     * @return 网格布局的格子内容
+     */
     GridCell[] cells();
 
+    /**
+     * @return 网格布局的列数
+     */
     int cols() default 12;
 
+    /**
+     * @return 网格的每一行的高度
+     */
     int rowHeight() default 32;
 
+    /**
+     * @return 是否可以改变大小
+     */
     boolean resizable() default false;
 
+    /**
+     * @return 是否可以拖动
+     */
     boolean draggable() default false;
 }

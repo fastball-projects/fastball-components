@@ -8,30 +8,30 @@ const mockData: Data[] = [
     {
         key: 1,
         color: 'green',
-        time: '2015-09-01',
-        title: 'Create a services site'
+        left: '2015-09-01',
+        right: 'Create a services site'
     }, {
         key: 2,
         color: 'red',
-        time: '2016-01-01',
-        title: 'Solve initial network problems 1'
+        left: '2016-01-01',
+        right: 'Solve initial network problems 1'
     }, {
         key: 3,
         color: 'gray',
-        time: '2016-12-31',
-        title: 'Technical testing 1\nTechnical testing 2\nTechnical testing 3'
+        left: '2016-12-31',
+        right: 'Technical testing 1\nTechnical testing 2\nTechnical testing 3'
     }, {
         key: 4,
         color: '#00CCFF',
-        time: '2017-01-01',
-        title: 'Custom color testing'
+        left: '2017-01-01',
+        right: 'Custom color testing'
     }
 ]
 
 const defaultFieldNames: TimelineProps['fieldNames'] = {
     key: 'id',
-    title: 'title',
-    time: 'time',
+    right: 'right',
+    left: 'left',
     color: 'color'
 }
 
@@ -52,12 +52,12 @@ const Timeline: React.FC<TimelineProps> = ({ componentKey, onRecordClick, __desi
     const treeProps: AntDTimelineProps = {}
 
     const items = timelineData.map((record: Data) => {
-        const { key, time, title, color } = timeLineFieldNames;
+        const { key, left, right, color } = timeLineFieldNames;
 
-        return <AntDTimeline.Item
+        return <AntDTimeline.Item key={key}
             color={color && record?.[color] as string || undefined}
-            label={time ? record[time] as string : null}
-        >{record[title] as string}</AntDTimeline.Item>
+            label={left ? record[left] as string : null}
+        >{record[right] as string}</AntDTimeline.Item>
     })
 
     return (

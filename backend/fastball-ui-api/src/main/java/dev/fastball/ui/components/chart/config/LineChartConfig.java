@@ -1,4 +1,4 @@
-package dev.fastball.ui.components.form.config;
+package dev.fastball.ui.components.chart.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,15 +7,14 @@ import java.lang.annotation.Target;
 
 /**
  * @author gr@fastball.dev
- * @since 2023/1/9
+ * @since 2023/1/29
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FormConfig {
+public @interface LineChartConfig {
+    String xField();
 
-    String title() default "";
+    String yField();
 
-    boolean showReset() default true;
-
-    boolean readonly() default false;
+    String seriesField() default "";
 }

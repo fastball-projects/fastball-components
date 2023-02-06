@@ -5,7 +5,12 @@ import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.exception.CompilerException;
 import dev.fastball.core.component.Component;
-import dev.fastball.ui.components.chart.config.ChartConfig;
+import dev.fastball.ui.components.chart.config.AreaChartConfig;
+import dev.fastball.ui.components.chart.config.BarChartConfig;
+import dev.fastball.ui.components.chart.config.ColumnChartConfig;
+import dev.fastball.ui.components.chart.config.LineChartConfig;
+
+import static dev.fastball.compile.utils.ElementCompileUtils.getReferencedComponentInfo;
 
 /**
  * @author gr@fastball.dev
@@ -22,14 +27,32 @@ public abstract class AbstractChartCompiler<T extends Component> extends Abstrac
 
     @Override
     protected void compileProps(ChartProps_AutoValue props, CompileContext compileContext) {
-        ChartConfig config = compileContext.getComponentElement().getAnnotation(ChartConfig.class);
-        if (config == null) {
-            String message = String.format("Chart component [%s] must add annotation @ChartConfig", compileContext.getComponentElement().getQualifiedName());
+        ChartProps.ChartFieldNames fieldNames = null;
+        AreaChartConfig areaChartConfig = compileContext.getComponentElement().getAnnotation(AreaChartConfig.class);
+        if (areaChartConfig != null) {
+            props.type(ChartType.Area);
+            fieldNames = new ChartProps.ChartFieldNames(areaChartConfig.xField(), areaChartConfig.yField(), areaChartConfig.seriesField());
+        }
+        BarChartConfig barChartConfig = compileContext.getComponentElement().getAnnotation(BarChartConfig.class);
+        if (barChartConfig != null) {
+            props.type(ChartType.Bar);
+            fieldNames = new ChartProps.ChartFieldNames(barChartConfig.xField(), barChartConfig.yField(), barChartConfig.seriesField());
+        }
+        ColumnChartConfig columnChartConfig = compileContext.getComponentElement().getAnnotation(ColumnChartConfig.class);
+        if (columnChartConfig != null) {
+            props.type(ChartType.Column);
+            fieldNames = new ChartProps.ChartFieldNames(columnChartConfig.xField(), columnChartConfig.yField(), columnChartConfig.seriesField());
+        }
+        LineChartConfig lineChartConfig = compileContext.getComponentElement().getAnnotation(LineChartConfig.class);
+        if (lineChartConfig != null) {
+            props.type(ChartType.Line);
+            fieldNames = new ChartProps.ChartFieldNames(lineChartConfig.xField(), lineChartConfig.yField(), lineChartConfig.seriesField());
+        }
+        if (fieldNames == null) {
+            String message = String.format("Chart component [%s] must add annotation @AreaChartConfig, @BarChartConfig, @ColumnChartConfig or @LineChartConfig", compileContext.getComponentElement().getQualifiedName());
             throw new CompilerException(message);
         }
-        ChartProps.ChartFieldNames fieldNames = new ChartProps.ChartFieldNames(config.xField(), config.yField(), config.seriesField());
         props.fieldNames(fieldNames);
-        props.type(config.type());
     }
 
     @Override

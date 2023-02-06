@@ -13,11 +13,20 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TimelineConfig {
 
-    String keyField();
+    /**
+     * @return 数据表示字段, 默认为 id
+     */
+    String keyField() default "id";
 
-    String titleField();
+    /**
+     * @return 时间轴的左侧字段
+     */
+    String leftField();
 
-    String timeField() default "";
+    /**
+     * @return 时间轴的右侧字段
+     */
+    String rightField();
 
     String colorField() default "";
 }

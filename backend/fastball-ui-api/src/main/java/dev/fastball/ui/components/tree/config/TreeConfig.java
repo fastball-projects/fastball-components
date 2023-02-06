@@ -13,11 +13,23 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TreeConfig {
 
+    /**
+     * @return 数据的标识字段, 默认是 id
+     */
     String keyField() default "id";
 
-    String titleField() default "title";
+    /**
+     * @return 展示字段
+     */
+    String titleField();
 
-    String childrenField() default "children";
+    /**
+     * @return 子字段, 用于声明树形数据的子孙数据字段
+     */
+    String childrenField();
 
+    /**
+     * @return 是否默认展开所有节点, 仅在同步树情况下生效
+     */
     boolean defaultExpandAll() default false;
 }
