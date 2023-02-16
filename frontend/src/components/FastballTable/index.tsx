@@ -8,7 +8,7 @@ import { Button } from 'antd';
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
 const buildMockData = (columns: ColumnInfo[]) => {
-    const record: Data = {};
+    const record: Data = { recordActionAvailableFlags: {} };
     columns.forEach(({ dataIndex, valueType }) => {
         if (valueType === 'digit') {
             record[dataIndex] = 9527
