@@ -1,16 +1,33 @@
 import React from 'react'
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import { MD5 } from 'object-hash'
 import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo } from '../../types'
 import FastballPopup from './components/Popup'
 import FastballActionButton from './components/ActionButton';
 
-const buildJsonRequestInfo = (): RequestInit => ({
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
+const TOKEN_LOCAL_KEY = 'fastball_token';
+
+const buildJsonRequestInfo = (): RequestInit => {
+
+    const tokenJson = localStorage.getItem(TOKEN_LOCAL_KEY)
+    let authorization: string = '';
+    if (tokenJson) {
+        const { token, expiration } = JSON.parse(tokenJson);
+        if (Date.now() < expiration) {
+            authorization = token;
+        } else {
+            localStorage.removeItem(TOKEN_LOCAL_KEY)
+        }
     }
-})
+    const request = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            AUTHORIZATION_HEADER_KEY: authorization
+        }
+    }
+    return request;
+}
 
 const buildRequestData = async (actionInfo: ApiActionInfo) => {
     let data: Data | Data[] | undefined = actionInfo.data
@@ -81,7 +98,15 @@ export const doApiAction = async (actionInfo: ApiActionInfo) => {
         actionInfo.callback()
     }
     if (json) {
-        return JSON.parse(json);
+        const result = JSON.parse(json);
+        if (result.status === 200) {
+            return result.data;
+        }
+        if (result.status === 401) {
+            location.href = '/login?redirectUrl=' + location.href
+        } else {
+            message.error(`Error ${result.status}: ${result.message}`);
+        }
     }
 }
 

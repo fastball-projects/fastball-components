@@ -3,7 +3,8 @@ import { ProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo } from '../../../types';
 import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField } from '../../common';
-import { Button } from 'antd';
+import { Button, Dropdown, MenuProps, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -95,19 +96,31 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
             valueType: 'option',
             align: 'left',
             render: (_, record) => {
-                return recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
                     const { actionKey, actionName, refresh } = action;
                     const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
-                    if (recordActionAvailableFlags[actionKey] === false) {
+                    if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
                         return null;
                     }
+
                     const trigger = <Button type='link'>{actionName || actionKey}</Button>
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
                     if (refresh) {
                         actionInfo.callback = () => ref.current?.reload()
                     }
-                    return buildAction(actionInfo)
+                    return { key: actionKey, label: buildAction(actionInfo) }
                 }).filter(action => action != null) : [];
+                
+                return (
+                    <Dropdown menu={{ items }}>
+                        <a onClick={(e) => e.preventDefault()}>
+                        <Space>
+                            操作
+                            <DownOutlined />
+                        </Space>
+                        </a>
+                    </Dropdown>
+                )
             }
         })
     }
