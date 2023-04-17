@@ -6,7 +6,7 @@ import { LeftAndRightLayoutProps } from '../../../types'
 
 const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayoutProps) => {
     const [record, setRecord] = React.useState(null)
-    const left = loadRefComponent(props.left, { onRecordClick: setRecord, __designMode: props.__designMode, input: props.input })
+    const left = loadRefComponent(props.left, { onRecordClick: setRecord, onDataLoad: props.interlocking ? setRecord : null, __designMode: props.__designMode, input: props.input })
     const right = loadRefComponent(props.right, { key: MD5(record), __designMode: props.__designMode, input: record })
     return (
         <ProCard

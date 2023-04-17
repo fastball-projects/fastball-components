@@ -2,6 +2,7 @@ import { FieldInfo, ActionInfo, Data } from '../common'
 import { BasicComponentProps, PopupComponentProps } from '../component'
 
 export type FormProps = {
+    column?: number
     headerTitle?: string
     showReset: boolean
     variableForm: boolean

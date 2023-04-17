@@ -29,6 +29,7 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         FormConfig config = compileContext.getComponentElement().getAnnotation(FormConfig.class);
         if (config != null) {
             props.showReset(config.showReset());
+            props.column(config.column());
             props.readonly(config.readonly());
         } else {
             props.showReset(true);

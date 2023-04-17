@@ -13,6 +13,8 @@ import java.util.List;
  */
 @AutoValue
 public interface FormProps extends ComponentProps {
+    int column();
+
     String headerTitle();
 
     boolean variableForm();

@@ -26,7 +26,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id' };
     const proTableColumns: ProTableColumn[] = [];
@@ -65,7 +65,11 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                 Object.assign(searchParam, searchFields, filter);
             }
             const data = [searchParam, input]
-            return await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
+            const result = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
+            if (onDataLoad) {
+                onDataLoad(result);
+            }
+            return result;
         }
     }
 

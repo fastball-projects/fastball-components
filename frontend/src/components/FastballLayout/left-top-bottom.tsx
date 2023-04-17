@@ -6,7 +6,7 @@ import { LeftAndTopBottomLayoutProps } from '../../../types'
 
 const LeftAndTopBottom: React.FC<LeftAndTopBottomLayoutProps> = (props: LeftAndTopBottomLayoutProps) => {
     const [record, setRecord] = React.useState(null)
-    const left = loadRefComponent(props.left, { onRecordClick: setRecord, __designMode: props.__designMode, input: props.input })
+    const left = loadRefComponent(props.left, { onRecordClick: setRecord, onDataLoad: props.interlocking ? setRecord : null, __designMode: props.__designMode, input: props.input })
     const top = loadRefComponent(props.top, { __designMode: props.__designMode, key: MD5(record), input: record })
     const bottom = loadRefComponent(props.bottom, { key: MD5(record), __designMode: props.__designMode, input: record })
     return (

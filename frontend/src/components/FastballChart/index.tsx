@@ -27,7 +27,7 @@ const mockFieldNames: ChartProps['fieldNames'] = {
     seriesField: 'category'
 }
 
-const FastballChart: React.FC<ChartProps> = ({ componentKey, type, fieldNames, input, __designMode }) => {
+const FastballChart: React.FC<ChartProps> = ({ componentKey, type, fieldNames, input, onDataLoad, __designMode }) => {
     const initData = __designMode === 'design' ? mockData : []
     const chartFieldNames = __designMode === 'design' ? mockFieldNames : fieldNames
     const { xField, yField, seriesField } = chartFieldNames
@@ -35,6 +35,9 @@ const FastballChart: React.FC<ChartProps> = ({ componentKey, type, fieldNames, i
 
     const loadData = async () => {
         const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+        if (onDataLoad) {
+            onDataLoad(res);
+        }
         setData(res || []);
     }
 

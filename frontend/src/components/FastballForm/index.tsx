@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { BetaSchemaForm, ProSchema } from '@ant-design/pro-components'
+import { BetaSchemaForm, ProConfigProvider, ProSchema, ProTable } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import type { Data, FieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField } from '../../common';
 import { Button } from 'antd';
+import SubTable from '../../common/components/SubTable';
+import Address from '../../common/components/Address';
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
 
@@ -48,10 +50,12 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     buildColumns(fields: FieldInfo[], parentDataIndex?: string[]): ProFormColumnsType<any, 'text'>[] {
-        const { readonly } = this.props;
+        const { readonly, column } = this.props;
+        const columnSpan = 24 / (column || 2);
         return fields.filter(filterEnabled).filter(field => field.valueType).map(field => {
             const formColumn: ProFormColumnsType = {};
             Object.assign(formColumn, field);
+            formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
             processingField(field, formColumn as ProSchema, this.props.__designMode);
             if (parentDataIndex) {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
@@ -65,31 +69,45 @@ class FastballForm extends React.Component<FormProps, any> {
                 formColumn.valueType = 'group'
                 formColumn.columns = this.buildColumns(field.subFields, field.dataIndex)
             }
-            if (field.valueType === 'Array' && field.subFields) {
-                formColumn.valueType = 'formList'
-                const subFieldColumn: ProFormColumnsType = {};
-                subFieldColumn.valueType = 'group'
-                subFieldColumn.columns = this.buildColumns(field.subFields);
-                formColumn.columns = [subFieldColumn]
-                if (readonly || field.readonly) {
-                    formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                        copyIconProps: false,
-                        deleteIconProps: false,
-                        creatorButtonProps: false
-                    })
-                }
+            if (field.valueType === 'SubTable' && field.subFields) {
+                formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                    columns: this.buildColumns(field.subFields)
+                })
             }
+            // if (field.valueType === 'Array' && field.subFields) {
+            //     formColumn.valueType = 'formList'
+            //     const subFieldColumn: ProFormColumnsType = {};
+            //     subFieldColumn.valueType = 'group'
+            //     subFieldColumn.columns = this.buildColumns(field.subFields);
+            //     formColumn.columns = [subFieldColumn]
+            //     if (readonly || field.readonly) {
+            //         formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+            //             copyIconProps: false,
+            //             deleteIconProps: false,
+            //             creatorButtonProps: false
+            //         })
+            //     }
+            // }
             return formColumn;
         })
     }
 
     render(): React.ReactNode {
-        const { componentKey, input, size = 'small', variableForm, setActions, __designMode, ...props } = this.props;
-        const proFormProps: ProFormProps = { size, grid: true, rowProps: { gutter: [16, 16] } };
+        const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, __designMode, ...props } = this.props;
+        const proFormProps: ProFormProps = { size, grid: true, layout: "horizontal", rowProps: { gutter: [16, 16] } };
 
         if (variableForm && __designMode !== 'design') {
-            proFormProps.request = async () => await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+            proFormProps.request = async () => {
+                const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+                if (onDataLoad) {
+                    onDataLoad(data);
+                }
+                return data;
+            }
         } else if (input) {
+            if (onDataLoad) {
+                onDataLoad(input);
+            }
             proFormProps.initialValues = input
         }
 
@@ -101,8 +119,20 @@ class FastballForm extends React.Component<FormProps, any> {
             proFormProps.submitter = { render: () => this.getActions() }
         }
 
-        console.log(proFormProps)
-        return <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
+        return <ProConfigProvider
+            valueTypeMap={{
+                SubTable: {
+                    render: (text, props) => <ProTable size="small" {...props} {...props?.fieldProps} />,
+                    renderFormItem: (text, props) => <SubTable size="small" {...props} {...props?.fieldProps} />
+                },
+                Address: {
+                    render: (text) => text,
+                    renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
+                }
+            }}
+        >
+            <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
+        </ProConfigProvider>
     }
 }
 

@@ -76,7 +76,7 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
     }
 
     render(): React.ReactNode {
-        const { componentKey, input, column, variableDescription, setActions, __designMode, ...props } = this.props;
+        const { componentKey, input, column, variableDescription, setActions, onDataLoad, __designMode, ...props } = this.props;
 
         const proDescriptionsProps: ProDescriptionsProps = { column };
         proDescriptionsProps.size = 'small'
@@ -84,12 +84,18 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
             proDescriptionsProps.request = async () => {
                 try {
                     const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+                    if (onDataLoad) {
+                        onDataLoad(data);
+                    }
                     return { data, success: true }
                 } catch (e) {
                     return { success: false }
                 }
             }
         } else if (input) {
+            if (onDataLoad) {
+                onDataLoad(input);
+            }
             proDescriptionsProps.dataSource = input
         }
 
@@ -103,7 +109,7 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
             });
         }
 
-        return <ProDescriptions layout="vertical" actionRef={this.ref} {...proDescriptionsProps} {...props} />
+        return <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
     }
 }
 

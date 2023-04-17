@@ -12,6 +12,8 @@ import java.util.List;
  */
 public interface LayoutProps extends ComponentProps {
     LayoutType layoutType();
+
+    boolean interlocking();
 }
 
 @AutoValue

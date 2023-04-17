@@ -30,6 +30,7 @@ public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, L
         LeftAndRight leftAndRight = compileContext.getComponentElement().getAnnotation(LeftAndRight.class);
         if (leftAndRight != null) {
             LeftAndRightLayoutProps_AutoValue props = new LeftAndRightLayoutProps_AutoValue();
+            props.interlocking(leftAndRight.interlocking());
             props.left(getReferencedComponentInfo(props, leftAndRight::left));
             props.right(getReferencedComponentInfo(props, leftAndRight::right));
             return props;
@@ -37,6 +38,7 @@ public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, L
         TopAndBottom topAndBottom = compileContext.getComponentElement().getAnnotation(TopAndBottom.class);
         if (topAndBottom != null) {
             TopAndBottomLayoutProps_AutoValue props = new TopAndBottomLayoutProps_AutoValue();
+            props.interlocking(topAndBottom.interlocking());
             props.top(getReferencedComponentInfo(props, topAndBottom::top));
             props.bottom(getReferencedComponentInfo(props, topAndBottom::bottom));
             return props;
@@ -44,6 +46,7 @@ public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, L
         LeftAndTopBottom leftAndTopBottom = compileContext.getComponentElement().getAnnotation(LeftAndTopBottom.class);
         if (leftAndTopBottom != null) {
             LeftAndTopBottomLayoutProps_AutoValue props = new LeftAndTopBottomLayoutProps_AutoValue();
+            props.interlocking(leftAndTopBottom.interlocking());
             props.left(getReferencedComponentInfo(props, leftAndTopBottom::left));
             props.top(getReferencedComponentInfo(props, leftAndTopBottom::top));
             props.bottom(getReferencedComponentInfo(props, leftAndTopBottom::bottom));

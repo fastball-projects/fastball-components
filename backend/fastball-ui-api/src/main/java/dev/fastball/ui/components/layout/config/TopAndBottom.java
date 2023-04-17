@@ -17,4 +17,6 @@ public @interface TopAndBottom {
     Class<? extends Component> top();
 
     Class<? extends Component> bottom();
+
+    boolean interlocking() default false;
 }

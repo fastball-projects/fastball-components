@@ -4,6 +4,7 @@ import { Tag } from "antd";
 import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem } from "../../types";
 import { doLookupAction } from "./action";
 import FastballPopup from "./components/Popup";
+import FastballAddress from "./components/Address";
 import { loadRefComponent } from './component';
 import { getByPaths } from './utils';
 

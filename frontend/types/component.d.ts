@@ -5,6 +5,7 @@ type ReactComponent<P> = Component<P> | FC<P>
 export type BasicComponentProps = {
     componentKey: string
     __designMode?: string
+    onDataLoad?: Function<Record>
     input?: any
 }
 

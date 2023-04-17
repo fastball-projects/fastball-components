@@ -63,6 +63,7 @@ export type FieldInfo = {
     displayModeComponent?: RefComponentInfo
     subFields?: FieldInfo[]
     readonly: boolean
+    entireRow: boolean
     fieldProps: any
     formItemProps: any
 } & Displayable

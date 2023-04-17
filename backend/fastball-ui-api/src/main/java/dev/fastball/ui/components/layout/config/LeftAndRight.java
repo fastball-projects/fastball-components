@@ -17,4 +17,6 @@ public @interface LeftAndRight {
     Class<? extends Component> left();
 
     Class<? extends Component> right();
+
+    boolean interlocking() default false;
 }

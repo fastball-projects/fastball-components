@@ -3,26 +3,27 @@ import { BasicComponentProps, ReactComponent } from '../component'
 
 export type LayoutProps = {
     layoutType: LayoutType
+    interlocking: boolean
 } & BasicComponentProps
 
 export type LeftAndRightLayoutProps = {
     layoutType?: 'LeftAndRight'
     left: ReferencedComponent
     right: ReferencedComponent
-} & BasicComponentProps
+} & LayoutProps
 
 export type TopAndBottomLayoutProps = {
     layoutType?: 'TopAndBottom'
     top: ReferencedComponent
     bottom: ReferencedComponent
-} & BasicComponentProps
+} & LayoutProps
 
 export type LeftAndTopBottomLayoutProps = {
     layoutType?: 'LeftAndTopBottom'
     left: ReferencedComponent
     top: ReferencedComponent
     bottom: ReferencedComponent
-} & BasicComponentProps
+} & LayoutProps
 
 export type GridLayoutProps = {
     layoutType?: 'Grid'
@@ -31,7 +32,7 @@ export type GridLayoutProps = {
     draggable: boolean
     resizable: boolean
     cells: GridCell[]
-} & BasicComponentProps
+} & LayoutProps
 
 export type GridCell = {
     x: number

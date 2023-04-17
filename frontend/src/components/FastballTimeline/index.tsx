@@ -35,13 +35,16 @@ const defaultFieldNames: TimelineProps['fieldNames'] = {
     color: 'color'
 }
 
-const Timeline: React.FC<TimelineProps> = ({ componentKey, onRecordClick, __designMode, fieldNames, recordActions, data, input }) => {
+const Timeline: React.FC<TimelineProps> = ({ componentKey, onRecordClick, onDataLoad, __designMode, fieldNames, recordActions, data, input }) => {
     const initData = __designMode === 'design' ? mockData : data
     const timeLineFieldNames = __designMode === 'design' ? defaultFieldNames : fieldNames
     const [timelineData, setTimelineData] = React.useState(initData);
 
     const loadData = async () => {
         const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+        if (onDataLoad) {
+            onDataLoad(res);
+        }
         setTimelineData(res || []);
     }
 
