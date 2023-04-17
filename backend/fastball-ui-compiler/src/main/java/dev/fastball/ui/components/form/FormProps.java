@@ -25,5 +25,7 @@ public interface FormProps extends ComponentProps {
 
     PopupType popupType();
 
-    List<FieldInfo> fields();
+    List<FormFieldInfo> fields();
+
+    List<ValueChangeHandlerInfo> valueChangeHandlers();
 }

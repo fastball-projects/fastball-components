@@ -35,6 +35,9 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         if (field.valueType === 'Array') {
             return;
         }
+        if (field.valueType === 'SubTable') {
+            return;
+        }
         const column: ProTableColumn = {}
         Object.assign(column, field, { hideInSearch: true });
         processingField(field, column, __designMode);

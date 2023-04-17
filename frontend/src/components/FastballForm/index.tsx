@@ -1,13 +1,23 @@
 import * as React from 'react'
 import { BetaSchemaForm, ProConfigProvider, ProSchema, ProTable } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
-import type { Data, FieldInfo, FormProps } from '../../../types';
+import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField } from '../../common';
 import { Button } from 'antd';
 import SubTable from '../../common/components/SubTable';
 import Address from '../../common/components/Address';
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
+
+const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): boolean => {
+    if (fieldDependencyInfo.condition === 'Equals') {
+        return values[fieldDependencyInfo.field] == fieldDependencyInfo.value;
+    }
+    if (fieldDependencyInfo.condition === 'NotEquals') {
+        return values[fieldDependencyInfo.field] != fieldDependencyInfo.value;
+    }
+    return false;
+}
 
 class FastballForm extends React.Component<FormProps, any> {
     ref = React.createRef<ProFormInstance>();
@@ -49,7 +59,7 @@ class FastballForm extends React.Component<FormProps, any> {
         return this.buildColumns(this.props.fields)
     }
 
-    buildColumns(fields: FieldInfo[], parentDataIndex?: string[]): ProFormColumnsType<any, 'text'>[] {
+    buildColumns(fields: FormFieldInfo[], parentDataIndex?: string[]): ProFormColumnsType<any, 'text'>[] {
         const { readonly, column } = this.props;
         const columnSpan = 24 / (column || 2);
         return fields.filter(filterEnabled).filter(field => field.valueType).map(field => {
@@ -71,29 +81,49 @@ class FastballForm extends React.Component<FormProps, any> {
             }
             if (field.valueType === 'SubTable' && field.subFields) {
                 formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                    columns: this.buildColumns(field.subFields)
+                    columns: this.buildColumns(field.subFields),
+                    title: formColumn.title
                 })
+                formColumn.name = formColumn.dataIndex
+                formColumn.title = null;
             }
-            // if (field.valueType === 'Array' && field.subFields) {
-            //     formColumn.valueType = 'formList'
-            //     const subFieldColumn: ProFormColumnsType = {};
-            //     subFieldColumn.valueType = 'group'
-            //     subFieldColumn.columns = this.buildColumns(field.subFields);
-            //     formColumn.columns = [subFieldColumn]
-            //     if (readonly || field.readonly) {
-            //         formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-            //             copyIconProps: false,
-            //             deleteIconProps: false,
-            //             creatorButtonProps: false
-            //         })
-            //     }
-            // }
+            if (field.valueType === 'Array' && field.subFields) {
+                formColumn.valueType = 'formList'
+                const subFieldColumn: ProFormColumnsType = {};
+                subFieldColumn.valueType = 'group'
+                subFieldColumn.columns = this.buildColumns(field.subFields);
+                formColumn.columns = [subFieldColumn]
+                formColumn.name = formColumn.dataIndex
+                if (readonly || field.readonly) {
+                    formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                        copyIconProps: false,
+                        deleteIconProps: false,
+                        creatorButtonProps: false
+                    })
+                }
+            }
+            if (field.fieldDependencyInfoList && field.fieldDependencyInfoList.length > 0) {
+                const dependencyFieldNames = field.fieldDependencyInfoList.map(({ field }) => field);
+                const dependencyField: ProFormColumnsType = {
+                    valueType: 'dependency', name: dependencyFieldNames, columns: (values) => {
+                        if (field.conditionComposeType === 'Or') {
+                            if (field.fieldDependencyInfoList?.find(fieldDependInfo => checkCondition(fieldDependInfo, values))) {
+                                return [formColumn]
+                            }
+                        } else if (!field.fieldDependencyInfoList?.find(fieldDependInfo => !checkCondition(fieldDependInfo, values))) {
+                            return [formColumn]
+                        }
+                        return [];
+                    }
+                };
+                return dependencyField;
+            }
             return formColumn;
         })
     }
 
     render(): React.ReactNode {
-        const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, __designMode, ...props } = this.props;
+        const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
         const proFormProps: ProFormProps = { size, grid: true, layout: "horizontal", rowProps: { gutter: [16, 16] } };
 
         if (variableForm && __designMode !== 'design') {
@@ -118,7 +148,18 @@ class FastballForm extends React.Component<FormProps, any> {
         } else {
             proFormProps.submitter = { render: () => this.getActions() }
         }
+        if (valueChangeHandlers && valueChangeHandlers.length > 0) {
+            proFormProps.onValuesChange = async (change, values) => {
+                const changeFields = Object.keys(change)
+                const handler = valueChangeHandlers.find(({ watchFields }) => changeFields.find(changeField => watchFields.includes(changeField)))
+                if (handler) {
+                    const data = await doApiAction({ componentKey, type: 'API', actionKey: handler.handlerKey, data: [values] })
+                    console.log({ ...data })
+                    this.ref.current?.setFieldsValue({ ...data })
+                }
+            }
 
+        }
         return <ProConfigProvider
             valueTypeMap={{
                 SubTable: {

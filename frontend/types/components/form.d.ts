@@ -8,10 +8,31 @@ export type FormProps = {
     variableForm: boolean
     readonly: boolean
     size?: FormSize
-    fields: FieldInfo[]
+    fields: FormFieldInfo[]
     recordActions?: ActionInfo[]
+    valueChangeHandlers?: ValueChangeHandler[]
     data?: Data
     initialValues?: Data
 } & BasicComponentProps & PopupComponentProps
+
+export type FormFieldInfo = {
+    fieldDependencyInfoList?: FieldDependencyInfo[]
+    conditionComposeType?: ConditionComposeType
+} & FieldInfo
+
+export type FieldDependencyInfo = {
+    field: string
+    value: string
+    condition: FieldDependencyCondition
+}
+
+export type ValueChangeHandler = {
+    watchFields: string[]
+    handlerKey: string
+}
+
+export type FieldDependencyCondition = 'Equals' | 'NotEquals'
+
+export type ConditionComposeType = 'And' | 'Or'
 
 export type FormSize = 'small' | 'middle' | 'large'
