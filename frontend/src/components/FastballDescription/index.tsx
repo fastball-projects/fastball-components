@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { ProDescriptions, ProSchema, ProTable } from '@ant-design/pro-components'
+import { ProConfigProvider, ProDescriptions, ProSchema, ProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProCoreActionType, ProDescriptionsProps, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import type { FieldInfo, DescriptionProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterFormOnlyField, filterVisibled, getByPaths, processingField } from '../../common';
+import SubTable from '../../common/components/SubTable';
 
 class FastballDescription extends React.Component<DescriptionProps, any> {
     ref = React.createRef<ProCoreActionType>();
@@ -58,6 +59,15 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
             if (field.valueType === 'SubFields' && field.subFields) {
                 return this.buildColumns(field.subFields!, field.dataIndex)
             }
+            if (field.valueType === 'SubTable' && field.subFields) {
+                const columns = this.buildColumns(field.subFields.filter(({ display }) => display === 'Show'))
+                columns.forEach(c => c.hideInTable = false)
+                column.fieldProps = Object.assign(column.fieldProps || {}, {
+                    columns,
+                    title: column.title
+                })
+                column.title = null;
+            }
             if (field.valueType === 'Array' && field.subFields) {
                 column.span = this.props.column
                 column.render = (_, record) => {
@@ -109,7 +119,18 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
             });
         }
 
-        return <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
+        return <ProConfigProvider
+            valueTypeMap={{
+                SubTable: {
+                    render: (data, props) => <SubTable size="small" {...props} {...props.fieldProps} value={data} readonly />,
+                },
+                Address: {
+                    render: (text) => text,
+                }
+            }}
+        >
+            <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
+        </ProConfigProvider>
     }
 }
 
