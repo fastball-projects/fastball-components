@@ -11,4 +11,6 @@ public @interface FieldDependencies {
     FieldDependency[] value();
 
     ConditionComposeType composeType() default ConditionComposeType.And;
+
+    FieldDependencyType type() default FieldDependencyType.Hidden;
 }

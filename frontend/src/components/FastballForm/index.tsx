@@ -10,11 +10,26 @@ import Address from '../../common/components/Address';
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
 
 const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): boolean => {
+    if (fieldDependencyInfo.condition === 'Empty') {
+        return !values[fieldDependencyInfo.field];
+    }
     if (fieldDependencyInfo.condition === 'Equals') {
         return values[fieldDependencyInfo.field] == fieldDependencyInfo.value;
     }
     if (fieldDependencyInfo.condition === 'NotEquals') {
         return values[fieldDependencyInfo.field] != fieldDependencyInfo.value;
+    }
+    if (fieldDependencyInfo.condition === 'GreaterThan') {
+        return values[fieldDependencyInfo.field] > fieldDependencyInfo.value;
+    }
+    if (fieldDependencyInfo.condition === 'GreaterThanOrEquals') {
+        return values[fieldDependencyInfo.field] >= fieldDependencyInfo.value;
+    }
+    if (fieldDependencyInfo.condition === 'LessThan') {
+        return values[fieldDependencyInfo.field] < fieldDependencyInfo.value;
+    }
+    if (fieldDependencyInfo.condition === 'LessThanOrEquals') {
+        return values[fieldDependencyInfo.field] <= fieldDependencyInfo.value;
     }
     return false;
 }
@@ -59,7 +74,7 @@ class FastballForm extends React.Component<FormProps, any> {
         return this.buildColumns(this.props.fields)
     }
 
-    buildColumns(fields: FormFieldInfo[], parentDataIndex?: string[]): ProFormColumnsType<any, 'text'>[] {
+    buildColumns(fields: FormFieldInfo[], parentDataIndex?: string[], tableColumns?: boolean): ProFormColumnsType<any, 'text'>[] {
         const { readonly, column } = this.props;
         const columnSpan = 24 / (column || 2);
         return fields.filter(filterEnabled).filter(field => field.valueType).map(field => {
@@ -75,13 +90,18 @@ class FastballForm extends React.Component<FormProps, any> {
                     rules: field.validationRules
                 })
             }
+            if (field.valueType === 'digit') {
+                formColumn.fieldProps = Object.assign(formColumn.formItemProps || {}, {
+                    style: { width: '100%' }
+                })
+            }
             if (field.valueType === 'SubFields' && field.subFields) {
                 formColumn.valueType = 'group'
                 formColumn.columns = this.buildColumns(field.subFields, field.dataIndex)
             }
             if (field.valueType === 'SubTable' && field.subFields) {
                 formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                    columns: this.buildColumns(field.subFields),
+                    columns: this.buildColumns(field.subFields, undefined, true),
                     title: formColumn.title
                 })
                 formColumn.name = formColumn.dataIndex
@@ -102,21 +122,33 @@ class FastballForm extends React.Component<FormProps, any> {
                     })
                 }
             }
+            // FIXME 这代码简直了....
             if (field.fieldDependencyInfoList && field.fieldDependencyInfoList.length > 0) {
-                const dependencyFieldNames = field.fieldDependencyInfoList.map(({ field }) => field);
-                const dependencyField: ProFormColumnsType = {
-                    valueType: 'dependency', name: dependencyFieldNames, columns: (values) => {
-                        if (field.conditionComposeType === 'Or') {
-                            if (field.fieldDependencyInfoList?.find(fieldDependInfo => checkCondition(fieldDependInfo, values))) {
-                                return [formColumn]
+                if (!tableColumns) {
+                    const dependencyFieldNames = field.fieldDependencyInfoList.map(({ field }) => field);
+                    const dependencyField: ProFormColumnsType = {
+                        title: formColumn.title, dataIndex: formColumn.dataIndex, valueType: 'dependency', name: dependencyFieldNames, columns: (values) => {
+                            if (field.conditionComposeType === 'Or' && field.fieldDependencyInfoList?.find(fieldDependInfo => checkCondition(fieldDependInfo, values))) {
+                                return [{ ...formColumn }]
+                            } else if (!field.fieldDependencyInfoList?.find(fieldDependInfo => !checkCondition(fieldDependInfo, values))) {
+                                return [{ ...formColumn }]
                             }
-                        } else if (!field.fieldDependencyInfoList?.find(fieldDependInfo => !checkCondition(fieldDependInfo, values))) {
-                            return [formColumn]
-                        }
-                        return [];
+                            if (field.fieldDependencyType === 'Readonly') {
+                                return [{ ...formColumn, readonly: true }]
+                            }
+                            return [];
+                        },
+                    };
+                    return dependencyField;
+                }
+                formColumn.editable = (text, values) => {
+                    if (field.conditionComposeType === 'Or' && field.fieldDependencyInfoList?.find(fieldDependInfo => checkCondition(fieldDependInfo, values))) {
+                        return true
+                    } else if (!field.fieldDependencyInfoList?.find(fieldDependInfo => !checkCondition(fieldDependInfo, values))) {
+                        return true
                     }
-                };
-                return dependencyField;
+                    return false
+                }
             }
             return formColumn;
         })
@@ -154,7 +186,6 @@ class FastballForm extends React.Component<FormProps, any> {
                 const handler = valueChangeHandlers.find(({ watchFields }) => changeFields.find(changeField => watchFields.includes(changeField)))
                 if (handler) {
                     const data = await doApiAction({ componentKey, type: 'API', actionKey: handler.handlerKey, data: [values] })
-                    console.log({ ...data })
                     this.ref.current?.setFieldsValue({ ...data })
                 }
             }
@@ -163,8 +194,8 @@ class FastballForm extends React.Component<FormProps, any> {
         return <ProConfigProvider
             valueTypeMap={{
                 SubTable: {
-                    render: (text, props) => <ProTable size="small" {...props} {...props?.fieldProps} />,
-                    renderFormItem: (text, props) => <SubTable size="small" {...props} {...props?.fieldProps} />
+                    render: (data, props) => <SubTable size="small" {...props} {...props.fieldProps} value={data} readonly />,
+                    renderFormItem: (data, props) => <SubTable size="small" {...props} {...props?.fieldProps} />
                 },
                 Address: {
                     render: (text) => text,

@@ -66,9 +66,9 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
         popupProps.width = width
     }
     if (popupType === 'Modal') {
-        popupWrapperComponent = <Modal onCancel={closePopup} {...popupProps}>{content}</Modal>
+        popupWrapperComponent = <Modal destroyOnClose onCancel={closePopup} {...popupProps}>{content}</Modal>
     } else if (popupType === 'Drawer') {
-        popupWrapperComponent = <Drawer onClose={closePopup} placement={placementType} {...popupProps}>{content}</Drawer>
+        popupWrapperComponent = <Drawer destroyOnClose onClose={closePopup} placement={placementType} {...popupProps}>{content}</Drawer>
     }
 
     return (

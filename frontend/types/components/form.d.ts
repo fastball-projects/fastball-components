@@ -9,6 +9,7 @@ export type FormProps = {
     readonly: boolean
     size?: FormSize
     fields: FormFieldInfo[]
+    actions?: ActionInfo[]
     recordActions?: ActionInfo[]
     valueChangeHandlers?: ValueChangeHandler[]
     data?: Data
@@ -18,6 +19,7 @@ export type FormProps = {
 export type FormFieldInfo = {
     fieldDependencyInfoList?: FieldDependencyInfo[]
     conditionComposeType?: ConditionComposeType
+    fieldDependencyType?: FieldDependencyType
 } & FieldInfo
 
 export type FieldDependencyInfo = {
@@ -31,8 +33,10 @@ export type ValueChangeHandler = {
     handlerKey: string
 }
 
-export type FieldDependencyCondition = 'Equals' | 'NotEquals'
+export type FieldDependencyCondition = 'Empty' | 'Equals' | 'NotEquals' | 'GreaterThan' | 'LessThan' | 'GreaterThanOrEquals' | 'LessThanOrEquals'
 
 export type ConditionComposeType = 'And' | 'Or'
+
+export type FieldDependencyType = 'Hidden' | 'Readonly'
 
 export type FormSize = 'small' | 'middle' | 'large'

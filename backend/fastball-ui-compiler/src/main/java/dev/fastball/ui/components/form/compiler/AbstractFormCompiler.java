@@ -62,9 +62,11 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         }
         if (fieldDependencies != null) {
             fieldInfo.setConditionComposeType(fieldDependencies.composeType());
+            fieldInfo.setFieldDependencyType(fieldDependencies.type());
             fieldInfo.setFieldDependencyInfoList(Arrays.stream(fieldDependencies.value()).map(this::buildFieldDependencyInfo).collect(Collectors.toList()));
         }
         if (fieldDependency != null) {
+            fieldInfo.setFieldDependencyType(fieldDependency.type());
             fieldInfo.setFieldDependencyInfoList(Collections.singletonList(buildFieldDependencyInfo(fieldDependency)));
         }
     }

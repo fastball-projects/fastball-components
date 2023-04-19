@@ -1,6 +1,11 @@
 package dev.fastball.ui.components.form.config;
 
 public enum FieldDependencyCondition {
+    Empty,
     Equals,
-    NotEquals
+    NotEquals,
+    GreaterThan,
+    LessThan,
+    GreaterThanOrEquals,
+    LessThanOrEquals
 }

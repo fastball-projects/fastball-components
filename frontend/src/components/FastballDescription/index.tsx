@@ -5,12 +5,15 @@ import type { FieldInfo, DescriptionProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterFormOnlyField, filterVisibled, getByPaths, processingField } from '../../common';
 import SubTable from '../../common/components/SubTable';
 
-class FastballDescription extends React.Component<DescriptionProps, any> {
-    ref = React.createRef<ProCoreActionType>();
+type DescriptionState = {
+    data?: Record<string, any>
+}
 
+class FastballDescription extends React.Component<DescriptionProps, DescriptionState> {
+    ref = React.createRef<ProCoreActionType>();
     constructor(props: DescriptionProps) {
         super(props)
-
+        this.state = { data: props.input }
         // 第一次调用传入的 setActions 将按钮注册到 popup, 否则会导致循环更新
         if (props.setActions) {
             props.setActions(this.getActions())
@@ -18,7 +21,8 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
     }
 
     getActions() {
-        const { componentKey, closePopup, input, recordActions } = this.props;
+        const { componentKey, closePopup, input, actions, recordActions } = this.props;
+        const { data } = this.state;
         const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
             if (action.closePopupOnSuccess !== false && closePopup) {
                 action.callback = () => {
@@ -29,8 +33,20 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
                     this.ref.current?.reload()
                 }
             }
-            return buildAction({ componentKey, ...action, data: input });
+            return buildAction({ componentKey, ...action, data });
         }) : []
+        actions?.filter(filterVisibled).forEach(action => {
+            if (action.closePopupOnSuccess !== false && closePopup) {
+                action.callback = () => {
+                    closePopup()
+                }
+            } else if (action.refresh !== false) {
+                action.callback = () => {
+                    this.ref.current?.reload()
+                }
+            }
+            buttons.push(buildAction({ componentKey, ...action }));
+        })
         return buttons;
     }
 
@@ -97,6 +113,7 @@ class FastballDescription extends React.Component<DescriptionProps, any> {
                     if (onDataLoad) {
                         onDataLoad(data);
                     }
+                    this.setState({ data })
                     return { data, success: true }
                 } catch (e) {
                     return { success: false }

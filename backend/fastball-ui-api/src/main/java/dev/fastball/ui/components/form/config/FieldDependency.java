@@ -15,4 +15,6 @@ public @interface FieldDependency {
     String value();
 
     FieldDependencyCondition condition() default FieldDependencyCondition.Equals;
+
+    FieldDependencyType type() default FieldDependencyType.Hidden;
 }
