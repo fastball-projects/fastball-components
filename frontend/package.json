@@ -1,6 +1,6 @@
 {
   "name": "fastball-components",
-  "version": "0.3.0-1681859952",
+  "version": "0.3.0-1682906759",
   "description": "Fastball UI components",
   "homepage": "https://github.com/fastball-projects/fastball-components",
   "main": "lib/index.js",
@@ -49,6 +49,6 @@
     "sass": "^1.57.1"
   },
   "componentConfig": {
-    "materialSchema": "https://unpkg.com/fastball-components@0.3.0-1681859952/build/lowcode/assets-prod.json"
+    "materialSchema": "https://unpkg.com/fastball-components@0.3.0-1682906759/build/lowcode/assets-prod.json"
   }
 }

@@ -81,6 +81,7 @@ class FastballForm extends React.Component<FormProps, any> {
             const formColumn: ProFormColumnsType = {};
             Object.assign(formColumn, field);
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
+            formColumn.name = formColumn.dataIndex
             processingField(field, formColumn as ProSchema, this.props.__designMode);
             if (parentDataIndex) {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
@@ -104,7 +105,6 @@ class FastballForm extends React.Component<FormProps, any> {
                     columns: this.buildColumns(field.subFields, undefined, true),
                     title: formColumn.title
                 })
-                formColumn.name = formColumn.dataIndex
                 formColumn.title = null;
             }
             if (field.valueType === 'Array' && field.subFields) {
@@ -113,7 +113,6 @@ class FastballForm extends React.Component<FormProps, any> {
                 subFieldColumn.valueType = 'group'
                 subFieldColumn.columns = this.buildColumns(field.subFields);
                 formColumn.columns = [subFieldColumn]
-                formColumn.name = formColumn.dataIndex
                 if (readonly || field.readonly) {
                     formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
                         copyIconProps: false,
@@ -194,8 +193,14 @@ class FastballForm extends React.Component<FormProps, any> {
         return <ProConfigProvider
             valueTypeMap={{
                 SubTable: {
-                    render: (data, props) => <SubTable size="small" {...props} {...props.fieldProps} value={data} readonly />,
-                    renderFormItem: (data, props) => <SubTable size="small" {...props} {...props?.fieldProps} />
+                    render: (data, props) => {
+                        console.log(data, props)
+                        return <SubTable size="small" {...props} {...props.fieldProps} readonly />
+                    },
+                    renderFormItem: (data, props) => {
+                        console.log(data, props)
+                        return <SubTable size="small" {...props} {...props?.fieldProps} />
+                    }
                 },
                 Address: {
                     render: (text) => text,
