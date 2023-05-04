@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { ProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo } from '../../../types';
@@ -30,6 +30,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id' };
     const proTableColumns: ProTableColumn[] = [];
+    const [searchState, setSearchState] = useState({});
 
     const buildTableColumns = (field: ColumnInfo, parentDataIndex?: string[]) => {
         if (field.valueType === 'Array') {
@@ -67,6 +68,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
             } else {
                 Object.assign(searchParam, searchFields, filter);
             }
+            setSearchState(searchParam);
             const data = [searchParam, input]
             const result = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
             if (onDataLoad) {
@@ -90,7 +92,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
     }
 
     const actionButtons = !actions ? [] : actions.filter(filterVisibled).map(action => {
-        const actionInfo: ActionInfo = { componentKey, ...action, data: input };
+        const actionInfo: ActionInfo = { componentKey, ...action, needArrayWrapper: false, data: [searchState, input] };
         if (action.refresh) {
             actionInfo.callback = () => ref.current?.reload()
         }

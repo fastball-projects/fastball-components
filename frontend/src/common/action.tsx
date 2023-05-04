@@ -22,7 +22,6 @@ const buildJsonRequestInfo = (): RequestInit => {
     const request = {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             AUTHORIZATION_HEADER_KEY: authorization
         }
     }
@@ -65,7 +64,9 @@ export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data, 
 export const buildAction = (actionInfo: ActionInfo) => {
     if (actionInfo.type === 'API') {
         const apiActionInfo = actionInfo as ApiActionInfo
-        apiActionInfo.needArrayWrapper = true;
+        if(apiActionInfo.needArrayWrapper !== false) {
+            apiActionInfo.needArrayWrapper = true;
+        }
         return <FastballActionButton key={apiActionInfo.actionKey} {...apiActionInfo} />
     } else if (actionInfo.type === 'Popup') {
         const popupActionInfo = actionInfo as PopupActionInfo
@@ -87,15 +88,64 @@ export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
     return <FastballPopup {...popupProps} />;
 }
 
-export const doApiAction = async (actionInfo: ApiActionInfo) => {
+export const doApiAction = async (actionInfo: ApiActionInfo, file?: File | Blob) => {
     const { componentKey, actionKey } = actionInfo;
     const data = await buildRequestData(actionInfo);
+    let url:string;
+    if(actionInfo.downloadFileAction) {
+        url = `/api/fastball/component/${componentKey}/downloadAction/${actionKey}`
+        return await postDownload(url, data, file, actionInfo.callback)
+    }
+    url = `/api/fastball/component/${componentKey}/action/${actionKey}`
+    return await callApi(url, data, file, actionInfo.callback)
+}
+
+const postDownload = async (url: string, data?: any, file?: File | Blob, callback?: Function) => {
     const requestInfo = buildJsonRequestInfo();
-    requestInfo.body = JSON.stringify(data)
-    const resp = await window.fetch(`/api/fastball/component/${componentKey}/action/${actionKey}`, requestInfo)
+    const formData = new FormData();
+    if (file) {
+        formData.append('file', file)
+    }
+    formData.append('data', new Blob([JSON.stringify(data)], {
+        type: "application/json"
+    }));
+    requestInfo.body = formData
+    try {
+        const resp = await window.fetch(url, requestInfo)
+        if (callback) {
+            callback()
+        }
+        const filename = resp.headers.get('content-disposition')?.split(';')[1].split('=')[1] || '下载文件'
+        const blob = await resp.blob()
+     
+        const link = document.createElement('a')
+        link.download = decodeURIComponent(filename)
+        link.style.display = 'none'
+        link.href = URL.createObjectURL(blob)
+        document.body.appendChild(link)
+        link.click()
+        URL.revokeObjectURL(link.href)
+        document.body.removeChild(link)
+    } catch(e) {
+        message.error(`Error ${e}`);
+    }
+ }
+ 
+
+export const callApi = async (url: string, data?: any, file?: File | Blob, callback?: Function) => {
+    const requestInfo = buildJsonRequestInfo();
+    const formData = new FormData();
+    if (file) {
+        formData.append('file', file)
+    }
+    formData.append('data', new Blob([JSON.stringify(data)], {
+        type: "application/json"
+    }));
+    requestInfo.body = formData
+    const resp = await window.fetch(url, requestInfo)
     const json = await resp.text();
-    if (actionInfo.callback) {
-        actionInfo.callback()
+    if (callback) {
+        callback()
     }
     if (json) {
         const result = JSON.parse(json);

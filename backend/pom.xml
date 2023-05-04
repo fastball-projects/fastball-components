@@ -5,11 +5,11 @@
     <parent>
         <artifactId>fastball-parent</artifactId>
         <groupId>dev.fastball</groupId>
-        <version>0.3.0-SNAPSHOT</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.1-SNAPSHOT</version>
 
     <artifactId>fastball-ui</artifactId>
 
@@ -20,6 +20,7 @@
         <module>fastball-ui-compiler</module>
         <module>fastball-ui-archetype</module>
         <module>fastball-ui-builtin-jpa</module>
+        <module>fastball-ui-builtin-excel</module>
     </modules>
 
     <profiles>
@@ -59,10 +60,16 @@
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
         <auto-service.version>1.0.1</auto-service.version>
         <javapoet.version>1.13.0</javapoet.version>
+        <easyexcel.version>3.2.1</easyexcel.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easyexcel.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
@@ -76,17 +83,22 @@
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-api</artifactId>
-                <version>0.3.0-SNAPSHOT</version>
+                <version>0.3.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-compiler</artifactId>
-                <version>0.3.0-SNAPSHOT</version>
+                <version>0.3.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-builtin-jpa</artifactId>
-                <version>0.3.0-SNAPSHOT</version>
+                <version>0.3.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-ui-builtin-excel</artifactId>
+                <version>0.3.1-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

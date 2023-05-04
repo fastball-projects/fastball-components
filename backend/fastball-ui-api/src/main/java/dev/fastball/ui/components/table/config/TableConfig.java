@@ -36,5 +36,12 @@ public @interface TableConfig {
      */
     boolean keywordSearch() default false;
 
+    /**
+     * 是否开启表格 Excel 导出
+     *
+     * @return 开启表格 Excel 导出
+     */
+    boolean exportable() default false;
+
     Class<? extends Component> rowExpandedComponent() default Component.class;
 }

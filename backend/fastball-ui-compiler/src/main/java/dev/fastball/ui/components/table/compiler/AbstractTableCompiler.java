@@ -6,6 +6,7 @@ import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.component.Component;
+import dev.fastball.core.info.action.ApiActionInfo;
 import dev.fastball.ui.components.table.ColumnInfo;
 import dev.fastball.ui.components.table.TableProps_AutoValue;
 import dev.fastball.ui.components.table.config.CopyableColumn;
@@ -14,6 +15,7 @@ import dev.fastball.ui.components.table.config.TableConfig;
 import dev.fastball.ui.components.table.param.TableSearchParam;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
@@ -29,6 +31,8 @@ import static dev.fastball.compile.utils.ElementCompileUtils.getReferencedCompon
 public abstract class AbstractTableCompiler<T extends Component> extends AbstractComponentCompiler<T, TableProps_AutoValue> {
 
     private static final String COMPONENT_TYPE = "FastballTable";
+
+    private static final String EXPORT_METHOD_NAME = "exportData";
 
     protected boolean searchable() {
         return false;
@@ -50,8 +54,8 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
             if (Objects.equals(searchType.getQualifiedName().toString(), TableSearchParam.class.getCanonicalName())) {
                 TypeMirror realSearchType = ((DeclaredType) genericTypes.get(1)).getTypeArguments().get(0);
                 searchType = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(realSearchType);
-                props.wrappedSearch(true);
             }
+            props.wrappedSearch(true);
             props.queryFields(TypeCompileUtils.compileTypeFields(searchType, compileContext.getProcessingEnv(), props));
         }
 
@@ -70,6 +74,16 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         }
         props.size(tableConfig.size());
         props.keywordSearch(tableConfig.keywordSearch());
+
+        // 是否开启导出
+        if(tableConfig.exportable()) {
+            ApiActionInfo exportActionInfo = ApiActionInfo.builder()
+                    .actionKey("exportData")
+                    .actionName("导出")
+                    .downloadFileAction(true)
+                    .build();
+            props.actions().add(exportActionInfo);
+        }
     }
 
     @Override

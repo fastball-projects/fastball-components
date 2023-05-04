@@ -101,6 +101,8 @@ export type TreeLookupActionInfo = {
 export type ApiActionInfo = {
     needArrayWrapper?: boolean
     componentKey: string
+    uploadFileAction: boolean
+    downloadFileAction: boolean
     type: 'API'
 } & ActionInfo
 

@@ -76,7 +76,7 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
     }
 
     private void compileOnValueChange(FormProps_AutoValue props, CompileContext compileContext) {
-        List<ValueChangeHandlerInfo> valueChangeHandlers = ElementCompileUtils.getMethods(compileContext.getComponentElement(), compileContext.getProcessingEnv()).values().stream().map(this::buildValueChangeHandlerInfo).filter(Objects::nonNull).collect(Collectors.toList());
+        List<ValueChangeHandlerInfo> valueChangeHandlers = compileContext.getMethodMap().values().stream().map(this::buildValueChangeHandlerInfo).filter(Objects::nonNull).collect(Collectors.toList());
         List<String> allWatchFields = valueChangeHandlers.stream().flatMap(info -> Arrays.stream(info.getWatchFields())).collect(Collectors.toList());
         if (allWatchFields.size() != allWatchFields.stream().distinct().count()) {
             String message = String.format("Form component [%s] @ValueChangeHandler has duplicate watchFields.", compileContext.getComponentElement().getQualifiedName());
