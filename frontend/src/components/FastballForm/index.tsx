@@ -158,7 +158,7 @@ class FastballForm extends React.Component<FormProps, any> {
 
         if (variableForm && __designMode !== 'design') {
             proFormProps.request = async () => {
-                const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
+                const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', needArrayWrapper: false, data: [input] })
                 if (onDataLoad) {
                     onDataLoad(data);
                 }
