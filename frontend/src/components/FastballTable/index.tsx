@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { ProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
-import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo } from '../../../types';
+import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo, ApiActionInfo } from '../../../types';
 import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField } from '../../common';
 import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -92,7 +92,14 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
     }
 
     const actionButtons = !actions ? [] : actions.filter(filterVisibled).map(action => {
-        const actionInfo: ActionInfo = { componentKey, ...action, needArrayWrapper: false, data: [searchState, input] };
+        const actionInfo: ActionInfo = { componentKey, ...action };
+        if(actionInfo.type === 'API') {
+            const apiActionInfo = actionInfo as ApiActionInfo
+            apiActionInfo.needArrayWrapper = false;
+            apiActionInfo.data = [searchState, input]
+        } else {
+            actionInfo.data = input
+        }
         if (action.refresh) {
             actionInfo.callback = () => ref.current?.reload()
         }
