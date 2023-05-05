@@ -49,18 +49,17 @@ class FastballForm extends React.Component<FormProps, any> {
     getActions() {
         const { componentKey, closePopup, showReset, input, recordActions } = this.props;
         const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
-            if (action.closePopupOnSuccess !== false && closePopup) {
-                action.callback = () => {
-                    this.ref.current?.resetFields()
+            action.callback = () => {
+                this.ref.current?.resetFields()
+                if (action.closePopupOnSuccess !== false && closePopup) {
                     closePopup()
                 }
             }
             return buildAction({
                 componentKey, ...action, loadData: async () => {
-                    const data: Data = {}
                     const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
-                    Object.assign(data, input, formData)
-                    return data;
+                    const data: Data = Object.assign({}, formData)
+                    return [data, input];
                 }
             });
         }) : []
