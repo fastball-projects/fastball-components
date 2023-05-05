@@ -56,7 +56,7 @@ class FastballForm extends React.Component<FormProps, any> {
                 }
             }
             return buildAction({
-                componentKey, ...action, loadData: async () => {
+                componentKey, ...action, needArrayWrapper: false, loadData: async () => {
                     const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
                     const data: Data = Object.assign({}, formData)
                     return [data, input];
