@@ -1,30 +1,58 @@
-import { Button, Upload, UploadProps, message } from "antd";
-import React from "react";
+import { Button, Popconfirm, Upload, UploadProps, message } from "antd";
+import React, { useState } from "react";
 import { ApiActionInfo } from "../../../types";
 import { callApi, doApiAction } from "../action";
 
 const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
-    const { actionKey, actionName, trigger, uploadFileAction } = props;
+    const [open, setOpen] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const { actionKey, actionName, trigger, confirmMessage, uploadFileAction } = props;
     const execute = async () => await doApiAction(props);
-    if (!uploadFileAction) {
+
+    const showPopconfirm = () => {
+        setOpen(true);
+    };
+
+    const handleOk = async () => {
+        setConfirmLoading(true);
+        await execute();
+        setOpen(false);
+        setConfirmLoading(false);
+    };
+
+    const handleCancel = () => {
+        setOpen(false);
+    };
+
+    let actionComponent;
+    if (uploadFileAction) {
+        const uploadProps: UploadProps = {
+            itemRender: () => <></>,
+            customRequest: async ({ file }) => {
+                if (file) {
+                    await doApiAction(props, file)
+                }
+            },
+            async onChange(info) {
+                if (info.file.status === 'done') {
+
+                } else if (info.file.status === 'error') {
+                    message.error(`${info.file.name} file upload failed.`);
+                }
+            },
+        };
+        return <Upload {...uploadProps}>{trigger || <Button key={actionKey}>{actionName || actionKey}</Button>}</Upload>
+    } else if (!confirmMessage) {
         return trigger ? <span key={actionKey} onClick={execute}>{trigger}</span> : (<Button key={actionKey} onClick={execute}>{actionName || actionKey}</Button>);
     }
-    const uploadProps: UploadProps = {
-        itemRender: () => <></>,
-        customRequest: async ({ file }) => {
-            if (file) {
-                await doApiAction(props, file)
-            }
-        },
-        async onChange(info) {
-            if (info.file.status === 'done') {
+    return <Popconfirm
+        title={confirmMessage}
+        open={open}
+        onConfirm={handleOk}
+        okButtonProps={{ loading: confirmLoading }}
+        onCancel={handleCancel}
+    >{trigger ? <span key={actionKey} onClick={showPopconfirm}>{trigger}</span> : (<Button key={actionKey} onClick={showPopconfirm}>{actionName || actionKey}</Button>)}</Popconfirm>
 
-            } else if (info.file.status === 'error') {
-                message.error(`${info.file.name} file upload failed.`);
-            }
-        },
-    };
-    return <Upload {...uploadProps}>{trigger || <Button key={actionKey}>{actionName || actionKey}</Button>}</Upload>
 }
 
 export default FastballActionButton;
