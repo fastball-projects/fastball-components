@@ -78,7 +78,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         // 是否开启导出
         if(tableConfig.exportable()) {
             ApiActionInfo exportActionInfo = ApiActionInfo.builder()
-                    .actionKey("exportData")
+                    .actionKey(EXPORT_METHOD_NAME)
                     .actionName("导出")
                     .downloadFileAction(true)
                     .build();

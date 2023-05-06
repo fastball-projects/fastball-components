@@ -1,9 +1,10 @@
 import React from 'react'
 import { Button, message } from 'antd';
 import { MD5 } from 'object-hash'
-import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo } from '../../types'
+import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo, PrintActionInfo, PrintProps } from '../../types'
 import FastballPopup from './components/Popup'
 import FastballActionButton from './components/ActionButton';
+import FastballPrint from './components/Printer';
 
 const TOKEN_LOCAL_KEY = 'fastball_token';
 
@@ -71,6 +72,10 @@ export const buildAction = (actionInfo: ActionInfo) => {
     } else if (actionInfo.type === 'Popup') {
         const popupActionInfo = actionInfo as PopupActionInfo
         return doPopupAction(popupActionInfo)
+    } else if (actionInfo.type === 'Print') {
+        const printActionInfo = actionInfo as PrintActionInfo
+        debugger
+        return doPrintAction(printActionInfo)
     } else {
         return null
     }
@@ -86,6 +91,19 @@ export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
         input: popupActionInfo.data
     }
     return <FastballPopup {...popupProps} />;
+}
+
+export const doPrintAction = (printActionInfo: PrintActionInfo) => {
+    const printProps: PrintProps = {
+        key: printActionInfo.actionKey,
+        ref: printActionInfo.ref,
+        componentRef: printActionInfo.componentRef,
+        printComponent: printActionInfo.printComponent,
+        onClose: printActionInfo.callback,
+        trigger: printActionInfo.trigger || <Button>{printActionInfo.actionName || printActionInfo.actionKey}</Button>,
+        input: printActionInfo.data
+    }
+    return <FastballPrint {...printProps} />;
 }
 
 export const doApiAction = async (actionInfo: ApiActionInfo, file?: File | Blob) => {

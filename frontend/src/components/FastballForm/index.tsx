@@ -6,6 +6,8 @@ import { buildAction, doApiAction, filterEnabled, filterVisibled, processingFiel
 import { Button } from 'antd';
 import SubTable from '../../common/components/SubTable';
 import Address from '../../common/components/Address';
+import { ComponentToPrint } from '../../common/components/Printer';
+
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
 
@@ -34,8 +36,9 @@ const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): 
     return false;
 }
 
-class FastballForm extends React.Component<FormProps, any> {
+class FastballForm extends React.PureComponent<FormProps, any> {
     ref = React.createRef<ProFormInstance>();
+    componentRef = React.createRef();
 
     constructor(props: FormProps) {
         super(props)
@@ -47,7 +50,7 @@ class FastballForm extends React.Component<FormProps, any> {
     }
 
     getActions() {
-        const { componentKey, closePopup, showReset, input, recordActions } = this.props;
+        const { componentKey, closePopup, showReset, input, actions, recordActions } = this.props;
         const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
             action.callback = () => {
                 this.ref.current?.resetFields()
@@ -56,6 +59,7 @@ class FastballForm extends React.Component<FormProps, any> {
                 }
             }
             return buildAction({
+                componentRef: this.componentRef,
                 componentKey, ...action, needArrayWrapper: false, loadData: async () => {
                     const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
                     const data: Data = Object.assign({}, formData)
@@ -63,6 +67,23 @@ class FastballForm extends React.Component<FormProps, any> {
                 }
             });
         }) : []
+        actions?.filter(filterVisibled).forEach(action => {
+            action.callback = () => {
+                this.ref.current?.resetFields()
+                if (action.closePopupOnSuccess !== false && closePopup) {
+                    closePopup()
+                }
+            }
+            const button = buildAction({
+                componentRef: this.componentRef,
+                componentKey, ...action, needArrayWrapper: false, loadData: async () => {
+                    const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
+                    const data: Data = Object.assign({}, formData)
+                    return [data, input];
+                }
+            });
+            buttons.push(button);
+        })
         if (showReset !== false) {
             buttons.push(<Button onClick={() => this.ref.current?.resetFields()}>重置</Button>)
         }
@@ -189,26 +210,28 @@ class FastballForm extends React.Component<FormProps, any> {
             }
 
         }
-        return <ProConfigProvider
-            valueTypeMap={{
-                SubTable: {
-                    render: (data, props) => {
-                        console.log(data, props)
-                        return <SubTable size="small" {...props} {...props.fieldProps} readonly />
+        return <ComponentToPrint ref={this.componentRef}>
+            <ProConfigProvider
+                valueTypeMap={{
+                    SubTable: {
+                        render: (data, props) => {
+                            console.log(data, props)
+                            return <SubTable size="small" {...props} {...props.fieldProps} readonly />
+                        },
+                        renderFormItem: (data, props) => {
+                            console.log(data, props)
+                            return <SubTable size="small" {...props} {...props?.fieldProps} />
+                        }
                     },
-                    renderFormItem: (data, props) => {
-                        console.log(data, props)
-                        return <SubTable size="small" {...props} {...props?.fieldProps} />
+                    Address: {
+                        render: (text) => text,
+                        renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
                     }
-                },
-                Address: {
-                    render: (text) => text,
-                    renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
-                }
-            }}
-        >
-            <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
-        </ProConfigProvider>
+                }}
+            >
+                <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
+            </ProConfigProvider>
+        </ComponentToPrint>
     }
 }
 

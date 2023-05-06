@@ -14,6 +14,10 @@ export type PopupComponentProps = {
     closePopup?: Function
 }
 
+export type PrintableComponentState = {
+    isPrinting: boolean
+}
+
 export type MockDataComponent<P> = {
     mockInterceptor?: Function<P>
 } & ReactComponent<P>

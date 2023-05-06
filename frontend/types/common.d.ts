@@ -50,6 +50,16 @@ export type PopupProps = {
     __designMode?: string
 }
 
+export type PrintProps = {
+    key?: string
+    ref?: MutableRefObject
+    input?: any
+    onClose?: Function
+    trigger: ReactComponent
+    printComponent: RefComponentInfo
+    __designMode?: string
+}
+
 export type FieldInfo = {
     dataIndex: string[]
     valueType: string
@@ -111,6 +121,11 @@ export type PopupActionInfo = {
     popupInfo: PopupInfo
 } & ActionInfo
 
+export type PrintActionInfo = {
+    type: 'Print'
+    printComponent: RefComponentInfo
+} & ActionInfo
+
 export type PopupInfo = {
     title?: string
     width?: number
@@ -122,7 +137,7 @@ export type PopupInfo = {
 
 export type LoadDataType = () => any
 
-export type ActionType = 'API' | 'Rest' | 'Popup' | 'Digit'
+export type ActionType = 'API' | 'Rest' | 'Popup' | 'Digit' | 'Print'
 
 export type PopupType = 'Modal' | 'Drawer' | 'Popover'
 

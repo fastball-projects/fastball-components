@@ -4,6 +4,8 @@ import type { ProTableProps, ProCoreActionType, ProDescriptionsProps, ProDescrip
 import type { FieldInfo, DescriptionProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterFormOnlyField, filterVisibled, getByPaths, processingField } from '../../common';
 import SubTable from '../../common/components/SubTable';
+import { ComponentToPrint } from '../../common/components/Printer';
+
 
 type DescriptionState = {
     data?: Record<string, any>
@@ -11,6 +13,8 @@ type DescriptionState = {
 
 class FastballDescription extends React.Component<DescriptionProps, DescriptionState> {
     ref = React.createRef<ProCoreActionType>();
+    componentRef = React.createRef();
+    
     constructor(props: DescriptionProps) {
         super(props)
         this.state = { data: props.input }
@@ -45,7 +49,7 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
                     this.ref.current?.reload()
                 }
             }
-            buttons.push(buildAction({ componentKey, ...action }));
+            buttons.push(buildAction({ componentRef: this.componentRef, componentKey, ...action }));
         })
         return buttons;
     }
@@ -136,18 +140,20 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
             });
         }
 
-        return <ProConfigProvider
-            valueTypeMap={{
-                SubTable: {
-                    render: (data, props) => <SubTable size="small" {...props} {...props.fieldProps} value={data} readonly />,
-                },
-                Address: {
-                    render: (text) => text,
-                }
-            }}
-        >
-            <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
-        </ProConfigProvider>
+        return <ComponentToPrint ref={this.componentRef}>
+            <ProConfigProvider
+                valueTypeMap={{
+                    SubTable: {
+                        render: (data, props) => <SubTable size="small" {...props} {...props.fieldProps} value={data} readonly />,
+                    },
+                    Address: {
+                        render: (text) => text,
+                    }
+                }}
+            >
+                <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
+            </ProConfigProvider>
+        </ComponentToPrint> 
     }
 }
 
