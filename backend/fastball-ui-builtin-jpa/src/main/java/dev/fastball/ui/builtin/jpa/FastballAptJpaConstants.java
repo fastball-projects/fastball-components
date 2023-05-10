@@ -7,6 +7,7 @@ public interface FastballAptJpaConstants {
     String LOOKUP_ACTION_CLASS_NAME_SUFFIX = "LookupAction";
     String LOOKUP_ACTION_METHOD_PARAM_NAME = "query";
     String LOOKUP_ACTION_METHOD_NAME = "loadLookupItems";
+    String BUILT_IN_COMPONENT_CLASS_NAME = "Builtin";
     String FORM_COMPONENT_CLASS_NAME_SUFFIX = "Form";
     String COMPONENT_METHOD_PARAM_NAME = "record";
     String FORM_SUBMIT_ACTION_NAME = "提交";

@@ -34,7 +34,7 @@ public class JpaLookupActionGenerator extends BuiltinGenerator {
                 TypeName.get(element.asType()), TypeName.OBJECT
         ));
         FieldSpec fieldSpec = FieldSpec.builder(ClassName.get(
-                buildPackageName(element, processingEnv), element.getSimpleName() + JPA_REPO_CLASS_NAME_SUFFIX
+                buildPackageName(element, processingEnv), buildBasicClassName(element) + JPA_REPO_CLASS_NAME_SUFFIX
         ), JPA_REPO_FIELD_NAME, Modifier.PROTECTED, Modifier.FINAL).build();
         typeBuilder.addField(fieldSpec);
         typeBuilder.addMethod(buildLoadLookupItemsMethod(element));

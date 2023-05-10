@@ -5,6 +5,7 @@ import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.exception.CompilerException;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
+import dev.fastball.core.annotation.Field;
 import dev.fastball.core.component.Component;
 import dev.fastball.ui.components.form.FieldDependencyInfo;
 import dev.fastball.ui.components.form.FormFieldInfo;
@@ -36,8 +37,6 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
     @Override
     protected void compileProps(FormProps_AutoValue props, CompileContext compileContext) {
         List<TypeElement> genericTypes = getGenericTypeElements(compileContext);
-        props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, FormFieldInfo::new, this::afterFieldBuild));
-        compileOnValueChange(props, compileContext);
         FormConfig config = compileContext.getComponentElement().getAnnotation(FormConfig.class);
         if (config != null) {
             props.showReset(config.showReset());
@@ -46,6 +45,8 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         } else {
             props.showReset(true);
         }
+        props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, FormFieldInfo::new, ((variableElement, formFieldInfo) -> afterFieldBuild(props, variableElement, formFieldInfo))));
+        compileOnValueChange(props, compileContext);
     }
 
     @Override
@@ -53,7 +54,16 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         return COMPONENT_TYPE;
     }
 
-    private void afterFieldBuild(VariableElement variableElement, FormFieldInfo fieldInfo) {
+    private void afterFieldBuild(FormProps_AutoValue props, VariableElement variableElement, FormFieldInfo fieldInfo) {
+        FormField formField = variableElement.getAnnotation(FormField.class);
+        Field fieldAnnotation = variableElement.getAnnotation(Field.class);
+        if (formField != null) {
+            if (props.readonly() || (fieldAnnotation != null && fieldAnnotation.readonly())) {
+                fieldInfo.setDisplay(formField.readonlyDisplay());
+            } else {
+                fieldInfo.setDisplay(formField.editableDisplay());
+            }
+        }
         FieldDependencies fieldDependencies = variableElement.getAnnotation(FieldDependencies.class);
         FieldDependency fieldDependency = variableElement.getAnnotation(FieldDependency.class);
         if (fieldDependencies != null && fieldDependency != null) {

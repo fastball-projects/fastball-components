@@ -14,51 +14,60 @@ const SubTable: React.FC<{
     ) => void;
     columns: ProColumns[]
 }> = ({ name, title, readonly, value, onChange, columns }) => {
-    console.log('SubTable', name, value)
-    if (onChange && value?.find((item) => item[EDIT_ID] === undefined || item[EDIT_ID] === null)) {
-        let nextEditId = 1;
+    // console.log('SubTable', name, value)
+    // if (onChange && value?.find((item) => item[EDIT_ID] === undefined || item[EDIT_ID] === null)) {
+    //     let nextEditId = 1;
 
-        const editableData = value.map(item => {
-            const newItem = { ...item }
-            if (newItem[EDIT_ID] === undefined || newItem[EDIT_ID] === null) {
-                newItem[EDIT_ID] = newItem.id || EDIT_ID + nextEditId++;
-            }
-            return newItem;
-        })
-        onChange?.(editableData)
-        return <></>;
-    }
+    //     const editableData = value.map(item => {
+    //         const newItem = { ...item }
+    //         if (newItem[EDIT_ID] === undefined || newItem[EDIT_ID] === null) {
+    //             newItem[EDIT_ID] = newItem.id || EDIT_ID + nextEditId++;
+    //         }
+    //         return newItem;
+    //     })
+    //     onChange?.(editableData)
+    //     return <></>;
+    // }
 
-    const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() => value?.map((item, index) => item[EDIT_ID]) || []);
+    value?.forEach((item, index) => item[EDIT_ID] = index.toString());
 
     let editable: RowEditableConfig<Record<string, any>> = {}
     let recordCreatorProps: any | boolean = false
     if (readonly !== true) {
         editable = {
             type: 'multiple',
-            editableKeys,
+            editableKeys: value?.map((record, i) => i.toString()),
             actionRender: (row, config, defaultDoms) => {
-                return [defaultDoms.save, defaultDoms.delete || defaultDoms.cancel];
+                return [defaultDoms.delete || defaultDoms.cancel];
             },
             onValuesChange: (record, recordList) => {
                 console.log('sub table value change', record, recordList)
                 onChange?.(recordList);
             },
-            onChange: setEditableRowKeys,
         }
         recordCreatorProps = {
             newRecordType: 'dataSource',
-            record: () => ({
-                [EDIT_ID]: Date.now(),
-            }),
+            record: (index?: number) => {
+                return {
+                    [EDIT_ID]: index?.toString() || '0',
+                }
+            },
         }
     }
+
+    const tableColumns: ProColumns[] = [...columns, {
+        title: '操作',
+        valueType: 'option',
+        width: 200,
+        render: () => null
+    }]
+
     return (
         <EditableProTable<Record<string, any>>
             cardBordered
             name={name}
             headerTitle={title}
-            columns={columns}
+            columns={tableColumns}
             rowKey={EDIT_ID}
             value={value}
             onChange={onChange}

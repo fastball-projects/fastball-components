@@ -12,6 +12,7 @@ import dev.fastball.ui.components.table.TableProps_AutoValue;
 import dev.fastball.ui.components.table.config.CopyableColumn;
 import dev.fastball.ui.components.table.config.SortableColumn;
 import dev.fastball.ui.components.table.config.TableConfig;
+import dev.fastball.ui.components.table.config.TableField;
 import dev.fastball.ui.components.table.param.TableSearchParam;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -76,7 +77,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         props.keywordSearch(tableConfig.keywordSearch());
 
         // 是否开启导出
-        if(tableConfig.exportable()) {
+        if (tableConfig.exportable()) {
             ApiActionInfo exportActionInfo = ApiActionInfo.builder()
                     .actionKey(EXPORT_METHOD_NAME)
                     .actionName("导出")
@@ -93,11 +94,15 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
 
     private List<ColumnInfo> buildTableColumnsFromReturnType(TypeElement returnType, ProcessingEnvironment processingEnv, TableProps_AutoValue props) {
         return TypeCompileUtils.compileTypeFields(returnType, processingEnv, props, ColumnInfo::new, (field, tableColumn) -> {
-            if (field.getAnnotation(SortableColumn.class) != null) {
+            TableField tableField = field.getAnnotation(TableField.class);
+            if (field.getAnnotation(SortableColumn.class) != null || (tableField != null && tableField.sortable())) {
                 tableColumn.setSortable(true);
             }
-            if (field.getAnnotation(CopyableColumn.class) != null) {
+            if (field.getAnnotation(CopyableColumn.class) != null || (tableField != null && tableField.copyable())) {
                 tableColumn.setCopyable(true);
+            }
+            if (tableField != null) {
+                tableColumn.setDisplay(tableField.display());
             }
         });
     }

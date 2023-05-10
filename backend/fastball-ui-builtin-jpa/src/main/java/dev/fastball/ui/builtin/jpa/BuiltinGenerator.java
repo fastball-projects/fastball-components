@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
+import static dev.fastball.ui.builtin.jpa.FastballAptJpaConstants.BUILT_IN_COMPONENT_CLASS_NAME;
 import static dev.fastball.ui.builtin.jpa.FastballAptJpaConstants.GENERATE_PACKAGE;
 
 public abstract class BuiltinGenerator implements FastballPreCompileGenerator {
@@ -63,7 +64,11 @@ public abstract class BuiltinGenerator implements FastballPreCompileGenerator {
     }
 
     protected String buildClassName(TypeElement element) {
-        return element.getSimpleName().toString() + getClassSuffix();
+        return buildBasicClassName(element) + getClassSuffix();
+    }
+
+    protected String buildBasicClassName(TypeElement element) {
+        return element.getSimpleName() + BUILT_IN_COMPONENT_CLASS_NAME;
     }
 
     abstract protected String getClassSuffix();

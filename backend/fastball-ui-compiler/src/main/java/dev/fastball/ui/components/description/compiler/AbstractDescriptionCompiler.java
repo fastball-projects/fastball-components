@@ -6,6 +6,7 @@ import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.component.Component;
 import dev.fastball.ui.components.description.DescriptionProps_AutoValue;
 import dev.fastball.ui.components.description.config.DescriptionConfig;
+import dev.fastball.ui.components.description.config.DescriptionField;
 import dev.fastball.ui.components.description.config.DescriptionSize;
 
 import javax.lang.model.element.TypeElement;
@@ -26,7 +27,12 @@ public abstract class AbstractDescriptionCompiler<T extends Component> extends A
     @Override
     protected void compileProps(DescriptionProps_AutoValue props, CompileContext compileContext) {
         List<TypeElement> genericTypes = getGenericTypeElements(compileContext);
-        props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props));
+        props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, (field, fieldInfo) -> {
+            DescriptionField descriptionField = field.getAnnotation(DescriptionField.class);
+            if(descriptionField != null) {
+                fieldInfo.setDisplay(descriptionField.display());
+            }
+        }));
         DescriptionConfig config = compileContext.getComponentElement().getAnnotation(DescriptionConfig.class);
         if (config != null) {
             props.size(config.size());

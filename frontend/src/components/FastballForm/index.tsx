@@ -36,13 +36,18 @@ const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): 
     return false;
 }
 
-class FastballForm extends React.PureComponent<FormProps, any> {
+type FormState = {
+    valueChangeHandlerProcessing: boolean
+}
+
+class FastballForm extends React.Component<FormProps, FormState> {
     ref = React.createRef<ProFormInstance>();
     componentRef = React.createRef();
 
+
     constructor(props: FormProps) {
         super(props)
-
+        this.state = { valueChangeHandlerProcessing: false }
         // 第一次调用传入的 setActions 将按钮注册到 popup, 否则会导致循环更新
         if (props.setActions) {
             props.setActions(this.getActions())
@@ -101,11 +106,11 @@ class FastballForm extends React.PureComponent<FormProps, any> {
             const formColumn: ProFormColumnsType = {};
             Object.assign(formColumn, field);
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
-            formColumn.name = formColumn.dataIndex
             processingField(field, formColumn as ProSchema, this.props.__designMode);
             if (parentDataIndex) {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
+            formColumn.name = formColumn.dataIndex
             if (field.validationRules) {
                 formColumn.formItemProps = Object.assign(formColumn.formItemProps || {}, {
                     rules: field.validationRules
@@ -201,6 +206,7 @@ class FastballForm extends React.PureComponent<FormProps, any> {
         }
         if (valueChangeHandlers && valueChangeHandlers.length > 0) {
             proFormProps.onValuesChange = async (change, values) => {
+                console.log(this, 'onValuesChange', valueChangeHandlers, change, values);
                 const changeFields = Object.keys(change)
                 const handler = valueChangeHandlers.find(({ watchFields }) => changeFields.find(changeField => watchFields.includes(changeField)))
                 if (handler) {
@@ -210,28 +216,28 @@ class FastballForm extends React.PureComponent<FormProps, any> {
             }
 
         }
-        return <ComponentToPrint ref={this.componentRef}>
-            <ProConfigProvider
-                valueTypeMap={{
-                    SubTable: {
-                        render: (data, props) => {
-                            console.log(data, props)
-                            return <SubTable size="small" {...props} {...props.fieldProps} readonly />
+        return (
+            <ComponentToPrint ref={this.componentRef}>
+                <ProConfigProvider
+                    valueTypeMap={{
+                        SubTable: {
+                            render: (data, props) => {
+                                return <SubTable size="small" {...props} {...props.fieldProps} readonly />
+                            },
+                            renderFormItem: (data, props) => {
+                                return <SubTable size="small" {...props} {...props?.fieldProps} />
+                            }
                         },
-                        renderFormItem: (data, props) => {
-                            console.log(data, props)
-                            return <SubTable size="small" {...props} {...props?.fieldProps} />
+                        Address: {
+                            render: (text) => text,
+                            renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
                         }
-                    },
-                    Address: {
-                        render: (text) => text,
-                        renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
-                    }
-                }}
-            >
-                <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
-            </ProConfigProvider>
-        </ComponentToPrint>
+                    }}
+                >
+                    <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
+                </ProConfigProvider>
+            </ComponentToPrint>
+        )
     }
 }
 

@@ -28,14 +28,16 @@ public class JpaTableGenerator extends BuiltinGenerator {
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(buildClassName(element)).addModifiers(Modifier.PUBLIC);
         typeBuilder.addAnnotation(UIComponent.class);
         typeBuilder.addAnnotation(RequiredArgsConstructor.class);
-        addViewActionsAnnotation(typeBuilder, element, processingEnv, false);
-        addViewActionsAnnotation(typeBuilder, element, processingEnv, true);
+        AnnotationSpec.Builder viewActionsAnnotation = AnnotationSpec.builder(ViewActions.class);
+        addViewActionsAnnotation(viewActionsAnnotation, element, processingEnv, false);
+        addViewActionsAnnotation(viewActionsAnnotation, element, processingEnv, true);
+        typeBuilder.addAnnotation(viewActionsAnnotation.build());
         typeBuilder.addSuperinterface(ParameterizedTypeName.get(
                 ClassName.get(Table.class),
                 TypeName.get(element.asType())
         ));
         FieldSpec fieldSpec = FieldSpec.builder(ClassName.get(
-                buildPackageName(element, processingEnv), element.getSimpleName() + JPA_REPO_CLASS_NAME_SUFFIX
+                buildPackageName(element, processingEnv), buildBasicClassName(element) + JPA_REPO_CLASS_NAME_SUFFIX
         ), JPA_REPO_FIELD_NAME, Modifier.PROTECTED, Modifier.FINAL).build();
         typeBuilder.addField(fieldSpec);
         typeBuilder.addMethod(buildLoadDataMethod(element));
@@ -43,21 +45,19 @@ public class JpaTableGenerator extends BuiltinGenerator {
         return typeBuilder;
     }
 
-    private void addViewActionsAnnotation(TypeSpec.Builder typeBuilder, TypeElement element, ProcessingEnvironment processingEnv, boolean edit) {
-        AnnotationSpec recordViewActionsAnnotation = AnnotationSpec.builder(edit ? RecordViewActions.class : ViewActions.class)
-                .addMember("value", "$L", AnnotationSpec.builder(ViewAction.class)
+    private void addViewActionsAnnotation(AnnotationSpec.Builder viewActionsAnnotationBuilder, TypeElement element, ProcessingEnvironment processingEnv, boolean edit) {
+        viewActionsAnnotationBuilder.addMember((edit ? "recordActions" : "actions"), "$L", AnnotationSpec.builder(ViewAction.class)
                         .addMember("key", "$S", edit ? TABLE_EDIT_VIEW_ACTION_KEY : TABLE_NEW_VIEW_ACTION_KEY)
                         .addMember("name", "$S", edit ? TABLE_EDIT_VIEW_ACTION_NAME : TABLE_NEW_VIEW_ACTION_NAME)
                         .addMember("popup", "$L", AnnotationSpec.builder(Popup.class)
                                 .addMember("value", "$L", AnnotationSpec.builder(RefComponent.class)
                                         .addMember("value", "$T.class", ClassName.get(
-                                                buildPackageName(element, processingEnv), element.getSimpleName() + FORM_COMPONENT_CLASS_NAME_SUFFIX
+                                                buildPackageName(element, processingEnv), buildBasicClassName(element) + FORM_COMPONENT_CLASS_NAME_SUFFIX
                                         ))
                                         .build())
                                 .build())
                         .build())
                 .build();
-        typeBuilder.addAnnotation(recordViewActionsAnnotation);
     }
 
     private MethodSpec buildLoadDataMethod(TypeElement element) {

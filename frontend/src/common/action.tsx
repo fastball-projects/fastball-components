@@ -162,12 +162,12 @@ export const callApi = async (url: string, data?: any, file?: File | Blob, callb
     requestInfo.body = formData
     const resp = await window.fetch(url, requestInfo)
     const json = await resp.text();
-    if (callback) {
-        callback()
-    }
     if (json) {
         const result = JSON.parse(json);
         if (result.status === 200) {
+            if (callback) {
+                callback()
+            }
             return result.data;
         }
         if (result.status === 401) {
