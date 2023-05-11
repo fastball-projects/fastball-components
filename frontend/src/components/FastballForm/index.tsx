@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BetaSchemaForm, ProConfigProvider, ProSchema, ProTable } from '@ant-design/pro-components'
+import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProSchema, ProTable } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField } from '../../common';
@@ -67,7 +67,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 componentRef: this.componentRef,
                 componentKey, ...action, needArrayWrapper: false, loadData: async () => {
                     const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
-                    const data: Data = Object.assign({}, formData)
+                    const data: Data = Object.assign({}, input, formData)
                     return [data, input];
                 }
             });
@@ -83,7 +83,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 componentRef: this.componentRef,
                 componentKey, ...action, needArrayWrapper: false, loadData: async () => {
                     const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
-                    const data: Data = Object.assign({}, formData)
+                    const data: Data = Object.assign({}, input, formData)
                     return [data, input];
                 }
             });
@@ -99,14 +99,14 @@ class FastballForm extends React.Component<FormProps, FormState> {
         return this.buildColumns(this.props.fields)
     }
 
-    buildColumns(fields: FormFieldInfo[], parentDataIndex?: string[], tableColumns?: boolean): ProFormColumnsType<any, 'text'>[] {
+    buildColumns(fields: FormFieldInfo[], parentDataIndex?: string[], editableFormRef?: React.RefObject<EditableFormInstance>): ProFormColumnsType<any, 'text'>[] {
         const { readonly, column } = this.props;
         const columnSpan = 24 / (column || 2);
         return fields.filter(filterEnabled).filter(field => field.valueType).map(field => {
             const formColumn: ProFormColumnsType = {};
             Object.assign(formColumn, field);
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
-            processingField(field, formColumn as ProSchema, this.props.__designMode);
+            processingField(field, formColumn as ProSchema, this.props.__designMode, editableFormRef);
             if (parentDataIndex) {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
@@ -126,11 +126,31 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.columns = this.buildColumns(field.subFields, field.dataIndex)
             }
             if (field.valueType === 'SubTable' && field.subFields) {
+                const editableFormRef = React.createRef<EditableFormInstance>()
                 formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                    columns: this.buildColumns(field.subFields, undefined, true),
-                    title: formColumn.title
+                    columns: this.buildColumns(field.subFields, undefined, editableFormRef),
+                    title: formColumn.title,
+                    editableFormRef,
                 })
                 formColumn.title = null;
+            }
+            if (field.expression) {
+                const fieldProps = formColumn.fieldProps || {}
+                formColumn.fieldProps = (formInstance, { dataIndex, rowIndex }) => {
+                    if (editableFormRef && rowIndex !== undefined) {
+                        fieldProps.onChange = (a,b,c) => {
+                            const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
+                            console.log('onSelect', editableFormRef, rowIndex, rowData, a,b,c)
+                        }
+                    } else if (formInstance) {
+                        fieldProps.onChange = (a,b,c) => {
+                            const rowData = formInstance.getFieldsValue?.() || {};
+                            console.log('onSelect', formInstance, dataIndex, rowData, a,b,c)
+                            formInstance.setFieldsValue?.(rowData)
+                        }
+                    }
+                    return fieldProps;
+                }
             }
             if (field.valueType === 'Array' && field.subFields) {
                 formColumn.valueType = 'formList'
@@ -148,7 +168,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
             }
             // FIXME 这代码简直了....
             if (field.fieldDependencyInfoList && field.fieldDependencyInfoList.length > 0) {
-                if (!tableColumns) {
+                if (!editableFormRef) {
                     const dependencyFieldNames = field.fieldDependencyInfoList.map(({ field }) => field);
                     const dependencyField: ProFormColumnsType = {
                         title: formColumn.title, dataIndex: formColumn.dataIndex, valueType: 'dependency', name: dependencyFieldNames, columns: (values) => {

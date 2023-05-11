@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ProSchema, ProSchemaComponentTypes, ProFormField } from "@ant-design/pro-components";
+import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance } from "@ant-design/pro-components";
 import { Tag } from "antd";
 import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem } from "../../types";
 import { doLookupAction } from "./action";
@@ -23,7 +23,7 @@ export const filterEnabled = (item: Displayable) => item.display !== 'Disabled'
 
 export const filterVisibled = (item: Displayable) => item.display !== 'Disabled' && item.display !== 'Hidden'
 
-export const processingField = (field: FieldInfo, column: ProSchema, __designMode?: string) => {
+export const processingField = (field: FieldInfo, column: ProSchema, __designMode?: string, editableFormRef?: React.RefObject<EditableFormInstance>) => {
     if (field.display === 'Hidden') {
         column.hideInForm = true;
         column.hideInDescriptions = true;
@@ -53,6 +53,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
     if (field.lookup) {
         const lookupAction: LookupActionInfo = field.lookup;
         const fieldProps = {
+            ...(column.fieldProps || {}),
             fieldNames: {
                 label: lookupAction.labelField,
                 value: lookupAction.valueField,
@@ -63,9 +64,38 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
             fieldProps.treeCheckable = lookupAction.multiple
         }
         if (lookupAction.multiple) {
-            column.fieldProps = Object.assign(fieldProps, { mode: "multiple" })
+            fieldProps.mode = "multiple";
         }
-        column.fieldProps = Object.assign(column.fieldProps || {}, fieldProps)
+        if (lookupAction.extraFillFields.length > 0) {
+            column.fieldProps = (formInstance, { dataIndex, rowIndex }) => {
+                if (editableFormRef && rowIndex !== undefined) {
+                    fieldProps.onChange = (_selectedValue: any, selectedItem: Record<string, any>) => {
+                        const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
+                        lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
+                            if (rowData[targetField] === undefined || rowData[targetField] === null || !onlyEmpty) {
+                                rowData[targetField] = selectedItem[fromField]
+                            }
+                        })
+                        console.log('onSelect', rowIndex, rowData)
+                        editableFormRef.current?.setRowData?.(rowIndex, rowData)
+                    }
+                } else if (formInstance) {
+                    fieldProps.onChange = (_selectedValue: any, selectedItem: Record<string, any>) => {
+                        const rowData = formInstance.getFieldsValue?.() || {};
+                        lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
+                            if (rowData[targetField] === undefined || rowData[targetField] === null || !onlyEmpty) {
+                                rowData[targetField] = selectedItem[fromField]
+                            }
+                        })
+                        console.log('onSelect', dataIndex, rowData)
+                        formInstance.setFieldsValue?.(rowData)
+                    }
+                }
+                return fieldProps;
+            }
+        } else {
+            column.fieldProps = fieldProps
+        }
         column.request = () => {
             return doLookupAction(lookupAction, undefined, __designMode);
         }

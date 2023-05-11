@@ -76,6 +76,7 @@ export type FieldInfo = {
     entireRow: boolean
     fieldProps: any
     formItemProps: any
+    expression: ExpressionInfo
 } & Displayable
 
 export type ActionRef = {
@@ -103,6 +104,7 @@ export type LookupActionInfo = {
     valueField: string
     multiple: boolean
     childrenField?: string
+    extraFillFields: LookupFillFieldInfo[]
 }
 export type TreeLookupActionInfo = {
     childrenField: string
@@ -134,6 +136,33 @@ export type PopupInfo = {
     triggerType: TriggerType
     placementType: PlacementType
     popupComponent: RefComponentInfo
+}
+
+export type LookupFillFieldInfo = {
+    /**
+     * 选项的字段 Key
+     */
+    fromField: string;
+    /**
+     * 填充的目标字段 Key
+     */
+    targetField: string;
+    /**
+     * 仅为目标值为空时, 进行填充
+     */
+    onlyEmpty: boolean;
+}
+
+
+export type ExpressionInfo = {
+    /**
+     * 表达式所需字段
+     */
+    fields: string[];
+    /**
+     * 具体表达式内容
+     */
+    expression: string;
 }
 
 export type LoadDataType = () => any

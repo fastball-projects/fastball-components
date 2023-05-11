@@ -1,4 +1,4 @@
-import { EditableProTable, ProColumns, RowEditableConfig } from '@ant-design/pro-components'
+import { EditableFormInstance, EditableProTable, ProColumns, RowEditableConfig } from '@ant-design/pro-components'
 import React from 'react';
 import { useState } from 'react';
 
@@ -13,7 +13,8 @@ const SubTable: React.FC<{
         value: readonly Record<string, any>[],
     ) => void;
     columns: ProColumns[]
-}> = ({ name, title, readonly, value, onChange, columns }) => {
+    editableFormRef?: React.RefObject<EditableFormInstance>
+}> = ({ name, title, readonly, value, onChange, columns, editableFormRef }) => {
     // console.log('SubTable', name, value)
     // if (onChange && value?.find((item) => item[EDIT_ID] === undefined || item[EDIT_ID] === null)) {
     //     let nextEditId = 1;
@@ -58,13 +59,13 @@ const SubTable: React.FC<{
     const tableColumns: ProColumns[] = [...columns, {
         title: '操作',
         valueType: 'option',
-        width: 200,
         render: () => null
     }]
 
     return (
         <EditableProTable<Record<string, any>>
             cardBordered
+            editableFormRef={editableFormRef}
             name={name}
             headerTitle={title}
             columns={tableColumns}

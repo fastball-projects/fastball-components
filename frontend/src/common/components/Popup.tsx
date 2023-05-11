@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Modal, Drawer, Popover, PopoverProps, ModalProps, DrawerProps } from 'antd';
+import { Modal, Drawer, Popover, PopoverProps, ModalProps, DrawerProps, Space } from 'antd';
 
 import type { PopupProps, RefComponentInfo } from '../../../types'
 import { loadRefComponent } from '../component'
@@ -22,7 +22,7 @@ const buildPopupComponent = ({ propsKey, dataPath, componentInfo }: RefComponent
 const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, input, __designMode }) => {
     const { triggerType, placementType, popupType, popupComponent, title, width } = popupInfo;
     const [open, setOpen] = React.useState(false);
-    const [actions, setActions] = React.useState([]);
+    const [actions, setActions] = React.useState<React.ReactNode>([]);
 
     const closePopup = () => {
         setOpen(false);
@@ -61,7 +61,7 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
 
     let popupWrapperComponent;
     const content = buildPopupComponent(popupComponent, { closePopup, setActions, __designMode }, input)
-    const popupProps: ModalProps = { title, open, footer: actions }
+    const popupProps: ModalProps = { title, open, footer: <Space>{actions}</Space> }
     if (width) {
         popupProps.width = width
     }
