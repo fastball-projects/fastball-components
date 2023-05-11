@@ -135,21 +135,22 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.title = null;
             }
             if (field.expression) {
-                const fieldProps = formColumn.fieldProps || {}
-                formColumn.fieldProps = (formInstance, { dataIndex, rowIndex }) => {
+                formColumn.dependencies = field.expression.fields;
+                formColumn.formItemProps = (formInstance, { dataIndex, rowIndex }) => {
                     if (editableFormRef && rowIndex !== undefined) {
-                        fieldProps.onChange = (a,b,c) => {
-                            const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
-                            console.log('onSelect', editableFormRef, rowIndex, rowData, a,b,c)
-                        }
+                        const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
+                        const value = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
+                        console.log('onSelect', editableFormRef, rowIndex, rowData, value)
+                        const dataPath = parentDataIndex || []
+                        editableFormRef.current?.setFieldValue([...dataPath, rowIndex, dataIndex], value)
+                        // editableFormRef.current?.setRowData?.(rowIndex, value)
                     } else if (formInstance) {
-                        fieldProps.onChange = (a,b,c) => {
-                            const rowData = formInstance.getFieldsValue?.() || {};
-                            console.log('onSelect', formInstance, dataIndex, rowData, a,b,c)
-                            formInstance.setFieldsValue?.(rowData)
-                        }
+                        const rowData = formInstance.getFieldsValue?.() || {};
+                        const newData = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
+                        console.log('onSelect', formInstance, dataIndex, rowData, newData)
+                        formInstance.setFieldsValue?.(rowData)
                     }
-                    return fieldProps;
+                    return formColumn.formItemProps;
                 }
             }
             if (field.valueType === 'Array' && field.subFields) {
