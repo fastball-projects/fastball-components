@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProSchema, ProTable } from '@ant-design/pro-components'
+import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProSchema, ProTable } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField } from '../../common';
-import { Button } from 'antd';
+import { Button, Upload, Image } from 'antd';
 import SubTable from '../../common/components/SubTable';
 import Address from '../../common/components/Address';
 import { ComponentToPrint } from '../../common/components/Printer';
@@ -14,6 +14,9 @@ type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProp
 const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): boolean => {
     if (fieldDependencyInfo.condition === 'Empty') {
         return !values[fieldDependencyInfo.field];
+    }
+    if (fieldDependencyInfo.condition === 'NotEmpty') {
+        return !!values[fieldDependencyInfo.field];
     }
     if (fieldDependencyInfo.condition === 'Equals') {
         return values[fieldDependencyInfo.field] == fieldDependencyInfo.value;
@@ -140,14 +143,12 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     if (editableFormRef && rowIndex !== undefined) {
                         const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
                         const value = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
-                        console.log('onSelect', editableFormRef, rowIndex, rowData, value)
                         const dataPath = parentDataIndex || []
                         editableFormRef.current?.setFieldValue([...dataPath, rowIndex, dataIndex], value)
                         // editableFormRef.current?.setRowData?.(rowIndex, value)
                     } else if (formInstance) {
                         const rowData = formInstance.getFieldsValue?.() || {};
                         const newData = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
-                        console.log('onSelect', formInstance, dataIndex, rowData, newData)
                         formInstance.setFieldsValue?.(rowData)
                     }
                     return formColumn.formItemProps;
@@ -227,7 +228,6 @@ class FastballForm extends React.Component<FormProps, FormState> {
         }
         if (valueChangeHandlers && valueChangeHandlers.length > 0) {
             proFormProps.onValuesChange = async (change, values) => {
-                console.log(this, 'onValuesChange', valueChangeHandlers, change, values);
                 const changeFields = Object.keys(change)
                 const handler = valueChangeHandlers.find(({ watchFields }) => changeFields.find(changeField => watchFields.includes(changeField)))
                 if (handler) {
@@ -252,6 +252,16 @@ class FastballForm extends React.Component<FormProps, FormState> {
                         Address: {
                             render: (text) => text,
                             renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
+                        },
+                        image: {
+                            render: (text) => <Image src={text}></Image>,
+                            renderFormItem: (item, props) => {
+                                return (
+                                  <ProForm.Item {...props} {...props?.fieldProps}>
+                                    <Upload maxCount={1} />
+                                  </ProForm.Item>
+                                );
+                              },
                         }
                     }}
                 >

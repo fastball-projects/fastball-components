@@ -12,9 +12,9 @@ public @interface FieldDependency {
 
     String field();
 
-    String value();
+    String value() default "";
 
-    FieldDependencyCondition condition() default FieldDependencyCondition.Equals;
+    FieldDependencyCondition condition() default FieldDependencyCondition.NotEmpty;
 
     FieldDependencyType type() default FieldDependencyType.Hidden;
 }

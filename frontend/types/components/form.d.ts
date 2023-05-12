@@ -33,7 +33,7 @@ export type ValueChangeHandler = {
     handlerKey: string
 }
 
-export type FieldDependencyCondition = 'Empty' | 'Equals' | 'NotEquals' | 'GreaterThan' | 'LessThan' | 'GreaterThanOrEquals' | 'LessThanOrEquals'
+export type FieldDependencyCondition = 'Empty' | 'NotEmpty' | 'Equals' | 'NotEquals' | 'GreaterThan' | 'LessThan' | 'GreaterThanOrEquals' | 'LessThanOrEquals'
 
 export type ConditionComposeType = 'And' | 'Or'
 
