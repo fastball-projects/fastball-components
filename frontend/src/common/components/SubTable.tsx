@@ -42,8 +42,10 @@ const SubTable: React.FC<{
                 return [defaultDoms.delete || defaultDoms.cancel];
             },
             onValuesChange: (record, recordList) => {
-                console.log('sub table value change', record, recordList)
-                onChange?.(recordList);
+                const values = Object.values(editableFormRef.current.getFieldsValue())
+                
+                console.log('sub table value change', value, record, recordList, values)
+                onChange?.(values);
             },
         }
         recordCreatorProps = {
@@ -65,6 +67,7 @@ const SubTable: React.FC<{
     return (
         <EditableProTable<Record<string, any>>
             cardBordered
+            controlleds
             editableFormRef={editableFormRef}
             name={name}
             headerTitle={title}

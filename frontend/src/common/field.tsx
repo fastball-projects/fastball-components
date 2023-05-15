@@ -69,7 +69,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
         if (lookupAction.extraFillFields.length > 0) {
             column.fieldProps = (formInstance, { dataIndex, rowIndex }) => {
                 if (editableFormRef && rowIndex !== undefined) {
-                    fieldProps.onChange = (_selectedValue: any, selectedItem: Record<string, any>) => {
+                    fieldProps.onSelect = (_selectedValue: any, selectedItem: Record<string, any>) => {
                         const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
                         lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
                             if (rowData[targetField] === undefined || rowData[targetField] === null || !onlyEmpty) {
@@ -80,7 +80,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
                         editableFormRef.current?.setRowData?.(rowIndex, rowData)
                     }
                 } else if (formInstance) {
-                    fieldProps.onChange = (_selectedValue: any, selectedItem: Record<string, any>) => {
+                    fieldProps.onSelect = (_selectedValue: any, selectedItem: Record<string, any>) => {
                         const rowData = formInstance.getFieldsValue?.() || {};
                         lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
                             if (rowData[targetField] === undefined || rowData[targetField] === null || !onlyEmpty) {

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 version=$1
+hosted=$2
 
 if [ ! -n "$version" ]; then
     echo "version is empty."
@@ -20,7 +21,11 @@ publish_frontend() {
     echo "installing dependency..."
     pnpm i
     echo "build & publish fastball component frontend ..."
-    npm run prepublish && npm publish
+    if [ ! -n "$hosted" ]; then
+        npm run prepublish && npm publish
+    else
+        npm run prepublish && npm publish --registry http://82.157.239.41:7777/repository/npm-hosted/
+    fi
     echo "fastball component frontend published."
     npm_version_line=$(grep -n 'npmVersion' ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml | cut -d ':' -f1)
     sed -i '' "${npm_version_line}s/.*/npmVersion: $frontend_version/" ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml
