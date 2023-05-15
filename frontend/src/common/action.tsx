@@ -97,7 +97,6 @@ export const doPrintAction = (printActionInfo: PrintActionInfo) => {
     const printProps: PrintProps = {
         key: printActionInfo.actionKey,
         ref: printActionInfo.ref,
-        componentRef: printActionInfo.componentRef,
         printComponent: printActionInfo.printComponent,
         onClose: printActionInfo.callback,
         trigger: printActionInfo.trigger || <Button>{printActionInfo.actionName || printActionInfo.actionKey}</Button>,

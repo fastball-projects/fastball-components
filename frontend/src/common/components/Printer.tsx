@@ -11,7 +11,7 @@ export const ComponentToPrint = React.forwardRef(({ children }, ref) => {
 
 class FastballPrint extends React.PureComponent<PrintProps> {
     render() {
-        const { trigger, componentRef, printComponent, input, __designMode } = this.props;
+        const { trigger, ref, printComponent, input, __designMode } = this.props;
 
         return (
             <div>
@@ -21,7 +21,7 @@ class FastballPrint extends React.PureComponent<PrintProps> {
                         if(printComponent) {
                             return loadRefComponent(printComponent.componentInfo, input)
                         }
-                        return componentRef.current
+                        return ref.current
                     }}
                 />
             </div>

@@ -44,12 +44,13 @@ type FormState = {
 }
 
 class FastballForm extends React.Component<FormProps, FormState> {
-    ref = React.createRef<ProFormInstance>();
+    ref: React.RefObject<ProFormInstance>;
     componentRef = React.createRef();
 
 
     constructor(props: FormProps) {
         super(props)
+        this.ref = props.formRef || React.createRef<ProFormInstance>()
         this.state = { valueChangeHandlerProcessing: false }
         // 第一次调用传入的 setActions 将按钮注册到 popup, 否则会导致循环更新
         if (props.setActions) {
@@ -67,7 +68,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 }
             }
             return buildAction({
-                componentRef: this.componentRef,
+                ref: this.componentRef,
                 componentKey, ...action, needArrayWrapper: false, loadData: async () => {
                     const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
                     const data: Data = Object.assign({}, input, formData)
@@ -83,7 +84,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 }
             }
             const button = buildAction({
-                componentRef: this.componentRef,
+                ref: this.componentRef,
                 componentKey, ...action, needArrayWrapper: false, loadData: async () => {
                     const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
                     const data: Data = Object.assign({}, input, formData)
@@ -257,11 +258,11 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             render: (text) => <Image src={text}></Image>,
                             renderFormItem: (item, props) => {
                                 return (
-                                  <ProForm.Item {...props} {...props?.fieldProps}>
-                                    <Upload maxCount={1} />
-                                  </ProForm.Item>
+                                    <ProForm.Item {...props} {...props?.fieldProps}>
+                                        <Upload maxCount={1} />
+                                    </ProForm.Item>
                                 );
-                              },
+                            },
                         }
                     }}
                 >

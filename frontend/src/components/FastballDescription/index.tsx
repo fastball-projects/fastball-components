@@ -49,7 +49,7 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
                     this.ref.current?.reload()
                 }
             }
-            buttons.push(buildAction({ componentRef: this.componentRef, componentKey, ...action }));
+            buttons.push(buildAction({ ref: this.componentRef, componentKey, ...action }));
         })
         return buttons;
     }

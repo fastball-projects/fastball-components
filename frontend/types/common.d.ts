@@ -88,6 +88,7 @@ export type ActionInfo = {
     actionName?: string
     componentKey?: string
     refresh?: boolean
+    needArrayWrapper?: boolean
     closePopupOnSuccess?: boolean
     callback?: Function
     trigger?: ReactComponent
@@ -111,11 +112,10 @@ export type TreeLookupActionInfo = {
 } & LookupActionInfo
 
 export type ApiActionInfo = {
-    needArrayWrapper?: boolean
     componentKey: string
     confirmMessage?: string
-    uploadFileAction: boolean
-    downloadFileAction: boolean
+    uploadFileAction?: boolean
+    downloadFileAction?: boolean
     type: 'API'
 } & ActionInfo
 

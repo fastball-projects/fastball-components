@@ -2,6 +2,7 @@ import { FieldInfo, ActionInfo, Data } from '../common'
 import { BasicComponentProps, PopupComponentProps } from '../component'
 
 export type FormProps = {
+    formRef?: React.RefObject<ProFormInstance>
     column?: number
     headerTitle?: string
     showReset: boolean
@@ -21,6 +22,18 @@ export type FormFieldInfo = {
     conditionComposeType?: ConditionComposeType
     fieldDependencyType?: FieldDependencyType
 } & FieldInfo
+
+export type TableFormProps = {
+    fields: TableFormFieldInfo[]
+} & FormProps
+
+
+export type TableFormFieldInfo = {
+    hideInTable?: boolean
+    hideInForm?: boolean
+    sortable?: boolean
+    copyable?: boolean
+} & FormFieldInfo
 
 export type FieldDependencyInfo = {
     field: string
