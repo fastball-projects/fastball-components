@@ -15,6 +15,12 @@ public @interface TableFormConfig {
 
     int formColumn() default 2;
 
+    String rowKey() default "id";
+
+    boolean rowSelectable() default false;
+
+    boolean defaultSelected() default false;
+
     String formTitle() default "";
 
     boolean showReset() default true;

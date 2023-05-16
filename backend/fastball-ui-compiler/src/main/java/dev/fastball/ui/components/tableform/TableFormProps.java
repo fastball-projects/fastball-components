@@ -16,6 +16,12 @@ public interface TableFormProps extends ComponentProps {
 
     boolean variableForm();
 
+    String rowKey();
+
+    boolean rowSelectable();
+
+    boolean defaultSelected();
+
     Boolean showReset();
 
     PopupType popupType();

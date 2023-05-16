@@ -27,6 +27,7 @@ export type TableFormProps = {
     fields: TableFormFieldInfo[]
     rowKey: string
     rowSelectable: boolean
+    defaultSelected?: boolean
 } & FormProps
 
 

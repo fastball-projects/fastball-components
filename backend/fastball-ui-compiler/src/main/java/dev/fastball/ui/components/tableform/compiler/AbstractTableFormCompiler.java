@@ -39,7 +39,11 @@ public abstract class AbstractTableFormCompiler<T extends Component> extends Abs
         if (config != null) {
             props.showReset(config.showReset());
             props.column(config.formColumn());
+            props.rowKey(config.rowKey());
+            props.rowSelectable(config.rowSelectable());
+            props.defaultSelected(config.defaultSelected());
         } else {
+            props.rowSelectable(false);
             props.showReset(true);
         }
         props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, TableFormFieldInfo::new, ((variableElement, formFieldInfo) -> afterFieldBuild(props, variableElement, formFieldInfo))));

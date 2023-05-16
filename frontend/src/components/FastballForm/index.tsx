@@ -62,7 +62,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
         const { componentKey, closePopup, showReset, input, actions, recordActions } = this.props;
         const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
             action.callback = () => {
-                this.ref.current?.resetFields()
+                this.ref.current?.resetFields?.()
                 if (action.closePopupOnSuccess !== false && closePopup) {
                     closePopup()
                 }

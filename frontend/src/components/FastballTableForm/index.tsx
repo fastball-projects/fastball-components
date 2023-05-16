@@ -36,7 +36,7 @@ const buildTableColumn = (field: TableFormFieldInfo, parentDataIndex?: string[],
 
 type TableFormState = {
     dataSource: Data[]
-    selectedRowKeys: any[]
+    selectedRowKeyMap: Record<string, boolean>
     formOpen: boolean
     dataIndex: number
 }
@@ -46,9 +46,9 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     editableFormRef = React.createRef<EditableFormInstance>();
     ref = React.createRef();
 
-    constructor(props: FormProps) {
+    constructor(props: TableFormProps) {
         super(props)
-        this.state = { dataSource: [], selectedRowKeys: [], formOpen: false, dataIndex: 0 }
+        this.state = { dataSource: [], selectedRowKeyMap: {}, formOpen: false, dataIndex: 0 }
         if (props.setActions) {
             props.setActions(this.getActions())
         }
@@ -57,12 +57,12 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     buildButtons(buttons: any[], actions?: ActionInfo[]) {
         const { componentKey, closePopup, rowKey, rowSelectable, input } = this.props;
         const loadData = () => {
-            let data = this.state.dataSource;
-            if(rowSelectable) {
-                this.state.dataSource.filter()
+            const { dataSource, selectedRowKeyMap } = this.state;
+            let data = dataSource;
+            if (rowSelectable) {
+                data = dataSource.filter(record => selectedRowKeyMap[record[rowKey]])
             }
-
-            return [this.state.dataSource, input];
+            return [data, input];
         }
         actions?.filter(filterVisibled).forEach(action => {
             action.callback = () => {
@@ -88,12 +88,12 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     buildTable() {
-        const { fields, componentKey, onDataLoad, input, __designMode } = this.props;
+        const { fields, componentKey, onDataLoad, rowKey, rowSelectable, input, __designMode } = this.props;
         const { dataSource } = this.state;
 
         let editable: RowEditableConfig<Record<string, any>> = {
             type: 'multiple',
-            editableKeys: dataSource?.map((record, i) => i.toString()),
+            editableKeys: rowKey ? dataSource?.map(record => record[rowKey]) : dataSource?.map((record, i) => i.toString()),
             actionRender: (_dom, { index }) => [<Button type='link' onClick={() => {
                 this.setState({ dataIndex: index, formOpen: true })
                 this.formRef.current?.resetFields
@@ -111,7 +111,7 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
                 tableColumns.push(column)
             }
         })
-        const tableProps: ProTableProps<Data, any> = { rowKey: 'id', search: false, columns: tableColumns }
+        const tableProps: ProTableProps<Data, any> = { rowKey, search: false, columns: tableColumns }
         tableColumns.push({
             title: '操作', valueType: 'option',
             render: (_dom, _record, dataIndex) => <Button type='link' onClick={() => {
@@ -119,33 +119,36 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
                 this.formRef.current?.resetFields
             }}>编辑</Button>
         })
-        tableProps.request = async (params, sortFields, filter) => {
-            const { pageSize, current, keyword, ...searchFields } = params
-            const searchParam = { sortFields, pageSize, current, keyword };
-            const search = Object.assign({}, searchFields, filter);
-            Object.assign(searchParam, { search });
-            const data = [searchParam, input]
-            const apiActionInfo: ApiActionInfo = { componentKey, type: 'API', actionKey: 'loadData', data }
-            const result = await doApiAction(apiActionInfo)
+        tableProps.request = async () => {
+            const apiActionInfo: ApiActionInfo = { componentKey, type: 'API', actionKey: 'loadData', data: [input] }
+            const result: Data[] = await doApiAction(apiActionInfo)
             if (onDataLoad) {
                 onDataLoad(result);
             }
-            this.setState({ dataSource: result })
+            const state = { dataSource: result, selectedRowKeyMap: {} }
+            if (rowSelectable) {
+                result.forEach(record => state.selectedRowKeyMap[record[rowKey]] = true)
+            }
+            this.setState(state)
             return result;
         }
 
-        const rowSelection = {
-            type: 'checkbox',
-            onChange: (selectedRowKeys: React.Key[], selectedRows: Data[]) => {
-                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-                this.setState({ selectedRowKeys })
-            },
-            getCheckboxProps: (record: Data) => ({
-                disabled: record.name === 'Disabled User',
-                defaultChecked: true,
-                name: record.name,
-            }),
-        };
+        let rowSelection;
+        if (rowSelectable) {
+            rowSelection = {
+                type: 'checkbox',
+                onChange: (selectedRowKeys: React.Key[], selectedRows: Data[]) => {
+                    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+                    const selectedRowKeyMap: Record<string, boolean> = {};
+                    selectedRowKeys.forEach(k => selectedRowKeyMap[k] = true)
+                    this.setState({ selectedRowKeyMap })
+                },
+                getCheckboxProps: (record: Data) => ({
+                    defaultChecked: true,
+                    name: record.name,
+                }),
+            }
+        }
 
         return <EditableProTable editableFormRef={this.editableFormRef} rowSelection={rowSelection} recordCreatorProps={false} value={dataSource} editable={editable} {...tableProps} />
     }
