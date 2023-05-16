@@ -25,12 +25,16 @@ export type FormFieldInfo = {
 
 export type TableFormProps = {
     fields: TableFormFieldInfo[]
+    rowKey: string
+    rowSelectable: boolean
 } & FormProps
 
 
 export type TableFormFieldInfo = {
     hideInTable?: boolean
     hideInForm?: boolean
+    editInTable?: boolean
+    editInForm?: boolean
     sortable?: boolean
     copyable?: boolean
 } & FormFieldInfo

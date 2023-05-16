@@ -11,6 +11,10 @@ public @interface TableFormField {
 
     boolean sortable() default false;
 
+    boolean editInTable() default false;
+
+    boolean editInForm() default true;
+
     boolean hideInTable() default false;
 
     boolean hideInForm() default false;

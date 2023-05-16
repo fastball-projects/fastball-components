@@ -67,13 +67,13 @@ const SubTable: React.FC<{
     return (
         <EditableProTable<Record<string, any>>
             cardBordered
-            controlleds
+            controlled
             editableFormRef={editableFormRef}
             name={name}
             headerTitle={title}
             columns={tableColumns}
             rowKey={EDIT_ID}
-            value={value}
+            value={value || []}
             onChange={onChange}
             recordCreatorProps={recordCreatorProps}
             editable={editable}

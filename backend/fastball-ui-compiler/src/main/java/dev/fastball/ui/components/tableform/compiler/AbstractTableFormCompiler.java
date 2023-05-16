@@ -57,6 +57,10 @@ public abstract class AbstractTableFormCompiler<T extends Component> extends Abs
             fieldInfo.setCopyable(formField.copyable());
             fieldInfo.setHideInTable(formField.hideInTable());
             fieldInfo.setHideInForm(formField.hideInForm());
+            fieldInfo.setEditInTable(formField.editInTable());
+            fieldInfo.setEditInForm(formField.editInForm());
+        } else {
+            fieldInfo.setEditInForm(true);
         }
         FieldDependencies fieldDependencies = variableElement.getAnnotation(FieldDependencies.class);
         FieldDependency fieldDependency = variableElement.getAnnotation(FieldDependency.class);
