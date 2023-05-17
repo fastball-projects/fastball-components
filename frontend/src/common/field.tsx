@@ -23,7 +23,7 @@ export const filterEnabled = (item: Displayable) => item.display !== 'Disabled'
 
 export const filterVisibled = (item: Displayable) => item.display !== 'Disabled' && item.display !== 'Hidden'
 
-export const processingField = (field: FieldInfo, column: ProSchema, __designMode?: string, editableFormRef?: React.RefObject<EditableFormInstance>) => {
+export const processingField = (field: FieldInfo, column: ProSchema, parentDataIndex?: string[], __designMode?: string, editableFormRef?: React.RefObject<EditableFormInstance>) => {
     if (field.display === 'Hidden') {
         column.hideInForm = true;
         column.hideInDescriptions = true;
@@ -82,13 +82,17 @@ export const processingField = (field: FieldInfo, column: ProSchema, __designMod
                 } else if (formInstance) {
                     fieldProps.onSelect = (_selectedValue: any, selectedItem: Record<string, any>) => {
                         const rowData = formInstance.getFieldsValue?.() || {};
+                        let record = rowData;
+                        if (!!parentDataIndex?.length) {
+                            record = getByPaths(rowData, parentDataIndex);
+                        }
                         lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
-                            if (rowData[targetField] === undefined || rowData[targetField] === null || !onlyEmpty) {
-                                rowData[targetField] = selectedItem[fromField]
+                            if (record[targetField] === undefined || record[targetField] === null || !onlyEmpty) {
+                                record[targetField] = selectedItem[fromField]
                             }
                         })
-                        console.log('onSelect', dataIndex, rowData)
-                        formInstance.setFieldsValue?.(rowData)
+                        console.log('onSelect', dataIndex, rowData, parentDataIndex)
+                        formInstance.setFieldsValue?.({ ...rowData })
                     }
                 }
                 return fieldProps;

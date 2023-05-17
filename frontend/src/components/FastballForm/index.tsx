@@ -110,7 +110,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
             const formColumn: ProFormColumnsType = {};
             Object.assign(formColumn, field);
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
-            processingField(field, formColumn as ProSchema, this.props.__designMode, editableFormRef);
+            processingField(field, formColumn as ProSchema, parentDataIndex, this.props.__designMode, editableFormRef);
             if (parentDataIndex) {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
