@@ -34,6 +34,10 @@
             <groupId>dev.fastball</groupId>
             <artifactId>fastball-compile</artifactId>
         </dependency>
+        <dependency>
+            <groupId>dev.fastball</groupId>
+            <artifactId>fastball-apt</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
