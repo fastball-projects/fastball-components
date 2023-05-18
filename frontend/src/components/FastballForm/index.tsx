@@ -3,7 +3,7 @@ import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProSc
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField } from '../../common';
-import { Button, Upload, Image } from 'antd';
+import { Button, Upload, Image, Spin } from 'antd';
 import SubTable from '../../common/components/SubTable';
 import Address from '../../common/components/Address';
 import { ComponentToPrint } from '../../common/components/Printer';
@@ -40,7 +40,8 @@ const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): 
 }
 
 type FormState = {
-    valueChangeHandlerProcessing: boolean
+    valueChangeHandlerProcessing: boolean,
+    dataSource: Data[] | null,
 }
 
 class FastballForm extends React.Component<FormProps, FormState> {
@@ -51,7 +52,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
     constructor(props: FormProps) {
         super(props)
         this.ref = props.formRef || React.createRef<ProFormInstance>()
-        this.state = { valueChangeHandlerProcessing: false }
+        this.state = { valueChangeHandlerProcessing: false, dataSource: null }
         // 第一次调用传入的 setActions 将按钮注册到 popup, 否则会导致循环更新
         if (props.setActions) {
             props.setActions(this.getActions())
@@ -203,22 +204,43 @@ class FastballForm extends React.Component<FormProps, FormState> {
 
     render(): React.ReactNode {
         const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
+        const { dataSource } = this.state;
         const proFormProps: ProFormProps = { size, grid: true, layout: "horizontal", rowProps: { gutter: [16, 16] } };
 
         if (variableForm && __designMode !== 'design') {
-            proFormProps.request = async () => {
-                const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', needArrayWrapper: false, data: [input] })
-                if (onDataLoad) {
-                    onDataLoad(data);
+            if (dataSource == null) {
+                const loadData = async () => {
+                    const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', needArrayWrapper: false, data: [input] })
+                    if (onDataLoad) {
+                        onDataLoad(data);
+                    }
+                    this.setState({ dataSource: data || [] })
                 }
-                return data;
+
+                loadData();
+                return <Spin />
             }
+            proFormProps.initialValues = dataSource
         } else if (input) {
             if (onDataLoad) {
                 onDataLoad(input);
             }
             proFormProps.initialValues = input
         }
+        // if (variableForm && __designMode !== 'design') {
+        //     proFormProps.request = async () => {
+        //         const data = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', needArrayWrapper: false, data: [input] })
+        //         if (onDataLoad) {
+        //             onDataLoad(data);
+        //         }
+        //         return data;
+        //     }
+        // } else if (input) {
+        //     if (onDataLoad) {
+        //         onDataLoad(input);
+        //     }
+        //     proFormProps.initialValues = input
+        // }
 
         proFormProps.columns = this.getColumns();
 
