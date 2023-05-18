@@ -28,6 +28,8 @@ export type TableFormProps = {
     rowKey: string
     rowSelectable: boolean
     defaultSelected?: boolean
+    value?: Data[]
+    onChange?: Function
 } & FormProps
 
 

@@ -67,7 +67,8 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
             fieldProps.mode = "multiple";
         }
         if (lookupAction.extraFillFields.length > 0) {
-            column.fieldProps = (formInstance, { dataIndex, rowIndex }) => {
+            column.fieldProps = (formInstance, config) => {
+                const { dataIndex, rowIndex, entity } = config;
                 if (editableFormRef && rowIndex !== undefined) {
                     fieldProps.onSelect = (_selectedValue: any, selectedItem: Record<string, any>) => {
                         const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
@@ -76,7 +77,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                                 rowData[targetField] = selectedItem[fromField]
                             }
                         })
-                        console.log('onSelect', rowIndex, rowData)
+                        console.log('onSelect', rowIndex, rowData, parentDataIndex, config)
                         editableFormRef.current?.setRowData?.(rowIndex, rowData)
                     }
                 } else if (formInstance) {
@@ -86,12 +87,15 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                         if (!!parentDataIndex?.length) {
                             record = getByPaths(rowData, parentDataIndex);
                         }
+                        if(Array.isArray(record) && Number.isInteger(rowIndex)) {
+                            record = record[rowIndex];
+                        }
                         lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
                             if (record[targetField] === undefined || record[targetField] === null || !onlyEmpty) {
                                 record[targetField] = selectedItem[fromField]
                             }
                         })
-                        console.log('onSelect', dataIndex, rowData, parentDataIndex)
+                        console.log('onSelect', dataIndex, rowIndex, rowData, parentDataIndex, config)
                         formInstance.setFieldsValue?.({ ...rowData })
                     }
                 }

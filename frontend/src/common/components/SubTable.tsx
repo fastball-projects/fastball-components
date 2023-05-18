@@ -2,7 +2,7 @@ import { EditableFormInstance, EditableProTable, ProColumns, RowEditableConfig }
 import React from 'react';
 import { useState } from 'react';
 
-const EDIT_ID = '__edit_id'
+export const EDIT_ID = '__edit_id'
 
 const SubTable: React.FC<{
     name?: string;
@@ -43,7 +43,9 @@ const SubTable: React.FC<{
             },
             onValuesChange: (record, recordList) => {
                 const values: any[] = Object.values(editableFormRef?.current?.getFieldsValue())
-                onChange?.(values);
+                const newRecordList = recordList.map((formRecord, index) => Object.assign({}, values[index], formRecord))
+                console.log(record, recordList, values, newRecordList)
+                onChange?.(newRecordList);
             },
         }
         recordCreatorProps = {

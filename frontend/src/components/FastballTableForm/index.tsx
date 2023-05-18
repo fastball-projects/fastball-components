@@ -158,10 +158,10 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     render(): React.ReactNode {
-        const { fields, componentKey } = this.props;
+        const { fields, componentKey, value, onChange } = this.props;
         const { dataSource, dataIndex, formOpen } = this.state;
 
-        const input = dataSource[dataIndex]
+        const input = dataSource?.[dataIndex]
         const formFields = fields.filter(({ hideInForm }) => !hideInForm).map(field => ({ ...field, readonly: !field.editInForm }))
         const formProps: FormProps = { componentKey, formRef: this.formRef, input, fields: formFields, showReset: false, variableForm: false, readonly: false }
         const onSave = () => {
@@ -174,6 +174,8 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
             <Button onClick={() => onSave()}>保存</Button>
             <Button onClick={() => this.closeForm()}>取消</Button>
         </Space>
+
+        console.log(dataSource, value, onChange)
 
         return <ComponentToPrint ref={this.ref}>
             <Drawer placement="right" width="75%" onClose={() => this.closeForm()} open={formOpen} footer={footerButtons}>
