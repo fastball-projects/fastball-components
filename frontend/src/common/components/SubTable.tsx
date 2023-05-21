@@ -6,6 +6,7 @@ export const EDIT_ID = '__edit_id'
 
 const SubTable: React.FC<{
     name?: string;
+    parentName?: string | string[];
     title?: string;
     readonly?: boolean;
     value?: Record<string, any>[];
@@ -14,7 +15,7 @@ const SubTable: React.FC<{
     ) => void;
     columns: ProColumns[]
     editableFormRef?: React.RefObject<EditableFormInstance>
-}> = ({ name, title, readonly, value, onChange, columns, editableFormRef }) => {
+}> = ({ name, parentName, title, readonly, value, onChange, columns, editableFormRef }) => {
     // console.log('SubTable', name, value)
     // if (onChange && value?.find((item) => item[EDIT_ID] === undefined || item[EDIT_ID] === null)) {
     //     let nextEditId = 1;
@@ -42,10 +43,10 @@ const SubTable: React.FC<{
                 return [defaultDoms.delete || defaultDoms.cancel];
             },
             onValuesChange: (record, recordList) => {
-                const values: any[] = Object.values(editableFormRef?.current?.getFieldsValue())
-                const newRecordList = recordList.map((formRecord, index) => Object.assign({}, values[index], formRecord))
-                console.log(record, recordList, values, newRecordList)
-                onChange?.(newRecordList);
+                // const values: any[] = editableFormRef?.current?.getRowsData?.() || []
+                // const newRecordList = recordList.map((formRecord, index) => Object.assign({}, values[index], formRecord))
+                // console.log(record, recordList, values, newRecordList)
+                onChange?.(recordList);
             },
         }
         recordCreatorProps = {
@@ -70,6 +71,7 @@ const SubTable: React.FC<{
             controlleds
             editableFormRef={editableFormRef}
             name={name}
+            parentName={parentName}
             headerTitle={title}
             columns={tableColumns}
             rowKey={EDIT_ID}

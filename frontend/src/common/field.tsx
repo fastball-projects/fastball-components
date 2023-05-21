@@ -79,6 +79,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                         })
                         console.log('onSelect', rowIndex, rowData, parentDataIndex, config)
                         editableFormRef.current?.setRowData?.(rowIndex, rowData)
+                        // editableFormRef.current?.resetFields
                     }
                 } else if (formInstance) {
                     fieldProps.onSelect = (_selectedValue: any, selectedItem: Record<string, any>) => {
@@ -96,6 +97,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                             }
                         })
                         console.log('onSelect', dataIndex, rowIndex, rowData, parentDataIndex, config)
+                        // formInstance.setFieldValue(dataIndex, record)
                         formInstance.setFieldsValue?.({ ...rowData })
                     }
                 }
