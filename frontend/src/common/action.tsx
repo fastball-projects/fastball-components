@@ -47,19 +47,26 @@ export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data, 
     if (__designMode === 'design') {
         return [];
     }
-    const actionRequest = { actionInfo, data }
-    const actionCacheHash = MD5(actionRequest);
-    if (!lookupActionCache[actionCacheHash]) {
-        const requestInfo = buildJsonRequestInfo();
-        requestInfo.body = JSON.stringify([data])
-        const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
-        const json = await resp.text();
-        if (json) {
-            const lookupItems = JSON.parse(json);
-            lookupActionCache[actionCacheHash] = lookupItems;
-        }
+    const requestInfo = buildJsonRequestInfo();
+    requestInfo.body = JSON.stringify([data])
+    const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
+    const json = await resp.text();
+    if (json) {
+        return JSON.parse(json);
     }
-    return lookupActionCache[actionCacheHash]
+    // const actionRequest = { actionInfo, data }
+    // const actionCacheHash = MD5(actionRequest);
+    // if (!lookupActionCache[actionCacheHash]) {
+    //     const requestInfo = buildJsonRequestInfo();
+    //     requestInfo.body = JSON.stringify([data])
+    //     const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
+    //     const json = await resp.text();
+    //     if (json) {
+    //         const lookupItems = JSON.parse(json);
+    //         lookupActionCache[actionCacheHash] = lookupItems;
+    //     }
+    // }
+    // return lookupActionCache[actionCacheHash]
 }
 
 export const buildAction = (actionInfo: ActionInfo) => {
