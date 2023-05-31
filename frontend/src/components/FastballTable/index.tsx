@@ -28,7 +28,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
 
 const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
-    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id' };
+    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { filterType: 'light' } };
     const proTableColumns: ProTableColumn[] = [];
     const [searchState, setSearchState] = useState({});
 
@@ -93,7 +93,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
 
     const actionButtons = !actions ? [] : actions.filter(filterVisibled).map(action => {
         const actionInfo: ActionInfo = { componentKey, ...action };
-        if(actionInfo.type === 'API') {
+        if (actionInfo.type === 'API') {
             const apiActionInfo = actionInfo as ApiActionInfo
             apiActionInfo.needArrayWrapper = false;
             apiActionInfo.data = [searchState, input]
@@ -126,14 +126,14 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                     }
                     return { key: actionKey, label: buildAction(actionInfo) }
                 }).filter(action => action != null) : [];
-                
+
                 return (
                     <Dropdown menu={{ items }}>
                         <a onClick={(e) => e.preventDefault()}>
-                        <Space>
-                            操作
-                            <DownOutlined />
-                        </Space>
+                            <Space>
+                                操作
+                                <DownOutlined />
+                            </Space>
                         </a>
                     </Dropdown>
                 )
@@ -143,9 +143,10 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
 
     proTableProps.columns = proTableColumns
     proTableProps.toolbar = { actions: actionButtons }
-    proTableProps.options = {}
     if (keywordSearch) {
-        proTableProps.options.search = true
+        proTableProps.options = { search: true }
+    } else {
+        proTableProps.options = false
     }
 
     proTableProps.expandable = {}

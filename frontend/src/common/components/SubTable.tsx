@@ -45,7 +45,7 @@ const SubTable: React.FC<{
             onValuesChange: (record, recordList) => {
                 // const values: any[] = editableFormRef?.current?.getRowsData?.() || []
                 // const newRecordList = recordList.map((formRecord, index) => Object.assign({}, values[index], formRecord))
-                // console.log(record, recordList, values, newRecordList)
+                console.log(record, recordList)
                 onChange?.(recordList);
             },
         }

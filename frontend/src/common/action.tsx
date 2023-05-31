@@ -23,7 +23,7 @@ const buildJsonRequestInfo = (): RequestInit => {
     const request = {
         method: 'POST',
         headers: {
-            AUTHORIZATION_HEADER_KEY: authorization
+            Authorization: authorization
         }
     }
     return request;
@@ -103,7 +103,7 @@ export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
 export const doPrintAction = (printActionInfo: PrintActionInfo) => {
     const printProps: PrintProps = {
         key: printActionInfo.actionKey,
-        ref: printActionInfo.ref,
+        printRef: printActionInfo.ref,
         printComponent: printActionInfo.printComponent,
         onClose: printActionInfo.callback,
         trigger: printActionInfo.trigger || <Button>{printActionInfo.actionName || printActionInfo.actionKey}</Button>,
@@ -177,7 +177,7 @@ export const callApi = async (url: string, data?: any, file?: File | Blob, callb
             return result.data;
         }
         if (result.status === 401) {
-            location.href = '/login?redirectUrl=' + location.href
+            location.href = '/#/login?redirectUrl=' + location.href
         } else {
             message.error(`Error ${result.status}: ${result.message}`);
         }

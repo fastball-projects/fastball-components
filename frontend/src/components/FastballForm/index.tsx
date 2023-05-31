@@ -2,7 +2,7 @@ import * as React from 'react'
 import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProSchema, ProTable } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
-import { buildAction, doApiAction, filterEnabled, filterVisibled, processingField, setByPaths } from '../../common';
+import { buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
 import { Button, Upload, Image, Spin } from 'antd';
 import SubTable, { EDIT_ID } from '../../common/components/SubTable';
 import Address from '../../common/components/Address';
@@ -155,8 +155,10 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             return;
                         }
                         const value = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
-                        setByPaths(rowData, dataIndex, value)
-                        editableFormRef.current?.setRowData?.(rowIndex, rowData)
+                        if(getByPaths(rowData, dataIndex) !== value) {
+                            setByPaths(rowData, dataIndex, value)
+                            editableFormRef.current?.setRowData?.(rowIndex, rowData)
+                        }
                         // const dataPath = [rowIndex, ...dataIndex]
                         // editableFormRef.current?.setFieldValue(dataPath, value)
                     } else if (formInstance) {
@@ -193,7 +195,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 if (!editableFormRef) {
                     const dependencyFieldNames = field.fieldDependencyInfoList.map(({ field }) => field);
                     const dependencyField: ProFormColumnsType = {
-                        title: formColumn.title, dataIndex: formColumn.dataIndex, valueType: 'dependency', name: dependencyFieldNames, columns: (values) => {
+                        title: formColumn.title, valueType: 'dependency', name: dependencyFieldNames, columns: (values) => {
                             if (field.conditionComposeType === 'Or' && field.fieldDependencyInfoList?.find(fieldDependInfo => checkCondition(fieldDependInfo, values))) {
                                 return [{ ...formColumn }]
                             } else if (!field.fieldDependencyInfoList?.find(fieldDependInfo => !checkCondition(fieldDependInfo, values))) {
@@ -288,7 +290,8 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     valueTypeMap={{
                         SubTable: {
                             render: (data, props) => {
-                                return <SubTable size="small" {...props} {...props.fieldProps} readonly />
+                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                                return <SubTable size="small" {...props} {...props.fieldProps} name={name} readonly />
                             },
                             renderFormItem: (data, props) => {
                                 const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name

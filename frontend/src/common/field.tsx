@@ -106,6 +106,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         } else {
             column.fieldProps = fieldProps
         }
+        column.params = { timestamp: Math.random() }
         column.request = () => {
             return doLookupAction(lookupAction, undefined, __designMode);
         }

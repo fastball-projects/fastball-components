@@ -14,7 +14,7 @@ public @interface FieldDependency {
 
     String value() default "";
 
-    FieldDependencyCondition condition() default FieldDependencyCondition.NotEmpty;
+    FieldDependencyCondition condition() default FieldDependencyCondition.Equals;
 
     FieldDependencyType type() default FieldDependencyType.Hidden;
 }

@@ -52,7 +52,7 @@ export type PopupProps = {
 
 export type PrintProps = {
     key?: string
-    ref?: MutableRefObject
+    printRef?: MutableRefObject
     input?: any
     onClose?: Function
     trigger: ReactComponent
