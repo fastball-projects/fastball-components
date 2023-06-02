@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FormConfig {
 
-    int column() default 2;
+    int column() default 3;
 
     String title() default "";
 

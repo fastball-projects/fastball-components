@@ -65,6 +65,7 @@ export type FieldInfo = {
     valueType: string
     fieldType: string
     tooltip?: string
+    defaultValue?: any
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: EnumItem }
     lookup?: LookupActionInfo

@@ -30,6 +30,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         column.hideInSearch = true;
         column.hideInTable = true;
     }
+    column.initialValue = field.defaultValue
     if (field.valueType == 'multiSelect') {
         column.valueType = 'select'
         column.fieldProps = Object.assign(column.fieldProps || {}, { mode: "multiple" })
@@ -88,7 +89,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                         if (!!parentDataIndex?.length) {
                             record = getByPaths(rowData, parentDataIndex);
                         }
-                        if(Array.isArray(record) && Number.isInteger(rowIndex)) {
+                        if (Array.isArray(record) && Number.isInteger(rowIndex)) {
                             record = record[rowIndex];
                         }
                         lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {

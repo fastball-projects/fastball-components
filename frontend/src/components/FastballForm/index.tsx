@@ -114,6 +114,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
         return fields.filter(filterEnabled).filter(field => field.valueType).map(field => {
             const formColumn: ProFormColumnsType = {};
             Object.assign(formColumn, field);
+            formColumn['@class'] = null;
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
             processingField(field, formColumn as ProSchema, parentDataIndex, this.props.__designMode, editableFormRef);
             if (!ignoreParentDataIndex && parentDataIndex) {
@@ -228,6 +229,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
 
     render(): React.ReactNode {
         const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
+        props['@class'] = null;
         const { dataSource } = this.state;
         const proFormProps: ProFormProps = { size, grid: true, layout: "horizontal", rowProps: { gutter: [16, 16] } };
 

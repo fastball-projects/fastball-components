@@ -43,6 +43,7 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
             props.column(config.column());
             props.readonly(config.readonly());
         } else {
+            props.column(3);
             props.showReset(true);
         }
         props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, FormFieldInfo::new, ((variableElement, formFieldInfo) -> afterFieldBuild(props, variableElement, formFieldInfo))));
