@@ -46,12 +46,12 @@ type FormState = {
 }
 
 class FastballForm extends React.Component<FormProps, FormState> {
-    ref: React.RefObject<ProFormInstance>;
+    formRef: React.RefObject<ProFormInstance>;
     componentRef = React.createRef();
 
     constructor(props: FormProps) {
         super(props)
-        this.ref = props.formRef || React.createRef<ProFormInstance>()
+        this.formRef = props.formRef || React.createRef<ProFormInstance>()
         this.state = { valueChangeHandlerProcessing: false, dataSource: null }
         // 第一次调用传入的 setActions 将按钮注册到 popup, 否则会导致循环更新
         if (props.setActions) {
@@ -67,7 +67,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
         const { componentKey, closePopup, showReset, input, actions, recordActions } = this.props;
         const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
             action.callback = () => {
-                this.ref.current?.resetFields?.()
+                this.formRef.current?.resetFields?.()
                 if (action.closePopupOnSuccess !== false && closePopup) {
                     closePopup()
                 }
@@ -75,7 +75,9 @@ class FastballForm extends React.Component<FormProps, FormState> {
             return buildAction({
                 ref: this.componentRef,
                 componentKey, ...action, needArrayWrapper: false, loadData: async () => {
-                    const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
+                    await this.formRef.current?.validateFields?.()
+                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
+                    const formData = await this.formRef.current?.getFieldsValue?.()
                     const data: Data = Object.assign({}, input, formData)
                     return [data, input];
                 }
@@ -83,7 +85,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
         }) : []
         actions?.filter(filterVisibled).forEach(action => {
             action.callback = () => {
-                this.ref.current?.resetFields()
+                this.formRef.current?.resetFields()
                 if (action.closePopupOnSuccess !== false && closePopup) {
                     closePopup()
                 }
@@ -91,7 +93,9 @@ class FastballForm extends React.Component<FormProps, FormState> {
             const button = buildAction({
                 ref: this.componentRef,
                 componentKey, ...action, needArrayWrapper: false, loadData: async () => {
-                    const formData = await this.ref.current?.validateFieldsReturnFormatValue?.()
+                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
+                    await this.formRef.current?.validateFields?.()
+                    const formData = await this.formRef.current?.getFieldsValue?.()
                     const data: Data = Object.assign({}, input, formData)
                     return [data, input];
                 }
@@ -99,7 +103,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
             buttons.push(button);
         })
         if (showReset !== false) {
-            buttons.push(<Button onClick={() => this.ref.current?.resetFields()}>重置</Button>)
+            buttons.push(<Button onClick={() => this.formRef.current?.resetFields()}>重置</Button>)
         }
         return buttons;
     }
@@ -281,7 +285,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 const handler = valueChangeHandlers.find(({ watchFields }) => changeFields.find(changeField => watchFields.includes(changeField)))
                 if (handler) {
                     const data = await doApiAction({ componentKey, type: 'API', actionKey: handler.handlerKey, data: [values] })
-                    this.ref.current?.setFieldsValue({ ...data })
+                    this.formRef.current?.setFieldsValue({ ...data })
                 }
             }
 
@@ -324,7 +328,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                         }
                     }}
                 >
-                    <BetaSchemaForm formRef={this.ref} {...proFormProps} {...props} />
+                    <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
                 </ProConfigProvider>
             </ComponentToPrint>
         )

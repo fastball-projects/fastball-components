@@ -59,7 +59,7 @@ const SubTable: React.FC<{
         }
     }
 
-    const tableColumns: ProColumns[] = [...columns, {
+    const tableColumns: ProColumns[] = [...columns.filter(({ valueType }) => valueType !== 'SubTable'), {
         title: '操作',
         valueType: 'option',
         render: () => null
