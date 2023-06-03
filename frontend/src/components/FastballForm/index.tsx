@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProSchema, ProTable } from '@ant-design/pro-components'
+import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProFormUploadButton, ProFormUploadDragger, ProSchema, ProTable } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
@@ -8,6 +8,8 @@ import SubTable, { EDIT_ID } from '../../common/components/SubTable';
 import Address from '../../common/components/Address';
 import { ComponentToPrint } from '../../common/components/Printer';
 import FastballTableForm from '../FastballTableForm';
+import { preview, upload } from '../../common/upload';
+import RichText from '../../common/components/RichText';
 
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
@@ -156,11 +158,11 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     const { dataIndex, rowIndex } = config;
                     if (editableFormRef && rowIndex !== undefined) {
                         const rowData = editableFormRef.current?.getRowData?.(rowIndex);
-                        if(!rowData) {
+                        if (!rowData) {
                             return;
                         }
                         const value = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
-                        if(getByPaths(rowData, dataIndex) !== value) {
+                        if (getByPaths(rowData, dataIndex) !== value) {
                             setByPaths(rowData, dataIndex, value)
                             editableFormRef.current?.setRowData?.(rowIndex, rowData)
                         }
@@ -301,7 +303,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             },
                             renderFormItem: (data, props) => {
                                 const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                return <SubTable size="small" {...props} {...props?.fieldProps} name={name}/>
+                                return <SubTable size="small" {...props} {...props?.fieldProps} name={name} />
                             }
                         },
                         TableForm: {
@@ -316,15 +318,31 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             render: (text) => text,
                             renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
                         },
+                        RichText: {
+                            render: (text) => <RichText {...props} {...props?.fieldProps} readOnly/>,
+                            renderFormItem: (text, props, dom) => <RichText {...props} {...props?.fieldProps} />
+                        },
                         image: {
                             render: (text) => <Image src={text}></Image>,
                             renderFormItem: (item, props) => {
                                 return (
-                                    <ProForm.Item {...props} {...props?.fieldProps}>
-                                        <Upload maxCount={1} />
-                                    </ProForm.Item>
+                                    <ProFormUploadButton
+                                        max={1}
+                                        {...props} {...props?.fieldProps}
+                                    />
                                 );
                             },
+                        },
+                        multi_image: {
+                            render: (_item, props) => <ProFormUploadButton {...props} {...props?.fieldProps} value={props?.fieldProps?.value?.fileList} readonly />,
+                            renderFormItem: (value, props) => {
+                                const fieldProps = Object.assign({}, props?.fieldProps)
+                                fieldProps.customRequest = upload;
+                                fieldProps.previewFile = preview;
+                                fieldProps.multiple = true;
+                                fieldProps.listType = 'picture-card';
+                                return <ProFormUploadButton {...props} {...props?.fieldProps} fieldProps={fieldProps} value={props?.fieldProps?.value?.fileList} />
+                            }
                         }
                     }}
                 >

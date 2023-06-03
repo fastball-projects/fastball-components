@@ -2,12 +2,17 @@ package dev.fastball.ui.components.table.config;
 
 import dev.fastball.core.info.basic.DisplayType;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Documented
-@Target(ElementType.FIELD)
+@Target({})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableField {
+public @interface TableFieldConfig {
+
+    String field();
+
+    String title() default "";
 
     boolean copyable() default false;
 

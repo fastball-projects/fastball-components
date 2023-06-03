@@ -3,10 +3,10 @@ package dev.fastball.ui.components.form.compiler;
 import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.exception.CompilerException;
-import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.annotation.Field;
 import dev.fastball.core.component.Component;
+import dev.fastball.core.info.basic.FieldInfo;
 import dev.fastball.ui.components.form.FieldDependencyInfo;
 import dev.fastball.ui.components.form.FormFieldInfo;
 import dev.fastball.ui.components.form.FormProps_AutoValue;
@@ -16,10 +16,7 @@ import dev.fastball.ui.components.form.config.*;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,12 +45,33 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         }
         props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, FormFieldInfo::new, ((variableElement, formFieldInfo) -> afterFieldBuild(props, variableElement, formFieldInfo))));
         compileOnValueChange(props, compileContext);
+        if (config != null) {
+            compileComponentFields(props, config);
+        }
     }
 
     @Override
     public String getComponentName() {
         return COMPONENT_TYPE;
     }
+
+
+    protected void compileComponentFields(FormProps_AutoValue props, FormConfig formConfig) {
+        Map<String, FormFieldConfig> fieldConfigMap = new HashMap<>();
+        for (FormFieldConfig fieldConfig : formConfig.fieldsConfig()) {
+            fieldConfigMap.put(fieldConfig.field(), fieldConfig);
+        }
+        for (FieldInfo field : props.fields()) {
+            Optional<String> fieldName = field.getDataIndex().stream().findFirst();
+            if (fieldName.isPresent() && fieldConfigMap.containsKey(fieldName.get())) {
+                FormFieldConfig fieldConfig = fieldConfigMap.get(fieldName.get());
+                field.setDisplay(fieldConfig.display());
+                field.setReadonly(fieldConfig.readonly());
+                field.setTitle(fieldConfig.title());
+            }
+        }
+    }
+
 
     private void afterFieldBuild(FormProps_AutoValue props, VariableElement variableElement, FormFieldInfo fieldInfo) {
         FormField formField = variableElement.getAnnotation(FormField.class);

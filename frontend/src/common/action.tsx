@@ -8,7 +8,7 @@ import FastballPrint from './components/Printer';
 
 const TOKEN_LOCAL_KEY = 'fastball_token';
 
-const buildJsonRequestInfo = (): RequestInit => {
+export const buildJsonRequestInfo = (): RequestInit => {
 
     const tokenJson = localStorage.getItem(TOKEN_LOCAL_KEY)
     let authorization: string = '';
@@ -72,7 +72,7 @@ export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data, 
 export const buildAction = (actionInfo: ActionInfo) => {
     if (actionInfo.type === 'API') {
         const apiActionInfo = actionInfo as ApiActionInfo
-        if(apiActionInfo.needArrayWrapper !== false) {
+        if (apiActionInfo.needArrayWrapper !== false) {
             apiActionInfo.needArrayWrapper = true;
         }
         return <FastballActionButton key={apiActionInfo.actionKey} {...apiActionInfo} />
@@ -115,8 +115,8 @@ export const doPrintAction = (printActionInfo: PrintActionInfo) => {
 export const doApiAction = async (actionInfo: ApiActionInfo, file?: File | Blob) => {
     const { componentKey, actionKey } = actionInfo;
     const data = await buildRequestData(actionInfo);
-    let url:string;
-    if(actionInfo.downloadFileAction) {
+    let url: string;
+    if (actionInfo.downloadFileAction) {
         url = `/api/fastball/component/${componentKey}/downloadAction/${actionKey}`
         return await postDownload(url, data, file, actionInfo.callback)
     }
@@ -141,7 +141,7 @@ const postDownload = async (url: string, data?: any, file?: File | Blob, callbac
         }
         const filename = resp.headers.get('content-disposition')?.split(';')[1].split('=')[1] || '下载文件'
         const blob = await resp.blob()
-     
+
         const link = document.createElement('a')
         link.download = decodeURIComponent(filename)
         link.style.display = 'none'
@@ -150,11 +150,11 @@ const postDownload = async (url: string, data?: any, file?: File | Blob, callbac
         link.click()
         URL.revokeObjectURL(link.href)
         document.body.removeChild(link)
-    } catch(e) {
+    } catch (e) {
         message.error(`Error ${e}`);
     }
- }
- 
+}
+
 
 export const callApi = async (url: string, data?: any, file?: File | Blob, callback?: Function) => {
     const requestInfo = buildJsonRequestInfo();
@@ -162,9 +162,11 @@ export const callApi = async (url: string, data?: any, file?: File | Blob, callb
     if (file) {
         formData.append('file', file)
     }
-    formData.append('data', new Blob([JSON.stringify(data)], {
-        type: "application/json"
-    }));
+    if (data) {
+        formData.append('data', new Blob([JSON.stringify(data)], {
+            type: "application/json"
+        }));
+    }
     requestInfo.body = formData
     const resp = await window.fetch(url, requestInfo)
     const json = await resp.text();

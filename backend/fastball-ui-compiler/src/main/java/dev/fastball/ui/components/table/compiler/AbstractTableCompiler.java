@@ -7,21 +7,17 @@ import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.component.Component;
 import dev.fastball.core.info.action.ApiActionInfo;
+import dev.fastball.core.info.basic.FieldInfo;
 import dev.fastball.ui.components.table.ColumnInfo;
 import dev.fastball.ui.components.table.TableProps_AutoValue;
-import dev.fastball.ui.components.table.config.CopyableColumn;
-import dev.fastball.ui.components.table.config.SortableColumn;
-import dev.fastball.ui.components.table.config.TableConfig;
-import dev.fastball.ui.components.table.config.TableField;
+import dev.fastball.ui.components.table.config.*;
 import dev.fastball.ui.components.table.param.TableSearchParam;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static dev.fastball.compile.utils.ElementCompileUtils.getReferencedComponentInfo;
 
@@ -76,6 +72,8 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         props.size(tableConfig.size());
         props.keywordSearch(tableConfig.keywordSearch());
 
+        compileComponentFields(props, tableConfig);
+
         // 是否开启导出
         if (tableConfig.exportable()) {
             ApiActionInfo exportActionInfo = ApiActionInfo.builder()
@@ -90,6 +88,36 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
     @Override
     protected String getComponentName() {
         return COMPONENT_TYPE;
+    }
+
+
+    protected void compileComponentFields(TableProps_AutoValue props, TableConfig tableConfig) {
+        Map<String, TableFieldConfig> columnConfigMap = new HashMap<>();
+        for (TableFieldConfig fieldConfig : tableConfig.columnsConfig()) {
+            columnConfigMap.put(fieldConfig.field(), fieldConfig);
+        }
+        for (ColumnInfo field : props.columns()) {
+            Optional<String> fieldName = field.getDataIndex().stream().findFirst();
+            if (fieldName.isPresent() && columnConfigMap.containsKey(fieldName.get())) {
+                TableFieldConfig fieldConfig = columnConfigMap.get(fieldName.get());
+                field.setDisplay(fieldConfig.display());
+                field.setTitle(fieldConfig.title());
+            }
+        }
+        if (props.queryFields() != null) {
+            Map<String, TableFieldConfig> queryFieldConfigMap = new HashMap<>();
+            for (TableFieldConfig fieldConfig : tableConfig.queryFieldsConfig()) {
+                queryFieldConfigMap.put(fieldConfig.field(), fieldConfig);
+            }
+            for (FieldInfo field : props.queryFields()) {
+                Optional<String> fieldName = field.getDataIndex().stream().findFirst();
+                if (fieldName.isPresent() && queryFieldConfigMap.containsKey(fieldName.get())) {
+                    TableFieldConfig fieldConfig = queryFieldConfigMap.get(fieldName.get());
+                    field.setDisplay(fieldConfig.display());
+                    field.setTitle(fieldConfig.title());
+                }
+            }
+        }
     }
 
     private List<ColumnInfo> buildTableColumnsFromReturnType(TypeElement returnType, ProcessingEnvironment processingEnv, TableProps_AutoValue props) {

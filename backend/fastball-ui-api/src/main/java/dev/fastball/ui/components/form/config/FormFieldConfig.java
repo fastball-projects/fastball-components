@@ -1,25 +1,20 @@
 package dev.fastball.ui.components.form.config;
 
-import java.lang.annotation.ElementType;
+import dev.fastball.core.info.basic.DisplayType;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * @author gr@fastball.dev
- * @since 2023/1/9
- */
-@Target(ElementType.TYPE)
+@Target({})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FormConfig {
+public @interface FormFieldConfig {
 
-    int column() default 3;
+    String field();
 
     String title() default "";
 
-    boolean showReset() default true;
-
     boolean readonly() default false;
 
-    FormFieldConfig[] fieldsConfig() default {};
+    DisplayType display() default DisplayType.Show;
 }

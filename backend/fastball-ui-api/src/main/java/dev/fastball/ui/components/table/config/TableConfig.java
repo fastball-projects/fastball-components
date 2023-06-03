@@ -43,5 +43,10 @@ public @interface TableConfig {
      */
     boolean exportable() default false;
 
+
+    TableFieldConfig[] columnsConfig() default {};
+
+    TableFieldConfig[] queryFieldsConfig() default {};
+
     Class<? extends Component> rowExpandedComponent() default Component.class;
 }
