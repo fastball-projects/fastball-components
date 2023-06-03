@@ -127,6 +127,9 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
             formColumn.name = formColumn.dataIndex
+            formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                name: formColumn.dataIndex
+            })
             if (field.validationRules) {
                 formColumn.formItemProps = Object.assign(formColumn.formItemProps || {}, {
                     rules: field.validationRules
@@ -341,7 +344,13 @@ class FastballForm extends React.Component<FormProps, FormState> {
                                 fieldProps.previewFile = preview;
                                 fieldProps.multiple = true;
                                 fieldProps.listType = 'picture-card';
-                                return <ProFormUploadButton {...props} {...props?.fieldProps} fieldProps={fieldProps} value={props?.fieldProps?.value?.fileList} />
+                                fieldProps.onChange = (values) => {
+                                    console.log('onChange', values)
+                                    props?.fieldProps?.onChange?.(values.fileList)
+                                }
+                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                                const fieldValue = Array.isArray(value) ? value : value.fileList
+                                return <ProFormUploadButton {...props} name={name} fieldProps={fieldProps} value={fieldValue} />
                             }
                         }
                     }}

@@ -42,6 +42,9 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         if (field.valueType === 'RichText') {
             return;
         }
+        if (field.valueType === 'multi_image') {
+            return;
+        }
         const column: ProTableColumn = {}
         Object.assign(column, field, { hideInSearch: true });
         processingField(field, column, __designMode);
