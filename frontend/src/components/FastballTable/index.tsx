@@ -42,7 +42,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         if (field.valueType === 'RichText') {
             return;
         }
-        if (field.valueType === 'multi_image') {
+        if (field.valueType === 'Attachment' || field.valueType === 'MultiAttachment') {
             return;
         }
         const column: ProTableColumn = {}

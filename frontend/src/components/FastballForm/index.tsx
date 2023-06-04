@@ -325,19 +325,33 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             render: (text) => <RichText {...props} {...props?.fieldProps} readOnly/>,
                             renderFormItem: (text, props, dom) => <RichText {...props} {...props?.fieldProps} />
                         },
-                        image: {
-                            render: (text) => <Image src={text}></Image>,
-                            renderFormItem: (item, props) => {
-                                return (
-                                    <ProFormUploadButton
-                                        max={1}
-                                        {...props} {...props?.fieldProps}
-                                    />
-                                );
+                        Attachment: {
+                            render: (value, props) => {
+                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                                const fieldValue = Array.isArray(value) ? value : value.fileList
+                                return <ProFormUploadButton {...props} name={name} value={fieldValue} readonly />
                             },
+                            renderFormItem: (value, props) => {
+                                const fieldProps = Object.assign({}, props?.fieldProps)
+                                fieldProps.customRequest = upload;
+                                fieldProps.previewFile = preview;
+                                fieldProps.multiple = true;
+                                fieldProps.listType = 'picture-card';
+                                fieldProps.onChange = (values) => {
+                                    console.log('onChange', values)
+                                    props?.fieldProps?.onChange?.(values.fileList)
+                                }
+                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                                const fieldValue = Array.isArray(value) ? value : value.fileList
+                                return <ProFormUploadButton max={1} {...props} name={name} fieldProps={fieldProps} value={fieldValue} />
+                            }
                         },
-                        multi_image: {
-                            render: (_item, props) => <ProFormUploadButton {...props} {...props?.fieldProps} value={props?.fieldProps?.value?.fileList} readonly />,
+                        MultiAttachment: {
+                            render: (value, props) => {
+                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                                const fieldValue = Array.isArray(value) ? value : value.fileList
+                                return <ProFormUploadButton {...props} name={name} value={fieldValue} readonly />
+                            },
                             renderFormItem: (value, props) => {
                                 const fieldProps = Object.assign({}, props?.fieldProps)
                                 fieldProps.customRequest = upload;
