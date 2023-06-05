@@ -67,7 +67,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         if (lookupAction.multiple) {
             fieldProps.mode = "multiple";
         }
-        if (lookupAction.extraFillFields.length > 0) {
+        if (lookupAction.extraFillFields && lookupAction.extraFillFields.length > 0) {
             column.fieldProps = (formInstance, config) => {
                 const { dataIndex, rowIndex, entity } = config;
                 if (editableFormRef && rowIndex !== undefined) {
