@@ -127,9 +127,11 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
             formColumn.name = formColumn.dataIndex
-            formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                name: formColumn.dataIndex
-            })
+            if(typeof formColumn.fieldProps !== 'function') {
+                formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                    name: formColumn.dataIndex
+                })
+            }
             if (field.validationRules) {
                 formColumn.formItemProps = Object.assign(formColumn.formItemProps || {}, {
                     rules: field.validationRules
