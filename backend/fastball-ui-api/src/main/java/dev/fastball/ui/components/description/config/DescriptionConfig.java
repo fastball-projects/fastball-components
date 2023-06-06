@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
  * @author gr@fastball.dev
  * @since 2023/1/9
  */
+@Deprecated
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DescriptionConfig {

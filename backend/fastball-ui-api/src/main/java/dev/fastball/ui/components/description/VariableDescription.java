@@ -7,6 +7,7 @@ import dev.fastball.core.component.Component;
  * @author gr@fastball.dev
  * @since 2023/1/10
  */
+@Deprecated
 public interface VariableDescription<T, P> extends Component {
     /**
      * 获取详情页初始化数据的接口
