@@ -75,7 +75,7 @@ const SubTable: React.FC<{
             headerTitle={title}
             columns={tableColumns}
             rowKey={EDIT_ID}
-            value={value || []}
+            value={value}
             onChange={onChange}
             recordCreatorProps={recordCreatorProps}
             editable={editable}
