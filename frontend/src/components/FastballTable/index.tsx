@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react'
-import { ProTable } from '@ant-design/pro-components'
+import { ProTable, ProConfigProvider } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo, ApiActionInfo } from '../../../types';
 import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField } from '../../common';
 import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import Address from '../../common/components/Address';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -26,9 +27,9 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, queryFields, columns, actions = [], recordActions = [], input, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, queryForm, pageable, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
-    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { filterType: 'light' } };
+    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { filterType: queryForm ? 'query' : 'light' } };
     const proTableColumns: ProTableColumn[] = [];
     const [searchState, setSearchState] = useState({});
 
@@ -66,16 +67,21 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         proTableProps.dataSource = buildMockData(columns);
     } else {
         proTableProps.request = async (params, sortFields, filter) => {
-            const { pageSize, current, keyword, ...searchFields } = params
-            const searchParam = { sortFields, pageSize, current, keyword };
-            if (wrappedSearch) {
-                const search = Object.assign({}, searchFields, filter);
-                Object.assign(searchParam, { search });
+            let data;
+            if (searchable) {
+                const { pageSize, current, keyword, ...searchFields } = params
+                const searchParam = { sortFields, pageSize, current, keyword };
+                if (wrappedSearch) {
+                    const search = Object.assign({}, searchFields, filter);
+                    Object.assign(searchParam, { search });
+                } else {
+                    Object.assign(searchParam, searchFields, filter);
+                }
+                setSearchState(searchParam);
+                data = [searchParam, input || value]
             } else {
-                Object.assign(searchParam, searchFields, filter);
+                data = [input || value]
             }
-            setSearchState(searchParam);
-            const data = [searchParam, input]
             const result = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data })
             if (onDataLoad) {
                 onDataLoad(result);
@@ -102,9 +108,9 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         if (actionInfo.type === 'API') {
             const apiActionInfo = actionInfo as ApiActionInfo
             apiActionInfo.needArrayWrapper = false;
-            apiActionInfo.data = [searchState, input]
+            apiActionInfo.data = [searchState, input || value]
         } else {
-            actionInfo.data = input
+            actionInfo.data = input || value
         }
         if (action.refresh) {
             actionInfo.callback = () => ref.current?.reload()
@@ -156,6 +162,10 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
     }
 
     proTableProps.expandable = {}
+    
+    if(!pageable) {
+        proTableProps.pagination = false
+    }
 
     if (rowExpandedComponent) {
         proTableProps.expandable.expandedRowRender = (record) => loadRefComponent(rowExpandedComponent, { input: record, __designMode })
@@ -179,10 +189,14 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         }
     }
 
-    return <ProTable
-        actionRef={ref}
-        {...proTableProps}
-        {...otherProps} />
+    return <ProConfigProvider valueTypeMap={{
+        Address: {
+            render: (value, props) => <Address {...props} {...props?.fieldProps} value={value} readonly />,
+            renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
+        },
+    }} >
+        <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
+    </ProConfigProvider>
 }
 
 

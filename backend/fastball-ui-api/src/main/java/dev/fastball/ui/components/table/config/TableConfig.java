@@ -37,11 +37,25 @@ public @interface TableConfig {
     boolean keywordSearch() default false;
 
     /**
+     * 是否开启表格分页, 默认为 True
+     *
+     * @return 是否开启表格分页
+     */
+    boolean pageable() default true;
+
+    /**
      * 是否开启表格 Excel 导出
      *
      * @return 开启表格 Excel 导出
      */
     boolean exportable() default false;
+
+    /**
+     * 是否开启搜索表单, 即以表单形式展示搜索条件, 默认为 False
+     *
+     * @return 开启搜索表单
+     */
+    boolean queryForm() default false;
 
 
     TableFieldConfig[] columnsConfig() default {};

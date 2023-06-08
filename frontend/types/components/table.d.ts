@@ -11,6 +11,9 @@ export type TableRecordActionInfo = ApiActionInfo & PopupActionInfo
 export type TableProps = {
     headerTitle?: string
     childrenFieldName?: string
+    queryForm: boolean
+    pageable: boolean
+    searchable: boolean
     wrappedSearch: boolean
     keywordSearch: boolean
     size: TableSize

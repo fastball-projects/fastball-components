@@ -19,6 +19,12 @@ public interface TableProps extends ComponentProps {
 
     String childrenFieldName();
 
+    boolean searchable();
+
+    boolean pageable();
+
+    boolean queryForm();
+
     boolean wrappedSearch();
 
     boolean keywordSearch();

@@ -53,6 +53,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 searchType = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(realSearchType);
             }
             props.wrappedSearch(true);
+            props.searchable(true);
             props.queryFields(TypeCompileUtils.compileTypeFields(searchType, compileContext.getProcessingEnv(), props));
         }
 
@@ -71,6 +72,8 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         }
         props.size(tableConfig.size());
         props.keywordSearch(tableConfig.keywordSearch());
+        props.queryForm(tableConfig.queryForm());
+        props.pageable(tableConfig.pageable());
 
         compileComponentFields(props, tableConfig);
 
