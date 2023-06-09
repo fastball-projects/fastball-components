@@ -3,7 +3,7 @@ import { ProTable, ProConfigProvider } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo, ApiActionInfo } from '../../../types';
 import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField } from '../../common';
-import { Button, Dropdown, MenuProps, Space } from 'antd';
+import { Button, Dropdown, MenuProps, Space, Image } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import Address from '../../common/components/Address';
 
@@ -27,9 +27,9 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, queryForm, pageable, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
-    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { filterType: queryForm ? 'query' : 'light' } };
+    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { filterType: lightQuery ? 'light' : 'query'} };
     const proTableColumns: ProTableColumn[] = [];
     const [searchState, setSearchState] = useState({});
 
@@ -43,7 +43,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         if (field.valueType === 'RichText') {
             return;
         }
-        if (field.valueType === 'Attachment' || field.valueType === 'MultiAttachment') {
+        if (field.valueType === 'MultiAttachment') {
             return;
         }
         const column: ProTableColumn = {}
@@ -162,7 +162,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
     }
 
     proTableProps.expandable = {}
-    
+
     if(!pageable) {
         proTableProps.pagination = false
     }
@@ -192,8 +192,10 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
     return <ProConfigProvider valueTypeMap={{
         Address: {
             render: (value, props) => <Address {...props} {...props?.fieldProps} value={value} readonly />,
-            renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
         },
+        Attachment: {
+            render: (value) => <Image src={value?.url} />
+        }
     }} >
         <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
     </ProConfigProvider>

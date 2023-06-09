@@ -11,7 +11,7 @@ export type TableRecordActionInfo = ApiActionInfo & PopupActionInfo
 export type TableProps = {
     headerTitle?: string
     childrenFieldName?: string
-    queryForm: boolean
+    lightQuery: boolean
     pageable: boolean
     searchable: boolean
     wrappedSearch: boolean

@@ -23,7 +23,7 @@ public interface TableProps extends ComponentProps {
 
     boolean pageable();
 
-    boolean queryForm();
+    boolean lightQuery();
 
     boolean wrappedSearch();
 

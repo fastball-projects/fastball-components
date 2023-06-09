@@ -55,6 +55,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         const lookupAction: LookupActionInfo = field.lookup;
         const fieldProps = {
             ...(column.fieldProps || {}),
+            popupMatchSelectWidth: false,
             fieldNames: {
                 label: lookupAction.labelField,
                 value: lookupAction.valueField,

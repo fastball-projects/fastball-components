@@ -59,6 +59,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
 
         TableConfig tableConfig = compileContext.getComponentElement().getAnnotation(TableConfig.class);
         if (tableConfig == null) {
+            props.pageable(true);
             return;
         }
         TypeMirror rowExpandedComponent = ElementCompileUtils.getTypeMirrorFromAnnotationValue(tableConfig::rowExpandedComponent);
@@ -72,7 +73,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         }
         props.size(tableConfig.size());
         props.keywordSearch(tableConfig.keywordSearch());
-        props.queryForm(tableConfig.queryForm());
+        props.lightQuery(tableConfig.lightQuery());
         props.pageable(tableConfig.pageable());
 
         compileComponentFields(props, tableConfig);

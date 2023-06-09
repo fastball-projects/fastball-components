@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProFormUploadButton, ProFormUploadDragger, ProSchema, ProTable } from '@ant-design/pro-components'
+import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProFormUploadButton, ProFormUploadDragger, ProSchema, ProCard } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
@@ -127,7 +127,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
             formColumn.name = formColumn.dataIndex
-            if(typeof formColumn.fieldProps !== 'function') {
+            if (typeof formColumn.fieldProps !== 'function') {
                 formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
                     name: formColumn.dataIndex
                 })
@@ -183,7 +183,13 @@ class FastballForm extends React.Component<FormProps, FormState> {
             }
             if (field.valueType === 'Array' && field.subFields) {
                 formColumn.valueType = 'formList'
+                formColumn.formItemProps = {
+                    itemRender: ({ listDom, action }, { index }) => <ProCard
+                        bordered title={`${field.title || ''} - ${index + 1}`} style={{ marginBlockEnd: 8 }} extra={action}
+                    >{listDom}</ProCard>
+                }
                 const subFieldColumn: ProFormColumnsType = {};
+
                 subFieldColumn.valueType = 'group'
                 subFieldColumn.columns = (config) => {
                     const getGroupColumns = (groupFieldProps: any) => this.buildColumns(field.subFields!, field.dataIndex, undefined, true).map(c => {
@@ -324,14 +330,12 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
                         },
                         RichText: {
-                            render: (text) => <RichText {...props} {...props?.fieldProps} readOnly/>,
+                            render: (text) => <RichText {...props} {...props?.fieldProps} readOnly />,
                             renderFormItem: (text, props, dom) => <RichText {...props} {...props?.fieldProps} />
                         },
                         Attachment: {
-                            render: (value, props) => {
-                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                const fieldValue = Array.isArray(value) ? value : value.fileList
-                                return <ProFormUploadButton {...props} name={name} value={fieldValue} readonly />
+                            render: (value) => {
+                                return <Image src={value?.url} />
                             },
                             renderFormItem: (value, props) => {
                                 const fieldProps = Object.assign({}, props?.fieldProps)
@@ -341,10 +345,10 @@ class FastballForm extends React.Component<FormProps, FormState> {
                                 fieldProps.listType = 'picture-card';
                                 fieldProps.onChange = (values) => {
                                     console.log('onChange', values)
-                                    props?.fieldProps?.onChange?.(values.fileList)
+                                    props?.fieldProps?.onChange?.(values.fileList[0])
                                 }
                                 const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                const fieldValue = Array.isArray(value) ? value : value.fileList
+                                const fieldValue = value ? [value] : []
                                 return <ProFormUploadButton max={1} {...props} name={name} fieldProps={fieldProps} value={fieldValue} />
                             }
                         },
@@ -352,7 +356,8 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             render: (value, props) => {
                                 const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
                                 const fieldValue = Array.isArray(value) ? value : value.fileList
-                                return <ProFormUploadButton {...props} name={name} value={fieldValue} readonly />
+                                const fieldProps = { showUploadList: { showRemoveIcon: false } }
+                                return <ProFormUploadButton {...props} name={name} value={fieldValue} fieldProps={fieldProps} readonly />
                             },
                             renderFormItem: (value, props) => {
                                 const fieldProps = Object.assign({}, props?.fieldProps)

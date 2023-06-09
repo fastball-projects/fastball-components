@@ -51,11 +51,11 @@ public @interface TableConfig {
     boolean exportable() default false;
 
     /**
-     * 是否开启搜索表单, 即以表单形式展示搜索条件, 默认为 False
+     * 是否开启轻量搜索表单, 即以轻量表单形式展示搜索条件, 默认为 False
      *
-     * @return 开启搜索表单
+     * @return 开启轻量搜索表单
      */
-    boolean queryForm() default false;
+    boolean lightQuery() default false;
 
 
     TableFieldConfig[] columnsConfig() default {};
