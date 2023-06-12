@@ -14,7 +14,7 @@ public @interface FormFieldConfig {
 
     String title() default "";
 
-    int order() default 1;
+    int order() default 0;
 
     boolean readonly() default false;
 

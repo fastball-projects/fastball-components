@@ -81,7 +81,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     await this.formRef.current?.validateFields?.()
                     // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
                     const formData = await this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, input, formData)
+                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
                     return [data, input];
                 }
             });
@@ -99,7 +99,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
                     await this.formRef.current?.validateFields?.()
                     const formData = await this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, input, formData)
+                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
                     return [data, input];
                 }
             });
@@ -156,6 +156,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     parentName: parentDataIndex,
                     editableFormRef,
                 })
+                formColumn.initialValue = []
                 formColumn.title = null;
             }
             if (field.expression) {
@@ -313,7 +314,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                                 const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
                                 return <SubTable size="small" {...props} {...props.fieldProps} name={name} readonly />
                             },
-                            renderFormItem: (data, props) => {
+                            renderFormItem: (data, props, dom) => {
                                 const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
                                 return <SubTable size="small" {...props} {...props?.fieldProps} name={name} />
                             }
