@@ -70,6 +70,7 @@ export type FieldInfo = {
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: EnumItem }
     autoComplete?: AutoCompleteActionInfo
+    dependencyFields?: string[]
     lookup?: LookupActionInfo
     popupInfo?: PopupInfo
     editModeComponent?: RefComponentInfo

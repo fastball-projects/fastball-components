@@ -332,7 +332,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                         },
                         AutoComplete: {
                             render: (text) => text,
-                            renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} />
+                            renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} input={props?.record}/>
                         },
                         RichText: {
                             render: (text) => <RichText {...props} {...props?.fieldProps} readOnly />,

@@ -9,6 +9,7 @@ import { doAutoCompleteAction } from "../action";
 type AutoCompleteType = {
     autoCompleteKey: string;
     readonly?: boolean;
+    input?: any;
     value?: string | number;
     inputType: 'Number' | 'Text';
     valueField: string;
@@ -43,21 +44,21 @@ const CustomInputNumber = ({ onChange, ...rest }) => {
     return <InputNumber onChange={handleChange} {...rest} />;
   }
 
-const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, value, inputType, readonly, valueField, fields, onChange }: AutoCompleteType) => {
-    let input;
+const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, value, inputType, readonly, valueField, fields, onChange }: AutoCompleteType) => {
+    let inputComponent;
     if (inputType == 'Number') {
-        input = <CustomInputNumber value={value} readOnly={readonly} />
+        inputComponent = <CustomInputNumber value={value} readOnly={readonly} />
     } else {
-        input = <Input value={value} readOnly={readonly} />
+        inputComponent = <Input value={value} readOnly={readonly} />
     }
     if (readonly) {
-        return input;
+        return inputComponent;
     }
 
     const [options, setOptions] = useState<AutoCompleteProps['options']>();
 
     const loadOptions = async () => {
-        const result = await doAutoCompleteAction(autoCompleteKey, value);
+        const result = await doAutoCompleteAction(autoCompleteKey, [input]);
         const option = {
             label: renderTitle(fields),
             options: result.map((item: Record<string, any>) => renderItem(valueField, fields, item))
@@ -67,14 +68,14 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, value, inpu
 
     useEffect(() => {
         loadOptions()
-    }, [])
+    }, [input])
 
     return <AntDAutoComplete
         popupMatchSelectWidth={false}
         onChange={onChange}
         options={options}
     >
-        {input}
+        {inputComponent}
     </AntDAutoComplete>;
 }
 

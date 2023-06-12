@@ -29,7 +29,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
 
 const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
-    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { filterType: lightQuery ? 'light' : 'query'} };
+    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { labelWidth: "auto", filterType: lightQuery ? 'light' : 'query'} };
     const proTableColumns: ProTableColumn[] = [];
     const [searchState, setSearchState] = useState({});
 

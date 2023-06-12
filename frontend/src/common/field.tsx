@@ -52,7 +52,10 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         )
         column.fieldProps = Object.assign(column.fieldProps || {}, { tagRender })
     }
-    if(field.autoComplete) {
+    if (field.autoComplete) {
+        if (field.dependencyFields) {
+            column.dependencies = field.dependencyFields
+        }
         column.fieldProps = Object.assign(column.fieldProps || {}, field.autoComplete)
     }
     if (field.lookup) {
