@@ -44,6 +44,13 @@ public @interface TableConfig {
     boolean pageable() default true;
 
     /**
+     * 是否开启数据序号显示
+     *
+     * @return 是否开启表格数据序号显示
+     */
+    boolean showRowIndex() default false;
+
+    /**
      * 是否开启表格 Excel 导出
      *
      * @return 开启表格 Excel 导出

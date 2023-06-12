@@ -10,6 +10,7 @@ import { ComponentToPrint } from '../../common/components/Printer';
 import FastballTableForm from '../FastballTableForm';
 import { preview, upload } from '../../common/upload';
 import RichText from '../../common/components/RichText';
+import AutoComplete from '../../common/components/AutoComplete';
 
 
 type ProFormProps = React.ComponentProps<typeof BetaSchemaForm> & DrawerFormProps & ModalFormProps
@@ -328,6 +329,10 @@ class FastballForm extends React.Component<FormProps, FormState> {
                         Address: {
                             render: (text) => text,
                             renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
+                        },
+                        AutoComplete: {
+                            render: (text) => text,
+                            renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} />
                         },
                         RichText: {
                             render: (text) => <RichText {...props} {...props?.fieldProps} readOnly />,

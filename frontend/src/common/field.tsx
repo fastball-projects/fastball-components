@@ -7,6 +7,7 @@ import FastballPopup from "./components/Popup";
 import FastballAddress from "./components/Address";
 import { loadRefComponent } from './component';
 import { getByPaths } from './utils';
+import AutoComplete from './components/AutoComplete';
 
 const formOnlyField: Record<string, boolean> = {
     group: true, formList: true, formSet: true, divider: true, dependency: true,
@@ -50,6 +51,9 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
             </Tag>
         )
         column.fieldProps = Object.assign(column.fieldProps || {}, { tagRender })
+    }
+    if(field.autoComplete) {
+        column.fieldProps = Object.assign(column.fieldProps || {}, field.autoComplete)
     }
     if (field.lookup) {
         const lookupAction: LookupActionInfo = field.lookup;

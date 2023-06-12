@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, message } from 'antd';
 import { MD5 } from 'object-hash'
-import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo, PrintActionInfo, PrintProps } from '../../types'
+import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo, PrintActionInfo, PrintProps, AutoCompleteActionInfo } from '../../types'
 import FastballPopup from './components/Popup'
 import FastballActionButton from './components/ActionButton';
 import FastballPrint from './components/Printer';
@@ -50,6 +50,32 @@ export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data, 
     const requestInfo = buildJsonRequestInfo();
     requestInfo.body = JSON.stringify([data])
     const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
+    const json = await resp.text();
+    if (json) {
+        return JSON.parse(json);
+    }
+    // const actionRequest = { actionInfo, data }
+    // const actionCacheHash = MD5(actionRequest);
+    // if (!lookupActionCache[actionCacheHash]) {
+    //     const requestInfo = buildJsonRequestInfo();
+    //     requestInfo.body = JSON.stringify([data])
+    //     const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
+    //     const json = await resp.text();
+    //     if (json) {
+    //         const lookupItems = JSON.parse(json);
+    //         lookupActionCache[actionCacheHash] = lookupItems;
+    //     }
+    // }
+    // return lookupActionCache[actionCacheHash]
+}
+
+export const doAutoCompleteAction = async (autoCompleteKey: string, data?: any, __designMode?: string) => {
+    if (__designMode === 'design') {
+        return [];
+    }
+    const requestInfo = buildJsonRequestInfo();
+    requestInfo.body = JSON.stringify([data])
+    const resp = await window.fetch(`/api/fastball/lookup/${autoCompleteKey}`, requestInfo)
     const json = await resp.text();
     if (json) {
         return JSON.parse(json);
@@ -175,6 +201,9 @@ export const callApi = async (url: string, data?: any, file?: File | Blob, callb
         if (result.status === 200) {
             if (callback) {
                 callback()
+            }
+            if(result.message) {
+               message.success(result.message);
             }
             return result.data;
         }

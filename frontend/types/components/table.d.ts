@@ -13,6 +13,7 @@ export type TableProps = {
     childrenFieldName?: string
     lightQuery: boolean
     pageable: boolean
+    showRowIndex: boolean
     searchable: boolean
     wrappedSearch: boolean
     keywordSearch: boolean

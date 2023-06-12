@@ -69,6 +69,7 @@ export type FieldInfo = {
     defaultValue?: any
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: EnumItem }
+    autoComplete?: AutoCompleteActionInfo
     lookup?: LookupActionInfo
     popupInfo?: PopupInfo
     editModeComponent?: RefComponentInfo
@@ -100,6 +101,13 @@ export type ActionInfo = {
     type: ActionType
 } & Displayable
 
+export type AutoCompleteActionInfo = {
+    autoCompleteKey: string
+    inputType: 'Number' | 'Text';
+    valueField: string;
+    fields: { name: string, title: string }[];
+}
+
 export type LookupActionInfo = {
     packageName?: string
     lookupKey: string
@@ -109,6 +117,7 @@ export type LookupActionInfo = {
     childrenField?: string
     extraFillFields: LookupFillFieldInfo[]
 }
+
 export type TreeLookupActionInfo = {
     childrenField: string
 } & LookupActionInfo

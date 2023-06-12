@@ -27,7 +27,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { filterType: lightQuery ? 'light' : 'query'} };
     const proTableColumns: ProTableColumn[] = [];
@@ -88,6 +88,20 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
             }
             return result;
         }
+    }
+
+    if(showRowIndex) {
+        proTableColumns.push({
+            title: '序号',
+            dataIndex: '__row_index',
+            readonly: true,
+            renderText: (_dom, _entity, index, { pageInfo }) => {
+                if(!pageInfo) {
+                    return index + 1;
+                }
+                return (pageInfo.current - 1) * pageInfo.pageSize + index + 1
+            }
+        })
     }
 
     columns.filter(filterEnabled).forEach(field => buildTableColumns(field));
