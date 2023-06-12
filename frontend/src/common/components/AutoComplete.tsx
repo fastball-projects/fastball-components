@@ -67,8 +67,11 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
         setOptions([option]);
     }
     if (Array.isArray(dependencyFields) && dependencyFields.length > 0) {
-        const dependencyRecordFields = input ? dependencyFields.map(field => input[field]).filter(v => v !== null && v != undefined) : []
-        const dependencyList = [dependencyFields, ...dependencyRecordFields]
+        const dependencyValues: Record<string, any> = {}
+        if (input) {
+            dependencyFields.forEach(field => dependencyValues[field] = input[field])
+        }
+        const dependencyList = [dependencyFields, dependencyValues]
         useEffect(() => {
             loadOptions()
         }, dependencyList)

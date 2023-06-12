@@ -71,6 +71,7 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
                 field.setOrder(fieldConfig.order());
             }
         }
+        props.fields(props.fields().stream().sorted().collect(Collectors.toList()));
     }
 
 

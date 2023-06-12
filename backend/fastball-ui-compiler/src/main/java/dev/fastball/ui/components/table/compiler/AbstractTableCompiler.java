@@ -18,6 +18,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static dev.fastball.compile.utils.ElementCompileUtils.getReferencedComponentInfo;
 
@@ -110,6 +111,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 field.setOrder(fieldConfig.order());
             }
         }
+        props.columns(props.columns().stream().sorted().collect(Collectors.toList()));
         if (props.queryFields() != null) {
             Map<String, TableFieldConfig> queryFieldConfigMap = new HashMap<>();
             for (TableFieldConfig fieldConfig : tableConfig.queryFieldsConfig()) {
@@ -124,6 +126,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                     field.setOrder(fieldConfig.order());
                 }
             }
+            props.queryFields(props.queryFields().stream().sorted().collect(Collectors.toList()));
         }
     }
 
