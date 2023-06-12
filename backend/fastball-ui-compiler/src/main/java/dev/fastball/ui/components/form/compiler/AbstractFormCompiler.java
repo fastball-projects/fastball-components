@@ -68,6 +68,7 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
                 field.setDisplay(fieldConfig.display());
                 field.setReadonly(fieldConfig.readonly());
                 field.setTitle(fieldConfig.title());
+                field.setOrder(fieldConfig.order());
             }
         }
     }

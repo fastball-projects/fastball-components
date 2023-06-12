@@ -14,6 +14,8 @@ public @interface FormFieldConfig {
 
     String title() default "";
 
+    int order() default 1;
+
     boolean readonly() default false;
 
     DisplayType display() default DisplayType.Show;

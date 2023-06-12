@@ -14,6 +14,8 @@ public @interface TableFieldConfig {
 
     String title() default "";
 
+    int order() default 1;
+
     boolean copyable() default false;
 
     boolean sortable() default false;

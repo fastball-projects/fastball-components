@@ -11,6 +11,7 @@ type AutoCompleteType = {
     readonly?: boolean;
     input?: any;
     value?: string | number;
+    dependencyFields?: string[]
     inputType: 'Number' | 'Text';
     valueField: string;
     fields: { name: string, title: string }[];
@@ -34,17 +35,17 @@ const renderItem = (valueField: string, fields: { name: string, title: string }[
 
 const CustomInputNumber = ({ onChange, ...rest }) => {
     const handleChange = value => {
-      onChange({
-        target: {
-          value: value,
-        },
-      });
+        onChange({
+            target: {
+                value: value,
+            },
+        });
     };
-  
-    return <InputNumber onChange={handleChange} {...rest} />;
-  }
 
-const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, value, inputType, readonly, valueField, fields, onChange }: AutoCompleteType) => {
+    return <InputNumber onChange={handleChange} {...rest} />;
+}
+
+const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, dependencyFields, value, inputType, readonly, valueField, fields, onChange }: AutoCompleteType) => {
     let inputComponent;
     if (inputType == 'Number') {
         inputComponent = <CustomInputNumber value={value} readOnly={readonly} />
@@ -65,10 +66,13 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, valu
         }
         setOptions([option]);
     }
-
-    useEffect(() => {
-        loadOptions()
-    }, [input])
+    if (Array.isArray(dependencyFields) && dependencyFields.length > 0) {
+        const dependencyRecordFields = input ? dependencyFields.map(field => input[field]).filter(v => v !== null && v != undefined) : []
+        const dependencyList = [dependencyFields, ...dependencyRecordFields]
+        useEffect(() => {
+            loadOptions()
+        }, dependencyList)
+    }
 
     return <AntDAutoComplete
         popupMatchSelectWidth={false}

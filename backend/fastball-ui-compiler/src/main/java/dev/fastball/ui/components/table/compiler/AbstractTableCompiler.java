@@ -107,6 +107,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 TableFieldConfig fieldConfig = columnConfigMap.get(fieldName.get());
                 field.setDisplay(fieldConfig.display());
                 field.setTitle(fieldConfig.title());
+                field.setOrder(fieldConfig.order());
             }
         }
         if (props.queryFields() != null) {
@@ -120,6 +121,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                     TableFieldConfig fieldConfig = queryFieldConfigMap.get(fieldName.get());
                     field.setDisplay(fieldConfig.display());
                     field.setTitle(fieldConfig.title());
+                    field.setOrder(fieldConfig.order());
                 }
             }
         }
