@@ -12,6 +12,7 @@ import dev.fastball.ui.components.form.FormFieldInfo;
 import dev.fastball.ui.components.form.FormProps_AutoValue;
 import dev.fastball.ui.components.form.ValueChangeHandlerInfo;
 import dev.fastball.ui.components.form.config.*;
+import org.springframework.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -67,7 +68,9 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
                 FormFieldConfig fieldConfig = fieldConfigMap.get(fieldName.get());
                 field.setDisplay(fieldConfig.display());
                 field.setReadonly(fieldConfig.readonly());
-                field.setTitle(fieldConfig.title());
+                if (StringUtils.hasLength(fieldConfig.title())) {
+                    field.setTitle(fieldConfig.title());
+                }
                 field.setOrder(fieldConfig.order());
             }
         }

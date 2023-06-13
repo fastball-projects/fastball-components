@@ -12,6 +12,7 @@ import dev.fastball.ui.components.table.ColumnInfo;
 import dev.fastball.ui.components.table.TableProps_AutoValue;
 import dev.fastball.ui.components.table.config.*;
 import dev.fastball.ui.components.table.param.TableSearchParam;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
@@ -59,35 +60,40 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         }
 
         TableConfig tableConfig = compileContext.getComponentElement().getAnnotation(TableConfig.class);
-        if (tableConfig == null) {
+        if (tableConfig != null) {
+            TypeMirror rowExpandedComponent = ElementCompileUtils.getTypeMirrorFromAnnotationValue(tableConfig::rowExpandedComponent);
+            if (rowExpandedComponent == null || !Component.class.getCanonicalName().equals(rowExpandedComponent.toString())) {
+                TypeElement rowExpandedComponentElement = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(rowExpandedComponent);
+                props.rowExpandedComponent(getReferencedComponentInfo(props, rowExpandedComponentElement));
+            }
+
+            if (!tableConfig.childrenFieldName().isEmpty()) {
+                props.childrenFieldName(tableConfig.childrenFieldName());
+            }
+            props.size(tableConfig.size());
+            props.keywordSearch(tableConfig.keywordSearch());
+            props.lightQuery(tableConfig.lightQuery());
+            props.pageable(tableConfig.pageable());
+            props.showRowIndex(tableConfig.showRowIndex());
+
+
+            // 是否开启导出
+            if (tableConfig.exportable()) {
+                ApiActionInfo exportActionInfo = ApiActionInfo.builder()
+                        .actionKey(EXPORT_METHOD_NAME)
+                        .actionName("导出")
+                        .downloadFileAction(true)
+                        .build();
+                props.actions().add(exportActionInfo);
+            }
+            compileComponentFields(props, tableConfig);
+        } else {
             props.pageable(true);
-            return;
-        }
-        TypeMirror rowExpandedComponent = ElementCompileUtils.getTypeMirrorFromAnnotationValue(tableConfig::rowExpandedComponent);
-        if (rowExpandedComponent == null || !Component.class.getCanonicalName().equals(rowExpandedComponent.toString())) {
-            TypeElement rowExpandedComponentElement = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(rowExpandedComponent);
-            props.rowExpandedComponent(getReferencedComponentInfo(props, rowExpandedComponentElement));
         }
 
-        if (!tableConfig.childrenFieldName().isEmpty()) {
-            props.childrenFieldName(tableConfig.childrenFieldName());
-        }
-        props.size(tableConfig.size());
-        props.keywordSearch(tableConfig.keywordSearch());
-        props.lightQuery(tableConfig.lightQuery());
-        props.pageable(tableConfig.pageable());
-        props.showRowIndex(tableConfig.showRowIndex());
-
-        compileComponentFields(props, tableConfig);
-
-        // 是否开启导出
-        if (tableConfig.exportable()) {
-            ApiActionInfo exportActionInfo = ApiActionInfo.builder()
-                    .actionKey(EXPORT_METHOD_NAME)
-                    .actionName("导出")
-                    .downloadFileAction(true)
-                    .build();
-            props.actions().add(exportActionInfo);
+        props.columns(props.columns().stream().sorted().collect(Collectors.toList()));
+        if (props.queryFields() != null) {
+            props.queryFields(props.queryFields().stream().sorted().collect(Collectors.toList()));
         }
     }
 
@@ -107,11 +113,12 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
             if (fieldName.isPresent() && columnConfigMap.containsKey(fieldName.get())) {
                 TableFieldConfig fieldConfig = columnConfigMap.get(fieldName.get());
                 field.setDisplay(fieldConfig.display());
-                field.setTitle(fieldConfig.title());
+                if (StringUtils.hasLength(fieldConfig.title())) {
+                    field.setTitle(fieldConfig.title());
+                }
                 field.setOrder(fieldConfig.order());
             }
         }
-        props.columns(props.columns().stream().sorted().collect(Collectors.toList()));
         if (props.queryFields() != null) {
             Map<String, TableFieldConfig> queryFieldConfigMap = new HashMap<>();
             for (TableFieldConfig fieldConfig : tableConfig.queryFieldsConfig()) {
@@ -122,11 +129,12 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 if (fieldName.isPresent() && queryFieldConfigMap.containsKey(fieldName.get())) {
                     TableFieldConfig fieldConfig = queryFieldConfigMap.get(fieldName.get());
                     field.setDisplay(fieldConfig.display());
-                    field.setTitle(fieldConfig.title());
+                    if (StringUtils.hasLength(fieldConfig.title())) {
+                        field.setTitle(fieldConfig.title());
+                    }
                     field.setOrder(fieldConfig.order());
                 }
             }
-            props.queryFields(props.queryFields().stream().sorted().collect(Collectors.toList()));
         }
     }
 
