@@ -1,5 +1,6 @@
 package dev.fastball.ui.components.form;
 
+import dev.fastball.core.info.action.ActionInfo;
 import dev.fastball.core.info.basic.FieldInfo;
 import dev.fastball.ui.components.form.config.ConditionComposeType;
 import dev.fastball.ui.components.form.config.FieldDependencyType;
@@ -16,4 +17,7 @@ public class FormFieldInfo extends FieldInfo {
     private ConditionComposeType conditionComposeType;
 
     private FieldDependencyType fieldDependencyType;
+
+    private List<ActionInfo> subTableRecordActions;
+
 }

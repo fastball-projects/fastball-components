@@ -44,6 +44,7 @@ export type PopupProps = {
     key?: string
     ref?: MutableRefObject
     input?: any
+    loadInput?: LoadDataType
     onClose?: Function
     trigger: ReactComponent
     popupInfo: PopupInfo
@@ -98,6 +99,7 @@ export type ActionInfo = {
     trigger?: ReactComponent
     data?: Data | Data[]
     loadData?: LoadDataType
+    loadInput?: LoadDataType
     actionKey: string
     type: ActionType
 } & Displayable

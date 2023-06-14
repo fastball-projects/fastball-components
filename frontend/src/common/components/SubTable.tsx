@@ -1,6 +1,11 @@
 import { EditableFormInstance, EditableProTable, ProColumns, RowEditableConfig } from '@ant-design/pro-components'
 import React from 'react';
 import { useState } from 'react';
+import { ActionInfo } from '../../../types';
+import { buildAction } from '../action';
+import { filterVisibled } from '../field';
+import { Button, Dropdown, MenuProps, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 
 export const EDIT_ID = '__edit_id'
 
@@ -9,13 +14,14 @@ const SubTable: React.FC<{
     parentName?: string | string[];
     title?: string;
     readonly?: boolean;
+    recordActions?: ActionInfo[];
     value?: Record<string, any>[];
     onChange?: (
         value: readonly Record<string, any>[],
     ) => void;
     columns: ProColumns[]
     editableFormRef?: React.RefObject<EditableFormInstance>
-}> = ({ name, parentName, title, readonly, value, onChange, columns, editableFormRef }) => {
+}> = ({ name, parentName, title, readonly, recordActions, value, onChange, columns, editableFormRef }) => {
     // console.log('SubTable', name, value)
     // if (onChange && value?.find((item) => item[EDIT_ID] === undefined || item[EDIT_ID] === null)) {
     //     let nextEditId = 1;
@@ -39,8 +45,28 @@ const SubTable: React.FC<{
         editable = {
             type: 'multiple',
             editableKeys: value?.map((record, i) => i.toString()),
-            actionRender: (row, config, defaultDoms) => {
-                return [defaultDoms.delete || defaultDoms.cancel];
+            actionRender: (record, config, defaultDoms) => {
+                const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                    const { actionKey, actionName, refresh } = action;
+                    const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
+                    if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
+                        return null;
+                    }
+                    const trigger = actionName || actionKey
+                    const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
+                    return { key: actionKey, label: buildAction(actionInfo) }
+                }).filter(action => action != null) : [];
+
+                return (
+                    <Dropdown menu={{ items: [{ key: '__delete', label: defaultDoms.delete || defaultDoms.cancel}, ...items] }}>
+                        <a onClick={(e) => e.preventDefault()}>
+                            <Space>
+                                操作
+                                <DownOutlined />
+                            </Space>
+                        </a>
+                    </Dropdown>
+                )
             },
             onValuesChange: (record, recordList) => {
                 // const values: any[] = editableFormRef?.current?.getRowsData?.() || []

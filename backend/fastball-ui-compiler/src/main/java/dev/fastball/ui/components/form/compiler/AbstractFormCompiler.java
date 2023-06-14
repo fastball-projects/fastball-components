@@ -3,9 +3,14 @@ package dev.fastball.ui.components.form.compiler;
 import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.exception.CompilerException;
+import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.annotation.Field;
+import dev.fastball.core.annotation.RecordAction;
 import dev.fastball.core.component.Component;
+import dev.fastball.core.component.DownloadFile;
+import dev.fastball.core.info.action.ActionInfo;
+import dev.fastball.core.info.action.ApiActionInfo;
 import dev.fastball.core.info.basic.FieldInfo;
 import dev.fastball.ui.components.form.FieldDependencyInfo;
 import dev.fastball.ui.components.form.FormFieldInfo;
@@ -14,6 +19,7 @@ import dev.fastball.ui.components.form.ValueChangeHandlerInfo;
 import dev.fastball.ui.components.form.config.*;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -48,6 +54,61 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         compileOnValueChange(props, compileContext);
         if (config != null) {
             compileComponentFields(props, config);
+            compileSubTableRecordViewActions(props, config);
+        }
+        compileSubTableRecordActions(props, compileContext);
+    }
+
+    private void compileSubTableRecordViewActions(FormProps_AutoValue props, FormConfig config) {
+        for (SubTableRecordViewAction subTableRecordViewAction : config.subTableViewActions()) {
+            List<ActionInfo> actionInfoList = Arrays.stream(subTableRecordViewAction.recordActions())
+                    .map(annotation -> buildViewActionInfo(annotation, props))
+                    .collect(Collectors.toList());
+            setFieldsSubTableRecordActionProps(props.fields(), subTableRecordViewAction.fields(), actionInfoList, 0);
+        }
+    }
+
+    protected void compileSubTableRecordActions(FormProps_AutoValue props, CompileContext compileContext) {
+        for (ExecutableElement method : compileContext.getMethodMap().values()) {
+            SubTableRecordAction actionAnnotation = method.getAnnotation(SubTableRecordAction.class);
+            if (actionAnnotation == null) {
+                continue;
+            }
+            if (actionAnnotation.fields().length == 0) {
+                throw new CompilerException("@SubTableRecordAction.fields cannot empty");
+            }
+            ApiActionInfo.ApiActionInfoBuilder builder = ApiActionInfo.builder()
+                    .componentKey(props.componentKey())
+                    .refresh(actionAnnotation.refresh())
+                    .confirmMessage(actionAnnotation.confirmMessage())
+                    .closePopupOnSuccess(actionAnnotation.closePopupOnSuccess())
+                    .actionName(actionAnnotation.name())
+                    .actionKey(actionAnnotation.key().isEmpty() ? method.getSimpleName().toString() : actionAnnotation.key());
+            builder.uploadFileAction(method.getParameters().stream().anyMatch(param -> isUploadField(param.asType(), compileContext.getProcessingEnv())));
+            if (method.getReturnType() != null) {
+                TypeElement returnType = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(method.getReturnType());
+                builder.downloadFileAction(returnType != null && ElementCompileUtils.isAssignableFrom(DownloadFile.class, returnType, compileContext.getProcessingEnv()));
+            }
+            setFieldsSubTableRecordActionProps(props.fields(), actionAnnotation.fields(), Collections.singletonList(builder.build()), 0);
+        }
+    }
+
+    protected void setFieldsSubTableRecordActionProps(List<FormFieldInfo> fieldInfoList, String[] subTableFields, List<ActionInfo> actionInfo, int index) {
+        for (FormFieldInfo fieldInfo : fieldInfoList) {
+            if (subTableFields[index].equals(fieldInfo.getDataIndex().get(0))) {
+                if (index == subTableFields.length - 1) {
+                    List<ActionInfo> subTableRecordActions = fieldInfo.getSubTableRecordActions();
+                    if (subTableRecordActions == null) {
+                        subTableRecordActions = new ArrayList<>();
+                        fieldInfo.setSubTableRecordActions(subTableRecordActions);
+                    }
+                    subTableRecordActions.addAll(actionInfo);
+                } else if (fieldInfo.getSubFields() != null) {
+                    setFieldsSubTableRecordActionProps((List<FormFieldInfo>) fieldInfo.getSubFields(), subTableFields, actionInfo, index + 1);
+                } else {
+                    throw new CompilerException("@SubTableRecordAction.fields cannot found model field");
+                }
+            }
         }
     }
 

@@ -21,5 +21,7 @@ public @interface FormConfig {
 
     boolean readonly() default false;
 
+    SubTableRecordViewAction[] subTableViewActions() default {};
+
     FormFieldConfig[] fieldsConfig() default {};
 }

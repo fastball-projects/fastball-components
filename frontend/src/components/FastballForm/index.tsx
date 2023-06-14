@@ -83,6 +83,11 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     const formData = await this.formRef.current?.getFieldsValue?.()
                     const data: Data = Object.assign({}, input, this.state.dataSource, formData)
                     return [data, input];
+                }, loadInput: () => {
+                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
+                    const formData = this.formRef.current?.getFieldsValue?.()
+                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
+                    return data;
                 }
             });
         }) : []
@@ -101,6 +106,12 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     const formData = await this.formRef.current?.getFieldsValue?.()
                     const data: Data = Object.assign({}, input, this.state.dataSource, formData)
                     return [data, input];
+                }, loadInput: async () => {
+                    await this.formRef.current?.validateFields?.()
+                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
+                    const formData = await this.formRef.current?.getFieldsValue?.()
+                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
+                    return data;
                 }
             });
             buttons.push(button);
@@ -155,6 +166,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     name: formColumn.name,
                     parentName: parentDataIndex,
                     editableFormRef,
+                    recordActions: field.subTableRecordActions
                 })
                 formColumn.initialValue = []
                 formColumn.title = null;
