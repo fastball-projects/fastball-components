@@ -93,7 +93,29 @@ const SubTable: React.FC<{
     }, ...columns.filter(({ valueType }) => valueType !== 'SubTable'), {
         title: '操作',
         valueType: 'option',
-        render: () => null
+        render: (_dom, record) => {
+            const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                const { actionKey, actionName, refresh } = action;
+                const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
+                if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
+                    return null;
+                }
+                const trigger = actionName || actionKey
+                const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
+                return { key: actionKey, label: buildAction(actionInfo) }
+            }).filter(action => action != null) : [];
+
+            return (
+                <Dropdown menu={{ items }}>
+                    <a onClick={(e) => e.preventDefault()}>
+                        <Space>
+                            操作
+                            <DownOutlined />
+                        </Space>
+                    </a>
+                </Dropdown>
+            )
+        }
     }]
 
     return (
