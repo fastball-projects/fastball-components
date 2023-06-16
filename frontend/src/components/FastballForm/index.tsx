@@ -126,13 +126,18 @@ class FastballForm extends React.Component<FormProps, FormState> {
         return this.buildColumns(this.props.fields)
     }
 
-    buildColumns(fields: FormFieldInfo[], parentDataIndex?: string[], editableFormRef?: React.RefObject<EditableFormInstance>, ignoreParentDataIndex?: boolean): ProFormColumnsType<any, 'text'>[] {
+    buildColumns(fields: FormFieldInfo[], parentDataIndex?: string[], parentDataPath?: string[], editableFormRef?: React.RefObject<EditableFormInstance>, ignoreParentDataIndex?: boolean): ProFormColumnsType<any, 'text'>[] {
         const { readonly, column } = this.props;
         const columnSpan = 24 / (column || 2);
+        const getRootValues = () => this.formRef.current?.getFieldsValue()
         return fields.filter(filterEnabled).filter(field => field.valueType).map(field => {
             const formColumn: ProFormColumnsType = {};
-            Object.assign(formColumn, field);
+            const parentPath = (Array.isArray(parentDataPath) ? [...parentDataPath] : []).concat(field.dataIndex)
+            Object.assign(formColumn, { ...field, parentPath, getRootValues });
             formColumn['@class'] = null;
+            formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                parentPath,
+            })
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
             processingField(field, formColumn as ProSchema, parentDataIndex, this.props.__designMode, editableFormRef);
             if (!ignoreParentDataIndex && parentDataIndex) {
@@ -141,7 +146,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
             formColumn.name = formColumn.dataIndex
             if (typeof formColumn.fieldProps !== 'function') {
                 formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                    name: formColumn.dataIndex
+                    name: formColumn.dataIndex,
                 })
             }
             if (field.validationRules) {
@@ -161,7 +166,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
             if (field.valueType === 'SubTable' && field.subFields) {
                 const editableFormRef = React.createRef<EditableFormInstance>()
                 formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                    columns: this.buildColumns(field.subFields, field.dataIndex, editableFormRef, true),
+                    columns: this.buildColumns(field.subFields, field.dataIndex, parentPath, editableFormRef, true),
                     title: formColumn.title,
                     name: formColumn.name,
                     parentName: parentDataIndex,
@@ -173,24 +178,38 @@ class FastballForm extends React.Component<FormProps, FormState> {
             }
             if (field.expression) {
                 formColumn.dependencies = field.expression.fields;
-                formColumn.formItemProps = (formInstance, config) => {
+                formColumn.formItemProps = (formInstance, config): any => {
+                    const getParent = (level?: number) => {
+                        if ( !parentDataPath) {
+                            return formInstance.getFieldsValue();
+                        }
+                        let parentLevel = level;
+                        if (!parentLevel) {
+                            return formInstance.getFieldValue(parentDataPath || []);
+
+                        }
+                        if (parentLevel < 0 || parentDataPath.length < parentLevel) {
+                            return formInstance.getFieldsValue();
+                        }
+                        return formInstance.getFieldValue(parentDataPath.slice(0, parentDataPath.length - parentLevel));
+                    };
                     const { dataIndex, rowIndex } = config;
                     if (editableFormRef && rowIndex !== undefined) {
                         const rowData = editableFormRef.current?.getRowData?.(rowIndex);
                         if (!rowData) {
                             return;
                         }
-                        const value = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
+                        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(getParent, rowData);
                         if (getByPaths(rowData, dataIndex) !== value) {
-                            setByPaths(rowData, dataIndex, value)
-                            editableFormRef.current?.setRowData?.(rowIndex, rowData)
+                            setByPaths(rowData, dataIndex, value);
+                            editableFormRef.current?.setRowData?.(rowIndex, rowData);
                         }
                         // const dataPath = [rowIndex, ...dataIndex]
                         // editableFormRef.current?.setFieldValue(dataPath, value)
                     } else if (formInstance) {
                         const rowData = formInstance.getFieldsValue?.() || {};
-                        const newData = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData)
-                        formInstance.setFieldsValue?.(rowData)
+                        const newData = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData);
+                        formInstance.setFieldsValue?.(rowData);
                     }
                     return formColumn.formItemProps;
                 }
@@ -206,10 +225,13 @@ class FastballForm extends React.Component<FormProps, FormState> {
 
                 subFieldColumn.valueType = 'group'
                 subFieldColumn.columns = (config) => {
-                    const getGroupColumns = (groupFieldProps: any) => this.buildColumns(field.subFields!, field.dataIndex, undefined, true).map(c => {
-                        c.rowIndex = groupFieldProps.rowIndex;
-                        return c;
-                    })
+                    const getGroupColumns = (groupFieldProps: any) => {
+                        const parentPath = (Array.isArray(parentDataPath) ? [...parentDataPath] : []).concat(field.dataIndex).concat(groupFieldProps.rowIndex)
+                        return this.buildColumns(field.subFields!, field.dataIndex, parentPath, undefined, true).map(c => {
+                            c.rowIndex = groupFieldProps.rowIndex;
+                            return c;
+                        })
+                    }
                     const groupColumns = getGroupColumns(config);
                     return groupColumns;
                 };
@@ -345,7 +367,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                         },
                         AutoComplete: {
                             render: (text) => text,
-                            renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} input={props?.record}/>
+                            renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} input={props?.record} />
                         },
                         RichText: {
                             render: (text) => <RichText {...props} {...props?.fieldProps} readOnly />,

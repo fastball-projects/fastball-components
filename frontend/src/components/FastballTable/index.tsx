@@ -145,7 +145,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                         return null;
                     }
 
-                    const trigger = <Button type='link'>{actionName || actionKey}</Button>
+                    const trigger = actionName || actionKey
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
                     if (refresh) {
                         actionInfo.callback = () => ref.current?.reload()

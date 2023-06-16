@@ -60,6 +60,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         const fieldProps = {
             ...(column.fieldProps || {}),
             popupMatchSelectWidth: false,
+            showSearch: lookupAction.showSearch,
             fieldNames: {
                 label: lookupAction.labelField,
                 value: lookupAction.valueField,
@@ -112,9 +113,27 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         } else {
             column.fieldProps = fieldProps
         }
-        column.params = { timestamp: Math.random() }
-        column.request = () => {
-            return doLookupAction(lookupAction, undefined, __designMode);
+
+        if(lookupAction.dependencyParams?.length) {
+            column.dependencies = lookupAction.dependencyParams.map(dependencyParam => dependencyParam.paramPath)
+            column.params = (record, config) => {
+                const requestParam = {}
+                const rootValues = config?.getRootValues?.()
+                lookupAction.dependencyParams?.forEach(dependencyParam => {
+                    if(dependencyParam.rootValue && rootValues) {
+                        requestParam[dependencyParam.paramKey] = getByPaths(rootValues, dependencyParam.paramPath)
+                    } else {
+                        requestParam[dependencyParam.paramKey] = getByPaths(record, dependencyParam.paramPath)
+                    }
+                })
+                console.log('lookup param', record, rootValues, requestParam, config)
+                return requestParam
+            }
+        }
+        
+        column.request = (params, props) => {
+            console.log('lookup request params', params, props)
+            return doLookupAction(lookupAction, params, __designMode);
         }
     }
     if (field.fieldType === 'popup' && field.popupInfo) {
