@@ -61,7 +61,7 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
     const [dependencyValuesHash, setDependencyValuesHash] = useState<string>();
 
     const loadOptions = async () => {
-        const result = await doAutoCompleteAction(autoCompleteKey, [input]);
+        const result = await doAutoCompleteAction(autoCompleteKey, input);
         const option = {
             label: renderTitle(fields),
             options: result.map((item: Record<string, any>) => renderItem(valueField, fields, item))
