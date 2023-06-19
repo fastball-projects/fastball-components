@@ -4,6 +4,7 @@ import { AutoComplete as AntDAutoComplete, InputNumber, Input, Col, Row } from '
 import "react-quill/dist/quill.snow.css";
 import { useState } from "react";
 import { useEffect } from "react";
+import { MD5 } from 'object-hash'
 import { doAutoCompleteAction } from "../action";
 
 type AutoCompleteType = {
@@ -57,6 +58,7 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
     }
 
     const [options, setOptions] = useState<AutoCompleteProps['options']>();
+    const [dependencyValuesHash, setDependencyValuesHash] = useState<string>();
 
     const loadOptions = async () => {
         const result = await doAutoCompleteAction(autoCompleteKey, [input]);
@@ -69,12 +71,19 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
     if (Array.isArray(dependencyFields) && dependencyFields.length > 0) {
         const dependencyValues: Record<string, any> = {}
         if (input) {
-            dependencyFields.forEach(field => dependencyValues[field] = input[field])
+            dependencyFields.forEach(field => {
+                if (input[field] !== undefined && input[field] !== null) {
+                    dependencyValues[field] = input[field]
+                }
+            })
         }
-        const dependencyList = [dependencyFields, dependencyValues]
+        const valuesHash = MD5(dependencyValues)
+        if(dependencyValuesHash != valuesHash) {
+            setDependencyValuesHash(valuesHash)
+        }
         useEffect(() => {
             loadOptions()
-        }, dependencyList)
+        }, [dependencyFields, valuesHash])
     }
 
     return <AntDAutoComplete

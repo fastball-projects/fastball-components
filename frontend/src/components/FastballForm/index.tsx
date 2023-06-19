@@ -208,8 +208,11 @@ class FastballForm extends React.Component<FormProps, FormState> {
                         // editableFormRef.current?.setFieldValue(dataPath, value)
                     } else if (formInstance) {
                         const rowData = formInstance.getFieldsValue?.() || {};
-                        const newData = eval(`({${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(rowData);
-                        formInstance.setFieldsValue?.(rowData);
+                        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(getParent, rowData);
+                        if (getByPaths(rowData, dataIndex) !== value) {
+                            setByPaths(rowData, dataIndex, value);
+                            formInstance.setFieldsValue?.(rowData);
+                        }
                     }
                     return formColumn.formItemProps;
                 }
