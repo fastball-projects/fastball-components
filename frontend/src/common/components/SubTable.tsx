@@ -13,6 +13,7 @@ const SubTable: React.FC<{
     name?: string;
     parentName?: string | string[];
     title?: string;
+    noAdd?: boolean;
     readonly?: boolean;
     recordActions?: ActionInfo[];
     value?: Record<string, any>[];
@@ -21,7 +22,7 @@ const SubTable: React.FC<{
     ) => void;
     columns: ProColumns[]
     editableFormRef?: React.RefObject<EditableFormInstance>
-}> = ({ name, parentName, title, readonly, recordActions, value, onChange, columns, editableFormRef }) => {
+}> = ({ name, parentName, title, readonly, recordActions, value, onChange, columns, editableFormRef, noAdd }) => {
     // console.log('SubTable', name, value)
     // if (onChange && value?.find((item) => item[EDIT_ID] === undefined || item[EDIT_ID] === null)) {
     //     let nextEditId = 1;
@@ -74,6 +75,9 @@ const SubTable: React.FC<{
                 console.log(record, recordList)
                 onChange?.(recordList);
             },
+        }
+        if(noAdd ) {
+
         }
         recordCreatorProps = {
             newRecordType: 'dataSource',

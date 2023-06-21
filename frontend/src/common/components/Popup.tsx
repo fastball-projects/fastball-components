@@ -60,8 +60,14 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
     }
 
     let popupWrapperComponent;
+
+    const totalClick = () => { 
+        navigator.clipboard.writeText(popupComponent?.componentInfo?.componentClass); 
+        console.log('Component class: ',popupComponent?.componentInfo?.componentClass) 
+    }
     const content = buildPopupComponent(popupComponent, { closePopup, setActions, __designMode }, input)
-    const popupProps: ModalProps = { title, open, footer: <Space>{actions}</Space> }
+    const totalComponent = <div onClick={totalClick}>{title}</div>
+    const popupProps: ModalProps = { title: totalComponent, open, footer: <Space>{actions}</Space> }
     if (width) {
         popupProps.width = width
     }

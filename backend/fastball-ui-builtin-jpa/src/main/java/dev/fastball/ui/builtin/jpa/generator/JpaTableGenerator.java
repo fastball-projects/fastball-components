@@ -6,15 +6,18 @@ import dev.fastball.compile.FastballPreCompileGenerator;
 import dev.fastball.core.annotation.*;
 import dev.fastball.core.component.DataResult;
 import dev.fastball.ui.builtin.jpa.BuiltinGenerator;
-import dev.fastball.ui.builtin.jpa.annotation.DataManagement;
-import dev.fastball.ui.components.table.Table;
+import dev.fastball.ui.components.table.SearchTable;
+import dev.fastball.ui.components.table.param.TableSearchParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.ClassUtils;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 import static dev.fastball.ui.builtin.jpa.FastballAptJpaConstants.*;
+import static dev.fastball.ui.builtin.jpa.generator.JpaQueryModelProcessor.QUERY_MODEL_PACKAGE;
+import static dev.fastball.ui.builtin.jpa.generator.JpaQueryModelProcessor.QUERY_MODEL_PREFIX;
 
 @AutoService(FastballPreCompileGenerator.class)
 public class JpaTableGenerator extends BuiltinGenerator {
@@ -32,15 +35,17 @@ public class JpaTableGenerator extends BuiltinGenerator {
         addViewActionsAnnotation(viewActionsAnnotation, element, processingEnv, false);
         addViewActionsAnnotation(viewActionsAnnotation, element, processingEnv, true);
         typeBuilder.addAnnotation(viewActionsAnnotation.build());
+        ClassName queryModel = ClassName.get(ClassUtils.getPackageName(element.getQualifiedName().toString()) + "." + QUERY_MODEL_PACKAGE, QUERY_MODEL_PREFIX + element.getSimpleName().toString());
         typeBuilder.addSuperinterface(ParameterizedTypeName.get(
-                ClassName.get(Table.class),
-                TypeName.get(element.asType())
+                ClassName.get(SearchTable.class),
+                TypeName.get(element.asType()),
+                queryModel
         ));
         FieldSpec fieldSpec = FieldSpec.builder(ClassName.get(
                 buildPackageName(element, processingEnv), buildBasicClassName(element) + JPA_REPO_CLASS_NAME_SUFFIX
         ), JPA_REPO_FIELD_NAME, Modifier.PROTECTED, Modifier.FINAL).build();
         typeBuilder.addField(fieldSpec);
-        typeBuilder.addMethod(buildLoadDataMethod(element));
+        typeBuilder.addMethod(buildLoadDataMethod(element, queryModel));
         typeBuilder.addMethod(buildDeleteMethod(element));
         return typeBuilder;
     }
@@ -60,12 +65,15 @@ public class JpaTableGenerator extends BuiltinGenerator {
                 .build();
     }
 
-    private MethodSpec buildLoadDataMethod(TypeElement element) {
+    private MethodSpec buildLoadDataMethod(TypeElement element, ClassName queryModel) {
         CodeBlock codeBlock = CodeBlock.builder()
-                .addStatement("return dev.fastball.core.component.DataResult.build(" + JPA_REPO_FIELD_NAME + ".findAll())")
+                .addStatement("org.springframework.data.domain.Page<" + element.toString() + "> page")
+                .addStatement("if(params.getSearch() == null) {page = " + JPA_REPO_FIELD_NAME + ".findAll(dev.fastball.ui.builtin.jpa.query.QueryUtils.pageable(params));} else {page = " + JPA_REPO_FIELD_NAME + ".findAll(params.getSearch().condition(), dev.fastball.ui.builtin.jpa.query.QueryUtils.pageable(params));}")
+                .addStatement("return dev.fastball.core.component.DataResult.build(page.getTotalElements(), page.getContent())")
                 .build();
         return MethodSpec.methodBuilder(TABLE_LOAD_DATA_METHOD_NAME)
                 .addAnnotation(Override.class)
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(TableSearchParam.class), queryModel), "params").build())
                 .addCode(codeBlock)
                 .returns(ParameterizedTypeName.get(ClassName.get(DataResult.class), TypeName.get(element.asType())))
                 .addModifiers(Modifier.PUBLIC)
