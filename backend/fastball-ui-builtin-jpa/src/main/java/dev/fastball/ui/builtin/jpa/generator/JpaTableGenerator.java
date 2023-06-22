@@ -68,7 +68,11 @@ public class JpaTableGenerator extends BuiltinGenerator {
     private MethodSpec buildLoadDataMethod(TypeElement element, ClassName queryModel) {
         CodeBlock codeBlock = CodeBlock.builder()
                 .addStatement("org.springframework.data.domain.Page<" + element.toString() + "> page")
-                .addStatement("if(params.getSearch() == null) {page = " + JPA_REPO_FIELD_NAME + ".findAll(dev.fastball.ui.builtin.jpa.query.QueryUtils.pageable(params));} else {page = " + JPA_REPO_FIELD_NAME + ".findAll(params.getSearch().condition(), dev.fastball.ui.builtin.jpa.query.QueryUtils.pageable(params));}")
+                .beginControlFlow("if(params.getSearch() == null)", "params.getSearch()")
+                .addStatement("page = " + JPA_REPO_FIELD_NAME + ".findAll(dev.fastball.ui.builtin.jpa.query.QueryUtils.pageable(params))")
+                .nextControlFlow("else")
+                .addStatement("page = " + JPA_REPO_FIELD_NAME + ".findAll(params.getSearch().condition(), dev.fastball.ui.builtin.jpa.query.QueryUtils.pageable(params))")
+                .endControlFlow()
                 .addStatement("return dev.fastball.core.component.DataResult.build(page.getTotalElements(), page.getContent())")
                 .build();
         return MethodSpec.methodBuilder(TABLE_LOAD_DATA_METHOD_NAME)
