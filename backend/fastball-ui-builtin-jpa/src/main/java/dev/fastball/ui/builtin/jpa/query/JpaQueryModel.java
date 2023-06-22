@@ -25,7 +25,7 @@ public abstract class JpaQueryModel<T> {
     protected abstract Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder);
 
     protected Predicate equalPredicate(Object value, String fieldName, Root<?> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.equal(root.get(fieldName),  value);
+        return criteriaBuilder.equal(root.get(fieldName), value);
     }
 
     protected Predicate likePredicate(String value, String fieldName, Root<?> root, CriteriaBuilder criteriaBuilder) {
@@ -37,7 +37,15 @@ public abstract class JpaQueryModel<T> {
     }
 
     protected <Y extends Comparable<? super Y>> Predicate rangePredicate(Range<Y> value, String fieldName, Root<?> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.between(root.get(fieldName), value.getStart(), value.getEnd());
+        Y start = value.getStart();
+        Y end = value.getEnd();
+        if (start != null && end != null) {
+            return criteriaBuilder.between(root.get(fieldName), start, end);
+        }
+        if (start != null) {
+            return criteriaBuilder.greaterThanOrEqualTo(root.get(fieldName), start);
+        }
+        return criteriaBuilder.lessThanOrEqualTo(root.get(fieldName), end);
     }
 
 }
