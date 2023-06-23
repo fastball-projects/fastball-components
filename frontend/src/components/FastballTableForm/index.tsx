@@ -88,7 +88,7 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     buildTable() {
-        const { fields, componentKey, onDataLoad, rowKey, rowSelectable, input, __designMode } = this.props;
+        const { fields, componentKey, onDataLoad, rowKey, rowEditable, rowSelectable, input, __designMode } = this.props;
         const { dataSource } = this.state;
 
         let editable: RowEditableConfig<Record<string, any>> = {
@@ -112,13 +112,16 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
             }
         })
         const tableProps: ProTableProps<Data, any> = { rowKey, search: false, columns: tableColumns }
-        tableColumns.push({
-            title: '操作', valueType: 'option',
-            render: (_dom, _record, dataIndex) => <Button type='link' onClick={() => {
-                this.setState({ dataIndex, formOpen: true })
-                this.formRef.current?.resetFields
-            }}>编辑</Button>
-        })
+        if(rowEditable) {
+            tableColumns.push({
+                title: '操作', valueType: 'option',
+                render: (_dom, _record, dataIndex) => <Button type='link' onClick={() => {
+                    this.setState({ dataIndex, formOpen: true })
+                    this.formRef.current?.resetFields
+                }}>编辑</Button>
+            })
+        }
+       
         tableProps.request = async () => {
             const apiActionInfo: ApiActionInfo = { componentKey, type: 'API', actionKey: 'loadData', data: [input] }
             const result: Data[] = await doApiAction(apiActionInfo)

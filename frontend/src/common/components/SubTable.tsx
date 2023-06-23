@@ -76,16 +76,15 @@ const SubTable: React.FC<{
                 onChange?.(recordList);
             },
         }
-        if(noAdd ) {
-
-        }
-        recordCreatorProps = {
-            newRecordType: 'dataSource',
-            record: (index?: number) => {
-                return {
-                    [EDIT_ID]: index?.toString() || '0',
-                }
-            },
+        if(noAdd !== true) {
+            recordCreatorProps = {
+                newRecordType: 'dataSource',
+                record: (index?: number) => {
+                    return {
+                        [EDIT_ID]: index?.toString() || '0',
+                    }
+                },
+            }
         }
     }
 

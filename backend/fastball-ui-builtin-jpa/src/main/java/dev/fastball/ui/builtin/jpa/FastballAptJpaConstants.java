@@ -5,7 +5,7 @@ public interface FastballAptJpaConstants {
     String JPA_REPO_CLASS_NAME_SUFFIX = "Repo";
     String JPA_REPO_FIELD_NAME = "repo";
     String LOOKUP_ACTION_CLASS_NAME_SUFFIX = "LookupAction";
-    String LOOKUP_ACTION_METHOD_PARAM_NAME = "query";
+    String LOOKUP_ACTION_METHOD_PARAM_NAME = "param";
     String LOOKUP_ACTION_METHOD_NAME = "loadLookupItems";
     String BUILT_IN_COMPONENT_CLASS_NAME = "Builtin";
     String FORM_COMPONENT_CLASS_NAME_SUFFIX = "Form";

@@ -12,11 +12,9 @@ import dev.fastball.core.component.DownloadFile;
 import dev.fastball.core.info.action.ActionInfo;
 import dev.fastball.core.info.action.ApiActionInfo;
 import dev.fastball.core.info.basic.FieldInfo;
-import dev.fastball.ui.components.form.FieldDependencyInfo;
-import dev.fastball.ui.components.form.FormFieldInfo;
-import dev.fastball.ui.components.form.FormProps_AutoValue;
-import dev.fastball.ui.components.form.ValueChangeHandlerInfo;
+import dev.fastball.ui.components.form.*;
 import dev.fastball.ui.components.form.config.*;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -119,25 +117,57 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
 
 
     protected void compileComponentFields(FormProps_AutoValue props, FormConfig formConfig) {
-        Map<String, FormFieldConfig> fieldConfigMap = new HashMap<>();
+        Map<String, FieldConfigOverrideInfo> fieldConfigMap = new HashMap<>();
         for (FormFieldConfig fieldConfig : formConfig.fieldsConfig()) {
-            fieldConfigMap.put(fieldConfig.field(), fieldConfig);
-        }
-        for (FieldInfo field : props.fields()) {
-            Optional<String> fieldName = field.getDataIndex().stream().findFirst();
-            if (fieldName.isPresent() && fieldConfigMap.containsKey(fieldName.get())) {
-                FormFieldConfig fieldConfig = fieldConfigMap.get(fieldName.get());
-                field.setDisplay(fieldConfig.display());
-                field.setReadonly(fieldConfig.readonly());
-                if (StringUtils.hasLength(fieldConfig.title())) {
-                    field.setTitle(fieldConfig.title());
+            if (fieldConfig.field().length == 1) {
+                fieldConfigMap.put(fieldConfig.field()[0], FieldConfigOverrideInfo.builder().config(fieldConfig).build());
+            } else {
+                FieldConfigOverrideInfo overrideInfo;
+                if (fieldConfigMap.containsKey(fieldConfig.field()[0])) {
+                    overrideInfo = fieldConfigMap.get(fieldConfig.field()[0]);
+                } else {
+                    overrideInfo = FieldConfigOverrideInfo.builder().subFieldsConfigMap(new HashMap<>()).build();
+                    fieldConfigMap.put(fieldConfig.field()[0], overrideInfo);
                 }
-                field.setOrder(fieldConfig.order());
+                for (int i = 1; i < fieldConfig.field().length - 1; i++) {
+                    if (overrideInfo.getSubFieldsConfigMap().containsKey(fieldConfig.field()[i])) {
+                        overrideInfo = overrideInfo.getSubFieldsConfigMap().get(fieldConfig.field()[i]);
+                    } else {
+                        FieldConfigOverrideInfo nextOverrideInfo = FieldConfigOverrideInfo.builder().subFieldsConfigMap(new HashMap<>()).build();
+                        overrideInfo.getSubFieldsConfigMap().put(fieldConfig.field()[i], nextOverrideInfo);
+                        overrideInfo = nextOverrideInfo;
+                    }
+                }
+                overrideInfo.getSubFieldsConfigMap().put(fieldConfig.field()[fieldConfig.field().length - 1], FieldConfigOverrideInfo.builder().config(fieldConfig).build());
             }
         }
+        overrideFields(props.fields(), fieldConfigMap);
         props.fields(props.fields().stream().sorted().collect(Collectors.toList()));
     }
 
+    private void overrideFields(Collection<FormFieldInfo> fields, Map<String, FieldConfigOverrideInfo> fieldsConfigMap) {
+        for (FieldInfo field : fields) {
+            Optional<String> fieldName = field.getDataIndex().stream().findFirst();
+            if (fieldName.isPresent() && fieldsConfigMap.containsKey(fieldName.get())) {
+                FieldConfigOverrideInfo overrideInfo = fieldsConfigMap.get(fieldName.get());
+                if (overrideInfo == null) {
+                    continue;
+                }
+                if (overrideInfo.getConfig() != null) {
+                    FormFieldConfig fieldConfig = overrideInfo.getConfig();
+                    field.setDisplay(fieldConfig.display());
+                    field.setReadonly(fieldConfig.readonly());
+                    if (StringUtils.hasLength(fieldConfig.title())) {
+                        field.setTitle(fieldConfig.title());
+                    }
+                    field.setOrder(fieldConfig.order());
+                }
+                if (!CollectionUtils.isEmpty(field.getSubFields()) && !CollectionUtils.isEmpty(overrideInfo.getSubFieldsConfigMap())) {
+                    overrideFields((Collection<FormFieldInfo>) field.getSubFields(), overrideInfo.getSubFieldsConfigMap());
+                }
+            }
+        }
+    }
 
     private void afterFieldBuild(FormProps_AutoValue props, VariableElement variableElement, FormFieldInfo fieldInfo) {
         FormField formField = variableElement.getAnnotation(FormField.class);

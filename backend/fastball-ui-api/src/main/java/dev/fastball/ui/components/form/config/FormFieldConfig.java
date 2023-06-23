@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FormFieldConfig {
 
-    String field();
+    String[] field();
 
     String title() default "";
 

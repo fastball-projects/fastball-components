@@ -17,6 +17,8 @@ public @interface TableFormConfig {
 
     String rowKey() default "id";
 
+    boolean rowEditable() default true;
+
     boolean rowSelectable() default false;
 
     boolean defaultSelected() default false;

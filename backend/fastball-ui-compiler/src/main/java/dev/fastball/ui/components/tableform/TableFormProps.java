@@ -18,6 +18,8 @@ public interface TableFormProps extends ComponentProps {
 
     String rowKey();
 
+    boolean rowEditable();
+
     boolean rowSelectable();
 
     boolean defaultSelected();

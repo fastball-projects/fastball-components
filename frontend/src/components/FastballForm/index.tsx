@@ -365,7 +365,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                             }
                         },
                         Address: {
-                            render: (text) => text,
+                            render: (value, props) => <Address {...props} {...props?.fieldProps} value={value} readonly />,
                             renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
                         },
                         AutoComplete: {
