@@ -7,7 +7,10 @@ import org.springframework.data.domain.Pageable;
 public class QueryUtils {
 
     public static Pageable pageable(TableSearchParam<?> param) {
-        return PageRequest.of(param.getCurrent().intValue() - 1, param.getPageSize().intValue());
+        if (param.page()) {
+            return PageRequest.of(param.getCurrent().intValue() - 1, param.getPageSize().intValue());
+        }
+        return Pageable.unpaged();
     }
 
 }
