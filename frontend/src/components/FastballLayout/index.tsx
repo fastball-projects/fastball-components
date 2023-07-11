@@ -4,19 +4,22 @@ import LeftAndRight from './left-right'
 import TopAndBottom from './top-bottom'
 import LeftAndTopBottom from './left-top-bottom'
 import GridLayout from './grid'
+import { ContainerContextProvider } from '../../common/ContainerContext'
 
 const FastballLayout: React.FC<LayoutProps> = (props: LayoutProps) => {
+    let layoutComponent;
     if (props.layoutType === 'LeftAndRight') {
-        return <LeftAndRight {...props as LeftAndRightLayoutProps} />
+        layoutComponent = <LeftAndRight {...props as LeftAndRightLayoutProps} />
     } else if (props.layoutType === 'TopAndBottom') {
-        return <TopAndBottom {...props as TopAndBottomLayoutProps} />
+        layoutComponent = <TopAndBottom {...props as TopAndBottomLayoutProps} />
     } else if (props.layoutType === 'LeftAndTopBottom') {
-        return <LeftAndTopBottom {...props as LeftAndTopBottomLayoutProps} />
+        layoutComponent = <LeftAndTopBottom {...props as LeftAndTopBottomLayoutProps} />
     } else if (props.layoutType === 'Grid') {
-        return <GridLayout {...props as GridLayoutProps} />
+        layoutComponent = <GridLayout {...props as GridLayoutProps} />
     } else {
         return null
     }
+    return <ContainerContextProvider container={props.container}>{layoutComponent}</ContainerContextProvider>
 }
 
 export default FastballLayout;

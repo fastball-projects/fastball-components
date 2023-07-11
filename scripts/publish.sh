@@ -21,7 +21,8 @@ publish_frontend() {
     npm version $frontend_version
     echo "installing dependency..."
     # pnpm i
-    yarn
+    npx pnpm@7 install
+    # yarn
     echo "build & publish fastball component frontend ..."
     # if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
     #     npm run prepublish && npm publish

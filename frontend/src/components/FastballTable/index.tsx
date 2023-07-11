@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react'
-import { ProTable } from '@fastball/pro-components'
+import { ProTable } from '@fastball/pro-components';
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@fastball/pro-components'
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, ApiActionInfo } from '../../../types';
 import { buildAction, doApiAction, loadRefComponent, filterVisibled, buildTableColumns, FastballFieldProvider } from '../../common';
 import { Dropdown, MenuProps, Space, Table } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import { ContainerContextProvider } from '../../common/ContainerContext';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -26,7 +27,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], selectionActions = [], selectionViewActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], selectionActions = [], selectionViewActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, tableLayout: 'fixed', rowKey: 'id', search: { labelWidth: "auto", filterType: lightQuery ? 'light' : 'query' } };
     const proTableColumns: ProTableColumn[] = [];
@@ -77,7 +78,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         })
     }
 
-    buildTableColumns(componentKey, proTableColumns, columns, queryFields, __designMode)
+    buildTableColumns(container, componentKey, proTableColumns, columns, queryFields, __designMode)
 
     if (!queryFields?.length) {
         proTableProps.search = false;
@@ -245,9 +246,11 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         }
     }
 
-    return <FastballFieldProvider>
-        <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
-    </FastballFieldProvider>
+    return <ContainerContextProvider container={container}>
+        <FastballFieldProvider container={container}>
+            <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
+        </FastballFieldProvider>
+    </ContainerContextProvider>
 }
 
 

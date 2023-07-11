@@ -1,6 +1,6 @@
 {
   "name": "fastball-components",
-  "version": "0.5.0-1715391838",
+  "version": "0.5.0-1716872664",
   "description": "Fastball UI components",
   "homepage": "https://github.com/fastball-projects/fastball-components",
   "main": "lib/index.js",
@@ -34,24 +34,28 @@
   },
   "dependencies": {
     "@alilc/lowcode-engine": "^1.0.16",
+    "@alilc/lowcode-react-renderer": "^1.3.2",
+    "@alilc/lowcode-utils": "^1.3.2",
     "@ant-design/icons": "^4.8.0",
     "@ant-design/plots": "^1.2.4",
-    "@fastball/pro-components": "2.5.5006",
+    "@fastball/pro-components": "2.5.5013",
     "@types/react": "^18.0.25",
     "antd": "5.16.5",
     "classnames": "^2.3.2",
     "dayjs": "^1.11.9",
     "less-loader": "^7.3.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
     "object-hash": "3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-grid-layout": "^1.3.4",
+    "react-grid-layout": "1.4.3",
     "react-quill": "^2.0.0",
     "react-to-print": "^2.14.12",
     "sass": "^1.57.1",
     "style-loader": "^2.0.0"
   },
   "componentConfig": {
-    "materialSchema": "https://unpkg.com/fastball-components@0.5.0-1715391838/build/lowcode/assets-prod.json"
+    "materialSchema": "https://unpkg.com/fastball-components@0.5.0-1716872664/build/lowcode/assets-prod.json"
   }
 }

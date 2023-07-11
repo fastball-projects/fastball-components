@@ -1,7 +1,6 @@
 import React from 'react'
 import { Button, message } from 'antd';
-import { MD5 } from 'object-hash'
-import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo, PrintActionInfo, PrintProps, AutoCompleteActionInfo } from '../../types'
+import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo, PrintActionInfo, PrintProps } from '../../types'
 import FastballPopup from './components/Popup'
 import FastballActionButton from './components/ActionButton';
 import FastballPrint from './components/Printer';

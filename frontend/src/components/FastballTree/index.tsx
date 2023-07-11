@@ -5,6 +5,7 @@ import { MoreOutlined } from "@ant-design/icons";
 
 import { buildAction, doApiAction, filterVisibled } from '../../common'
 import type { ActionInfo, ActionRef, Data, TreeProps, TreeState } from '../../../types'
+import { ContainerContextProvider } from '../../common/ContainerContext';
 
 const mockData: Data[] = [{
     key: "1",
@@ -94,7 +95,7 @@ class Tree extends React.Component<TreeProps, TreeState> {
     }
 
     render(): React.ReactNode {
-        const { treeData, loading } = this.state;
+        const { container, treeData, loading } = this.state;
         if (loading) {
             return <Spin />
         }
@@ -138,7 +139,9 @@ class Tree extends React.Component<TreeProps, TreeState> {
             }
         }
 
-        return <AntDTree {...treeProps} />;
+        return <ContainerContextProvider container={container}>
+            <AntDTree {...treeProps} />;
+        </ContainerContextProvider>
     }
 }
 export default Tree;

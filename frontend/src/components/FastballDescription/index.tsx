@@ -5,6 +5,7 @@ import type { FieldInfo, DescriptionProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterFormOnlyField, filterVisibled, getByPaths, processingField } from '../../common';
 import SubTable from '../../common/components/SubTable';
 import { ComponentToPrint } from '../../common/components/Printer';
+import { ContainerContextProvider } from '../../common/ContainerContext';
 
 
 type DescriptionState = {
@@ -14,7 +15,7 @@ type DescriptionState = {
 class FastballDescription extends React.Component<DescriptionProps, DescriptionState> {
     ref = React.createRef<ProCoreActionType>();
     componentRef = React.createRef();
-    
+
     constructor(props: DescriptionProps) {
         super(props)
         this.state = { data: props.input }
@@ -54,20 +55,20 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
         return buttons;
     }
 
-    buildTableColumns(fields: FieldInfo[]): ProSchema[] {
+    buildTableColumns(container: Element, fields: FieldInfo[]): ProSchema[] {
         return fields.filter(filterEnabled).map(field => {
             const column: ProSchema = {};
-            processingField(field, column, this.props.__designMode);
+            processingField(container, field, column, this.props.__designMode);
             Object.assign(column, field);
             return column;
         })
     }
 
-    buildColumns(fields: FieldInfo[], parentDataIndex?: string[]): ProDescriptionsItemProps[] {
+    buildColumns(container: Element, fields: FieldInfo[], parentDataIndex?: string[]): ProDescriptionsItemProps[] {
         return fields.filter(filterEnabled).flatMap(field => {
             const column: ProDescriptionsItemProps = {};
             Object.assign(column, field, { hideInTable: true, hideInSetting: true });
-            processingField(field, column, this.props.__designMode);
+            processingField(container, field, column, this.props.__designMode);
             if (field.validationRules) {
                 column.formItemProps = {
                     rules: field.validationRules
@@ -77,10 +78,10 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
                 column.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
             if (field.valueType === 'SubFields' && field.subFields) {
-                return this.buildColumns(field.subFields!, field.dataIndex)
+                return this.buildColumns(container, field.subFields!, field.dataIndex)
             }
             if (field.valueType === 'SubTable' && field.subFields) {
-                const columns = this.buildColumns(field.subFields.filter(({ display }) => display === 'Show'))
+                const columns = this.buildColumns(container, field.subFields.filter(({ display }) => display === 'Show'))
                 columns.forEach(c => c.hideInTable = false)
                 column.fieldProps = Object.assign(column.fieldProps || {}, {
                     columns,
@@ -93,7 +94,7 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
                 column.render = (_, record) => {
                     const records: Record<string, any> = getByPaths(record, field.dataIndex)
                     if (records && Array.isArray(records)) {
-                        return <ProTable size='small' pagination={false} toolBarRender={false} search={false} dataSource={records} columns={this.buildTableColumns(field.subFields!)} />
+                        return <ProTable size='small' pagination={false} toolBarRender={false} search={false} dataSource={records} columns={this.buildTableColumns(container, field.subFields!)} />
                     }
                 }
             }
@@ -101,12 +102,12 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
         })
     }
 
-    getColumns(): ProDescriptionsItemProps[] {
-        return this.buildColumns(this.props.fields);
+    getColumns(container: Element): ProDescriptionsItemProps[] {
+        return this.buildColumns(container, this.props.fields);
     }
 
     render(): React.ReactNode {
-        const { componentKey, input, column, variableDescription, setActions, onDataLoad, __designMode, ...props } = this.props;
+        const { componentKey, container, input, column, variableDescription, setActions, onDataLoad, __designMode, ...props } = this.props;
 
         const proDescriptionsProps: ProDescriptionsProps = { column };
         proDescriptionsProps.size = 'small'
@@ -130,7 +131,7 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
             proDescriptionsProps.dataSource = input
         }
 
-        proDescriptionsProps.columns = this.getColumns();
+        proDescriptionsProps.columns = this.getColumns(container);
 
         if (!setActions) {
             proDescriptionsProps.columns.push({
@@ -140,20 +141,24 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
             });
         }
 
+        const getPopupContainer = container ? () => container : undefined;
         return <ComponentToPrint ref={this.componentRef}>
-            <ProConfigProvider
-                valueTypeMap={{
-                    SubTable: {
-                        render: (data, props) => <SubTable size="small" {...props} {...props.fieldProps} value={data} readonly />,
-                    },
-                    Address: {
-                        render: (text) => text,
-                    }
-                }}
-            >
-                <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
-            </ProConfigProvider>
-        </ComponentToPrint> 
+            <ContainerContextProvider container={container}>
+                <ProConfigProvider
+                    getPopupContainer={getPopupContainer}
+                    valueTypeMap={{
+                        SubTable: {
+                            render: (data, props) => <SubTable size="small" {...props} {...props.fieldProps} value={data} readonly />,
+                        },
+                        Address: {
+                            render: (text) => text,
+                        }
+                    }}
+                >
+                    <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
+                </ProConfigProvider>
+            </ContainerContextProvider>
+        </ComponentToPrint>
     }
 }
 

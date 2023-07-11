@@ -7,6 +7,7 @@ export type BasicComponentProps = {
     __designMode?: string
     onDataLoad?: Function<Record>
     input?: any
+    container?: Container
 }
 
 export type PopupComponentProps = {

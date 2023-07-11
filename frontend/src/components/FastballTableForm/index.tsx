@@ -3,14 +3,15 @@ import React from "react";
 import { MD5 } from 'object-hash'
 import { Button, Drawer, Space } from "antd";
 import { EditableFormInstance, ProColumns, ProFormInstance, ProTable, ProTableProps, RowEditableConfig } from "@fastball/pro-components";
-import { EditableProTable } from '@fastball/pro-table'
+import { EditableProTable } from '@fastball/pro-components'
 import FastballForm from "../FastballForm";
 import { buildAction, doApiAction, filterVisibled, processingField } from "../../common";
 import { ComponentToPrint } from "../../common/components/Printer";
+import { ContainerContextProvider } from "../../common/ContainerContext";
 
 const EDIT_ID = '__edit_id';
 
-const buildTableColumn = (componentKey: string, field: TableFormFieldInfo, parentDataIndex?: string[], __designMode?: string): ProColumns | undefined => {
+const buildTableColumn = (container: Element, componentKey: string, field: TableFormFieldInfo, parentDataIndex?: string[], __designMode?: string): ProColumns | undefined => {
     if (field.valueType === 'Array') {
         return;
     }
@@ -19,7 +20,7 @@ const buildTableColumn = (componentKey: string, field: TableFormFieldInfo, paren
     }
     const column: ProColumns = {}
     Object.assign(column, field, { hideInSearch: true });
-    processingField(componentKey, field, column, __designMode);
+    processingField(container, componentKey, field, column, __designMode);
     if (!field.editInTable) {
         column.readonly = true
     }
@@ -27,7 +28,7 @@ const buildTableColumn = (componentKey: string, field: TableFormFieldInfo, paren
         column.dataIndex = [...parentDataIndex, ...field.dataIndex]
     }
     if (field.valueType === 'SubFields' && field.subFields) {
-        field.subFields.forEach(subField => buildTableColumn(componentKey, subField, field.dataIndex))
+        field.subFields.forEach(subField => buildTableColumn(container, componentKey, subField, field.dataIndex))
         return;
     }
     if (field.valueType === 'textarea') {
@@ -102,7 +103,7 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     buildTable() {
-        const { fields, componentKey, onDataLoad, rowEditable, rowSelectable, childrenFieldName, input, __designMode } = this.props;
+        const { container, fields, componentKey, onDataLoad, rowEditable, rowSelectable, childrenFieldName, input, __designMode } = this.props;
         const { dataSource, dataSourceMap } = this.state;
 
         let editable: RowEditableConfig<Record<string, any>> = {
@@ -119,7 +120,7 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
 
         const tableColumns: ProColumns[] = []
         fields.filter(filterVisibled).filter(({ hideInTable }) => !hideInTable).map(field => ({ ...field })).sort((f1, f2) => f1.order - f2.order).forEach(field => {
-            const column = buildTableColumn(componentKey, field, undefined, __designMode)
+            const column = buildTableColumn(container, componentKey, field, undefined, __designMode)
             if (column) {
                 tableColumns.push(column)
             }
@@ -224,7 +225,7 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     render(): React.ReactNode {
-        const { fields, componentKey, value, onChange } = this.props;
+        const { container, fields, componentKey, value, onChange } = this.props;
         const { dataSource, dataIndex, formOpen } = this.state;
 
         const input = dataSource?.[dataIndex]
@@ -241,11 +242,18 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
             <Button onClick={() => this.closeForm()}>取消</Button>
         </Space>
 
+        let getContainer;
+        if (container) {
+            getContainer = container
+        }
+
         return <ComponentToPrint ref={this.ref}>
-            <Drawer placement="right" width="75%" onClose={() => this.closeForm()} open={formOpen} footer={footerButtons}>
-                <FastballForm key={input ? MD5(input) : ""} {...formProps} />
-            </Drawer>
-            {this.buildTable()}
+            <ContainerContextProvider container={container}>
+                <Drawer placement="right" width="75%" onClose={() => this.closeForm()} open={formOpen} footer={footerButtons} getContainer={getContainer}>
+                    <FastballForm key={input ? MD5(input) : ""} {...formProps} />
+                </Drawer>
+                {this.buildTable()}
+            </ContainerContextProvider>
         </ComponentToPrint>
     }
 

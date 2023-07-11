@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { LookupProps } from "../../../types";
 import { SelectableTable } from "./LookupSelectableTable";
 import { ProFormSelect } from "@fastball/pro-components";
 import type { ProFormSelectProps } from "@fastball/pro-components";
 import { Drawer } from "antd";
+import { ContainerContext } from "../ContainerContext";
 
 const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, onChange, params, request,  ...otherProps }) => {
     const [open, setOpen] = useState(false);
     const [initialValue, setInitialValue] = useState();
     const closeDropdown = () => setOpen(false);
     const { multiple, valueField, labelField, selectedFirst } = lookup
+
+    const containerContext = useContext(ContainerContext)
+    const container = containerContext?.container
+    const getContainer = container ? () => container : undefined;
+
     const selectProps: ProFormSelectProps = {
         ...otherProps,
         request,
@@ -20,6 +26,7 @@ const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, o
             // onDropdownVisibleChange: (visible) => setOpen(visible),
             showSearch: false,
             popupMatchSelectWidth: 1,
+            getPopupContainer: getContainer,
             fieldNames: {
                 label: labelField,
                 value: valueField
@@ -46,7 +53,7 @@ const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, o
     
     //     options: data
     return <>
-        <Drawer width="75%" open={open} onClose={() => setOpen(false)}>
+        <Drawer width="75%" open={open} onClose={() => setOpen(false)} getContainer={getContainer}>
             <SelectableTable closeDropdown={closeDropdown} componentKey={componentKey} value={value} onChange={onChange}
                 onSelect={otherProps.fieldProps?.onSelect} lookup={lookup} params={params} />
         </Drawer>

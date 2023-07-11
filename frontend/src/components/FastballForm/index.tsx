@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { EditableFormInstance, ProSchema, ProCard } from '@fastball/pro-components'
-import { BetaSchemaForm } from '@fastball/pro-form';
+import { BetaSchemaForm } from '@fastball/pro-components';
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@fastball/pro-components';
 import { Data, FieldDependencyInfo, FormFieldInfo, FormProps } from '../../../types';
 import { FastballFieldProvider, buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
@@ -8,6 +8,7 @@ import { Button, Spin } from 'antd';
 import dayjs from 'dayjs';
 import { EDIT_ID } from '../../common/components/SubTable';
 import { ComponentToPrint } from '../../common/components/Printer';
+import { ContainerContextProvider } from '../../common/ContainerContext';
 
 dayjs.extend((option, dayjsClass, dayjsFactory) => {
     dayjsClass.prototype.toJSON = function () {
@@ -172,7 +173,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
     }
 
     buildColumns(componentKey: string, fields: FormFieldInfo[], parentDataIndex?: string[], parentDataPath?: string[], editableFormRef?: React.RefObject<EditableFormInstance>, ignoreParentDataIndex?: boolean): ProFormColumnsType<any, 'text'>[] {
-        const { readonly, column } = this.props;
+        const { readonly, column, container } = this.props;
         const columnSpan = 24 / (column || 2);
         const getRootValues = () => this.formRef.current?.getFieldsValue()
         return fields.filter(filterEnabled).filter(field => field.valueType).sort((f1, f2) => f1.order - f2.order).map(field => {
@@ -184,7 +185,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 parentPath,
             })
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
-            processingField(componentKey, field, formColumn as ProSchema, parentDataIndex, this.props.__designMode, editableFormRef);
+            processingField(container, componentKey, field, formColumn as ProSchema, parentDataIndex, this.props.__designMode, editableFormRef);
             if (!ignoreParentDataIndex && parentDataIndex) {
                 formColumn.dataIndex = [...parentDataIndex, ...field.dataIndex]
             }
@@ -201,7 +202,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
             }
             if (field.valueType === 'digit') {
                 formColumn.fieldProps = Object.assign(formColumn.formItemProps || {}, {
-                    precision: field.digitPrecision || 2 
+                    precision: field.digitPrecision || 2
                 })
             }
             if (!readonly && (field.valueType === 'dateTime' || field.valueType === 'date')) {
@@ -269,7 +270,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 subFieldColumn.columns = (config) => {
                     const getGroupColumns = (groupFieldProps: any) => {
                         const parentPath = (Array.isArray(parentDataPath) ? [...parentDataPath] : []).concat(field.dataIndex).concat(groupFieldProps.rowIndex)
-                        return this.buildColumns(componentKey, field.subFields!, field.dataIndex, parentPath, undefined, true).map(c => {
+                        return this.buildColumns(container, componentKey, field.subFields!, field.dataIndex, parentPath, undefined, true).map(c => {
                             c.rowIndex = groupFieldProps.rowIndex;
                             return c;
                         })
@@ -336,7 +337,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
     }
 
     render(): React.ReactNode {
-        const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
+        const { container, componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
         props['@class'] = null;
         const { dataSource } = this.state;
         const proFormProps: ProFormProps = { size, grid: true, layout: "horizontal", rowProps: { gutter: [16, 16] }, scrollToFirstError: true };
@@ -396,9 +397,11 @@ class FastballForm extends React.Component<FormProps, FormState> {
         }
         return (
             <ComponentToPrint ref={this.componentRef}>
-                <FastballFieldProvider>
-                    <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
-                </FastballFieldProvider>
+                <ContainerContextProvider container={container}>
+                    <FastballFieldProvider container={container}>
+                        <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
+                    </FastballFieldProvider>
+                </ContainerContextProvider>
             </ComponentToPrint>
         )
     }

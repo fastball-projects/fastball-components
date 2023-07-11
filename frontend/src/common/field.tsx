@@ -36,7 +36,7 @@ export const filterEnabled = (item: Displayable) => item.display !== 'Disabled'
 
 export const filterVisibled = (item: Displayable) => item.display !== 'Disabled' && item.display !== 'Hidden'
 
-export const processingField = (componentKey: string, field: FieldInfo, column: ProSchema, parentDataIndex?: string[], __designMode?: string, editableFormRef?: React.RefObject<EditableFormInstance>) => {
+export const processingField = (container: Element, componentKey: string, field: FieldInfo, column: ProSchema, parentDataIndex?: string[], __designMode?: string, editableFormRef?: React.RefObject<EditableFormInstance>) => {
     if (field.display === 'Hidden') {
         column.hideInForm = true;
         column.hideInDescriptions = true;
@@ -86,6 +86,9 @@ export const processingField = (componentKey: string, field: FieldInfo, column: 
                 children: lookupAction.childrenField
             },
             lookup: field.lookup
+        }
+        if (container) {
+            fieldProps.getPopupContainer = () => container
         }
         if (field.lookup.columns?.length) {
             if (field.valueType == 'treeSelect') {
@@ -229,7 +232,7 @@ export const processingField = (componentKey: string, field: FieldInfo, column: 
     }
 }
 
-export const buildTableColumn = (componentKey: string, proTableColumns: ProTableColumn[], field: ColumnInfo, parentDataIndex?: string[], __designMode?: boolean) => {
+export const buildTableColumn = (container: Element, componentKey: string, proTableColumns: ProTableColumn[], field: ColumnInfo, parentDataIndex?: string[], __designMode?: boolean) => {
     if (field.valueType === 'Array') {
         return;
     }
@@ -244,12 +247,12 @@ export const buildTableColumn = (componentKey: string, proTableColumns: ProTable
     }
     const column: ProTableColumn = {}
     Object.assign(column, field, { hideInSearch: true });
-    processingField(componentKey, field, column, __designMode);
+    processingField(container, componentKey, field, column, __designMode);
     if (parentDataIndex) {
         column.dataIndex = [...parentDataIndex, ...field.dataIndex]
     }
     if (field.valueType === 'SubFields' && field.subFields) {
-        field.subFields.forEach(subField => buildTableColumn(componentKey, proTableColumns, subField, field.dataIndex))
+        field.subFields.forEach(subField => buildTableColumn(container, componentKey, proTableColumns, subField, field.dataIndex))
         return;
     }
     if (field.valueType === 'textarea') {
@@ -265,19 +268,26 @@ export const buildTableColumn = (componentKey: string, proTableColumns: ProTable
     return column;
 }
 
-export const buildTableColumns = (componentKey: string, proTableColumns: ProTableColumn[], columns?: ColumnInfo[], queryFields?: FieldInfo[], __designMode?: string) => {
-    columns?.filter(filterEnabled).map(field => buildTableColumn(componentKey, proTableColumns, field)).filter(Boolean).forEach(field => proTableColumns.push(field));
+export const buildTableColumns = (container: Element, componentKey: string, proTableColumns: ProTableColumn[], columns?: ColumnInfo[], queryFields?: FieldInfo[], __designMode?: string) => {
+    columns?.filter(filterEnabled).map(field => buildTableColumn(container, componentKey, proTableColumns, field)).filter(Boolean).forEach(field => proTableColumns.push(field));
 
     queryFields?.filter(filterEnabled).forEach(field => {
         const proTableColumn: ProTableColumn = {};
         Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
-        processingField(componentKey, field, proTableColumn, null, __designMode);
+        processingField(container, componentKey, field, proTableColumn, null, __designMode);
         proTableColumns.push(proTableColumn);
     });
 }
 
-export const FastballFieldProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+interface FastballFieldProviderProps {
+    children: React.ReactNode
+    container?: Element
+}
+
+export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children, container }) => {
+    const getPopupContainer = container ? () => container : undefined;
     return <ProConfigProvider
+        getPopupContainer={getPopupContainer}
         valueTypeMap={{
             SubTable: {
                 render: (data, props) => {

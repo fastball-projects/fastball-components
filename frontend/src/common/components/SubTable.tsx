@@ -1,5 +1,5 @@
 import { EditableFormInstance, ProColumns, RowEditableConfig } from '@fastball/pro-components'
-import { EditableProTable } from '@fastball/pro-table'
+import { EditableProTable } from '@fastball/pro-components'
 import React from 'react';
 import { useState } from 'react';
 import { ActionInfo } from '../../../types';

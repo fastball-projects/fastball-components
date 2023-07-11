@@ -3,6 +3,7 @@ import { Timeline as AntDTimeline, Spin } from 'antd';
 import type { TimelineProps as AntDTimelineProps } from 'antd';
 import { doApiAction } from '../../common'
 import { Data, TimelineProps } from '../../../types';
+import { ContainerContextProvider } from '../../common/ContainerContext';
 
 const mockData: Data[] = [
     {
@@ -35,7 +36,7 @@ const defaultFieldNames: TimelineProps['fieldNames'] = {
     color: 'color'
 }
 
-const Timeline: React.FC<TimelineProps> = ({ componentKey, onRecordClick, onDataLoad, __designMode, fieldNames, recordActions, data, input }) => {
+const Timeline: React.FC<TimelineProps> = ({ container, componentKey, onRecordClick, onDataLoad, __designMode, fieldNames, recordActions, data, input }) => {
     const initData = __designMode === 'design' ? mockData : data
     const timeLineFieldNames = __designMode === 'design' ? defaultFieldNames : fieldNames
     const [timelineData, setTimelineData] = React.useState(initData);
@@ -64,9 +65,11 @@ const Timeline: React.FC<TimelineProps> = ({ componentKey, onRecordClick, onData
     })
 
     return (
-        <AntDTimeline mode='left' {...treeProps}>
-            {items}
-        </AntDTimeline>
+        <ContainerContextProvider container={container}>
+            <AntDTimeline mode='left' {...treeProps}>
+                {items}
+            </AntDTimeline>
+        </ContainerContextProvider>
     )
 };
 

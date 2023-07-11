@@ -1,13 +1,19 @@
 import { Button, Popconfirm, Upload, UploadProps, message } from "antd";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { ApiActionInfo } from "../../../types";
 import { callApi, doApiAction } from "../action";
+import { ContainerContext } from "../ContainerContext";
 
 const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const { actionKey, actionName, trigger, confirmMessage, uploadFileAction } = props;
+
+    const containerContext = useContext(ContainerContext)
+    const container = containerContext?.container
+    const getContainer = container ? () => container : undefined;
+
     const execute = async () => {
         setLoading(true)
         try {
@@ -61,6 +67,8 @@ const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
         return trigger ? <span key={actionKey} onClick={execute}>{trigger}</span> : (<Button key={actionKey} onClick={execute} loading={loading}>{actionName || actionKey}</Button>);
     }
     return <Popconfirm
+        getPopupContainer={getContainer}
+        getTooltipContainer={getContainer}
         title={confirmMessage}
         open={open}
         onConfirm={handleOk}

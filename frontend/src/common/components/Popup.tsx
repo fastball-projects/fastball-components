@@ -1,9 +1,10 @@
-import * as React from 'react'
+import React, { useContext } from 'react'
 import { Modal, Drawer, Popover, PopoverProps, ModalProps, DrawerProps, Space } from 'antd';
 
 import type { PopupInfo, PopupProps, RefComponentInfo } from '../../../types'
 import { loadRefComponent } from '../component'
 import { getByPaths } from '../utils';
+import { ContainerContext } from '../ContainerContext';
 
 const loadPopupComponent = (popupInfo: PopupInfo, input?: any): RefComponentInfo | null => {
     const { popupComponent, dynamicPopup, dynamicPopupRules, conditionPath } = popupInfo;
@@ -46,23 +47,28 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
     const [open, setOpen] = React.useState(false);
     const [actions, setActions] = React.useState<React.ReactNode>([]);
 
+    const containerContext = useContext(ContainerContext)
+    const container = containerContext?.container
+    const getContainer = container ? () => container : undefined;
+
+    const popupComponent = loadPopupComponent(popupInfo, input);
+
+
     const closePopup = () => {
         setOpen(false);
         if (onClose) {
             onClose();
         }
     }
-    const popupComponent = loadPopupComponent(popupInfo, input);
-
     if(!popupComponent) {
         return trigger
     }
 
     if (popupType === 'Popover') {
-        const content = buildPopupComponent(popupComponent, { closePopup, __designMode }, input)
+        const content = buildPopupComponent(popupComponent, { container, closePopup, __designMode }, input)
         const onOpenChange = (visible: boolean) => visible ? setOpen(true) : closePopup()
         // const forceRender = triggerType === 'Hover'
-        const popoverProps: PopoverProps = { title, onOpenChange, open, content, placement: placementType, arrowPointAtCenter: true }
+        const popoverProps: PopoverProps = { title, onOpenChange, open, content, placement: placementType, arrowPointAtCenter: true, getPopupContainer: getContainer, getTooltipContainer: getContainer }
         if (width) {
             popoverProps.overlayStyle = { width }
         }
@@ -95,9 +101,9 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
         navigator.clipboard.writeText(popupComponent.componentInfo.componentClass);
         console.log('Component class: ', popupComponent.componentInfo.componentClass)
     }
-    const content = buildPopupComponent(popupComponent, { closePopup, setActions, __designMode }, input)
+    const content = buildPopupComponent(popupComponent, { container, closePopup, setActions, __designMode }, input)
     const titleComponent = <div onClick={titleClick}>{title}</div>
-    const popupProps: ModalProps = { title: titleComponent, open, footer: <Space>{actions}</Space> }
+    const popupProps: ModalProps = { title: titleComponent, open, footer: <Space>{actions}</Space>, getContainer }
     if (width) {
         popupProps.width = width
     }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import type { AutoCompleteProps } from 'antd';
 import { AutoComplete as AntDAutoComplete, InputNumber, Input, Col, Row } from 'antd';
 import "react-quill/dist/quill.snow.css";
@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { MD5 } from 'object-hash'
 import { doAutoCompleteAction } from "../action";
 import { loadCache, setCache } from "../cache";
+import { ContainerContext } from "../ContainerContext";
 
 type AutoCompleteType = {
     autoCompleteKey: string;
@@ -48,6 +49,11 @@ const CustomInputNumber = ({ onChange, inputValue, ...rest }) => {
 }
 
 const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, dependencyFields, value, inputType, readonly, valueField, fields, onChange }: AutoCompleteType) => {
+
+    const containerContext = useContext(ContainerContext)
+    const container = containerContext?.container
+    const getContainer = container ? () => container : undefined;
+
     let inputComponent;
     if (inputType == 'Number') {
         inputComponent = <CustomInputNumber inputValue={value} readOnly={readonly} />
@@ -94,6 +100,7 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
     }
 
     return <AntDAutoComplete
+        getPopupContainer={getContainer}
         popupMatchSelectWidth={false}
         onChange={onChange}
         options={options}
