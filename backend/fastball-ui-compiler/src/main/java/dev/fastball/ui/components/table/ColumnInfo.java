@@ -14,4 +14,6 @@ public class ColumnInfo extends FieldInfo {
     private boolean sortable;
 
     private boolean copyable;
+
+    private int width;
 }

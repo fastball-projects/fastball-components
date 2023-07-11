@@ -45,7 +45,7 @@ public abstract class AbstractTableFormCompiler<T extends Component> extends Abs
             props.defaultSelected(config.defaultSelected());
         } else {
             props.rowSelectable(false);
-            props.rowEditable(true);
+            props.rowEditable(false);
             props.showReset(true);
         }
         props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, TableFormFieldInfo::new, ((variableElement, formFieldInfo) -> afterFieldBuild(props, variableElement, formFieldInfo))));

@@ -1,13 +1,20 @@
 import * as React from 'react'
-import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance } from "@ant-design/pro-components";
-import { Tag } from "antd";
-import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem } from "../../types";
+import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect } from "@ant-design/pro-components";
+import { Tag, Image } from "antd";
+import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem, ColumnInfo, Data, ReactComponent } from "../../types";
 import { doLookupAction } from "./action";
 import FastballPopup from "./components/Popup";
-import FastballAddress from "./components/Address";
 import { loadRefComponent } from './component';
 import { getByPaths } from './utils';
 import AutoComplete from './components/AutoComplete';
+import { FC } from 'react';
+import RichText from './components/RichText';
+import SubTable from './components/SubTable';
+import FastballTableForm from '../components/FastballTableForm';
+import Address from './components/Address';
+import LookupComponent from './components/Lookup';
+import TreeLookupComponent from './components/TreeLookup';
+import { preview, upload } from './upload';
 
 const formOnlyField: Record<string, boolean> = {
     group: true, formList: true, formSet: true, divider: true, dependency: true,
@@ -17,6 +24,8 @@ const setDateRangeFieldProps = (column: ProSchema, fieldProps: Record<string, an
     column.valueType = 'dateRange'
     column.fieldProps = Object.assign(column.fieldProps || {}, fieldProps)
 }
+
+type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
 export const filterFormOnlyField = (field: FieldInfo) => formOnlyField[field.valueType] !== true
 
@@ -65,10 +74,16 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                 label: lookupAction.labelField,
                 value: lookupAction.valueField,
                 children: lookupAction.childrenField
-            }
+            },
+            lookup: field.lookup
         }
-        if (field.valueType == 'treeSelect') {
-            fieldProps.treeCheckable = lookupAction.multiple
+        if (field.lookup.columns?.length) {
+            if (field.valueType == 'treeSelect') {
+                fieldProps.treeCheckable = lookupAction.multiple
+                column.valueType = 'TreeLookup'
+            } else {
+                column.valueType = 'Lookup'
+            }
         }
         if (lookupAction.multiple) {
             fieldProps.mode = "multiple";
@@ -114,13 +129,13 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
             column.fieldProps = fieldProps
         }
 
-        if(lookupAction.dependencyParams?.length) {
+        if (lookupAction.dependencyParams?.length) {
             column.dependencies = lookupAction.dependencyParams.map(dependencyParam => dependencyParam.paramPath)
             column.params = (record, config) => {
                 const requestParam = {}
                 const rootValues = config?.getRootValues?.()
                 lookupAction.dependencyParams?.forEach(dependencyParam => {
-                    if(dependencyParam.rootValue && rootValues) {
+                    if (dependencyParam.rootValue && rootValues) {
                         requestParam[dependencyParam.paramKey] = getByPaths(rootValues, dependencyParam.paramPath)
                     } else {
                         requestParam[dependencyParam.paramKey] = getByPaths(record, dependencyParam.paramPath)
@@ -130,7 +145,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                 return requestParam
             }
         }
-        
+
         column.request = (params, props) => {
             console.log('lookup request params', params, props)
             return doLookupAction(lookupAction, params, __designMode);
@@ -187,4 +202,140 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
             }
         }
     }
+}
+
+export const buildTableColumn = (proTableColumns: ProTableColumn[], field: ColumnInfo, parentDataIndex?: string[], __designMode?: boolean) => {
+    if (field.valueType === 'Array') {
+        return;
+    }
+    if (field.valueType === 'SubTable') {
+        return;
+    }
+    if (field.valueType === 'RichText') {
+        return;
+    }
+    if (field.valueType === 'MultiAttachment') {
+        return;
+    }
+    const column: ProTableColumn = {}
+    Object.assign(column, field, { hideInSearch: true });
+    processingField(field, column, __designMode);
+    if (parentDataIndex) {
+        column.dataIndex = [...parentDataIndex, ...field.dataIndex]
+    }
+    if (field.valueType === 'SubFields' && field.subFields) {
+        field.subFields.forEach(subField => buildTableColumn(proTableColumns, subField, field.dataIndex))
+        return;
+    }
+    if (field.valueType === 'textarea') {
+        column.ellipsis = true
+    }
+    if (field.width) {
+        column.width = field.width
+    }
+    column.sorter = field.sortable
+    return column;
+}
+
+export const buildTableColumns = (proTableColumns: ProTableColumn[], columns?: ColumnInfo[], queryFields?: FieldInfo[], __designMode?: string) => {
+    columns?.filter(filterEnabled).map(field => buildTableColumn(proTableColumns, field)).filter(Boolean).forEach(field => proTableColumns.push(field));
+
+    queryFields?.filter(filterEnabled).forEach(field => {
+        const proTableColumn: ProTableColumn = {};
+        Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
+        processingField(field, proTableColumn, __designMode);
+        proTableColumns.push(proTableColumn);
+    });
+}
+
+export const FastballFieldProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+    return <ProConfigProvider
+        valueTypeMap={{
+            SubTable: {
+                render: (data, props) => {
+                    const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                    return <SubTable size="small" {...props} {...props.fieldProps} name={name} readonly />
+                },
+                renderFormItem: (data, props, dom) => {
+                    const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                    return <SubTable size="small" {...props} {...props?.fieldProps} name={name} />
+                }
+            },
+            TableForm: {
+                render: (data, props) => {
+                    return <FastballTableForm {...props} {...props.fieldProps} readonly />
+                },
+                renderFormItem: (data, props) => {
+                    return <FastballTableForm {...props} {...props?.fieldProps} />
+                }
+            },
+            Address: {
+                render: (value, props) => <Address {...props} {...props?.fieldProps} value={value} readonly />,
+                renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
+            },
+            Lookup: {
+                render: (value, props) => <ProFormSelect {...props} {...props?.fieldProps} value={value} readonly />,
+                renderFormItem: (text, props, dom) => {
+                    return <LookupComponent {...props} {...props?.fieldProps} />
+                }
+            },
+            TreeLookup: {
+                render: (value, props) => <ProFormTreeSelect {...props} {...props?.fieldProps} value={value} readonly />,
+                renderFormItem: (text, props, dom) => {
+                    return <TreeLookupComponent {...props} {...props?.fieldProps} />
+                }
+            },
+            AutoComplete: {
+                render: (text) => text,
+                renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} input={props?.record} />
+            },
+            RichText: {
+                render: (text) => <RichText {...props} {...props?.fieldProps} readOnly />,
+                renderFormItem: (text, props, dom) => <RichText {...props} {...props?.fieldProps} />
+            },
+            Attachment: {
+                render: (value) => {
+                    return <Image src={value?.url} />
+                },
+                renderFormItem: (value, props) => {
+                    const fieldProps = Object.assign({}, props?.fieldProps)
+                    fieldProps.customRequest = upload;
+                    fieldProps.previewFile = preview;
+                    fieldProps.multiple = true;
+                    fieldProps.listType = 'picture-card';
+                    fieldProps.onChange = (values) => {
+                        console.log('onChange', values)
+                        props?.fieldProps?.onChange?.(values.fileList[0])
+                    }
+                    const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                    const fieldValue = value ? [value] : []
+                    return <ProFormUploadButton max={1} {...props} name={name} fieldProps={fieldProps} value={fieldValue} />
+                }
+            },
+            MultiAttachment: {
+                render: (value, props) => {
+                    const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                    const fieldValue = Array.isArray(value) ? value : value.fileList
+                    const fieldProps = { showUploadList: { showRemoveIcon: false } }
+                    return <ProFormUploadButton {...props} name={name} value={fieldValue} fieldProps={fieldProps} readonly />
+                },
+                renderFormItem: (value, props) => {
+                    const fieldProps = Object.assign({}, props?.fieldProps)
+                    fieldProps.customRequest = upload;
+                    fieldProps.previewFile = preview;
+                    fieldProps.multiple = true;
+                    fieldProps.listType = 'picture-card';
+                    fieldProps.onChange = (values) => {
+                        console.log('onChange', values)
+                        props?.fieldProps?.onChange?.(values.fileList)
+                    }
+                    const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
+                    const fieldValue = Array.isArray(value) ? value : value.fileList
+                    return <ProFormUploadButton {...props} name={name} fieldProps={fieldProps} value={fieldValue} />
+                }
+            }
+        }}
+    >
+        {children}
+    </ProConfigProvider>
 }

@@ -116,6 +116,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 if (StringUtils.hasLength(fieldConfig.title())) {
                     field.setTitle(fieldConfig.title());
                 }
+                field.setWidth(fieldConfig.width());
                 field.setOrder(fieldConfig.order());
             }
         }
@@ -148,6 +149,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 tableColumn.setCopyable(true);
             }
             if (tableField != null) {
+                tableColumn.setWidth(tableField.width());
                 tableColumn.setDisplay(tableField.display());
             }
         });

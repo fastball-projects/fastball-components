@@ -1,4 +1,5 @@
 import { MutableRefObject } from 'react'
+import { ProFieldFCRenderProps } from '@ant-design/pro-components'
 import { ReactComponent } from "./component"
 import { ValidationRule } from './validation'
 
@@ -119,6 +120,8 @@ export type LookupActionInfo = {
     multiple: boolean
     showSearch: boolean
     childrenField?: string
+    columns?: ColumnInfo[]
+    queryFields?: FieldInfo[]
     dependencyParams?: DependencyParamInfo[]
     extraFillFields: LookupFillFieldInfo[]
 }
@@ -198,6 +201,23 @@ export type ExpressionInfo = {
      */
     expression: string;
 }
+
+export type LookupProps = {
+    lookup: LookupActionInfo
+    multiple?: boolean
+} & ProFieldFCRenderProps
+
+
+export type LookupSelectableTableProps = {
+    lookup: LookupActionInfo
+    multiple?: boolean
+    closeDropdown: Function
+} & ProFieldFCRenderProps
+
+export type TreeLookupProps = {
+    lookup: TreeLookupActionInfo
+    multiple?: boolean
+} & ProFieldFCRenderProps
 
 export type LoadDataType = () => any
 

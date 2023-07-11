@@ -33,6 +33,8 @@ public interface TableProps extends ComponentProps {
 
     TableSize size();
 
+    int pageSize();
+
     ReferencedComponentInfo rowExpandedComponent();
 
     List<ColumnInfo> columns();

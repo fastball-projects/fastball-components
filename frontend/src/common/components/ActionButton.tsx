@@ -5,9 +5,14 @@ import { callApi, doApiAction } from "../action";
 
 const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const { actionKey, actionName, trigger, confirmMessage, uploadFileAction } = props;
-    const execute = async () => await doApiAction(props);
+    const execute = async () => {
+        setLoading(true)
+        await doApiAction(props);
+        setLoading(false)
+    }
 
     const showPopconfirm = () => {
         setOpen(true);
@@ -41,9 +46,9 @@ const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
                 }
             },
         };
-        return <Upload {...uploadProps}>{trigger || <Button key={actionKey}>{actionName || actionKey}</Button>}</Upload>
+        return <Upload {...uploadProps}>{trigger || <Button key={actionKey} loading={loading}>{actionName || actionKey}</Button>}</Upload>
     } else if (!confirmMessage) {
-        return trigger ? <span key={actionKey} onClick={execute}>{trigger}</span> : (<Button key={actionKey} onClick={execute}>{actionName || actionKey}</Button>);
+        return trigger ? <span key={actionKey} onClick={execute}>{trigger}</span> : (<Button key={actionKey} onClick={execute} loading={loading}>{actionName || actionKey}</Button>);
     }
     return <Popconfirm
         title={confirmMessage}
@@ -51,7 +56,7 @@ const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
         onConfirm={handleOk}
         okButtonProps={{ loading: confirmLoading }}
         onCancel={handleCancel}
-    >{trigger ? <span key={actionKey} onClick={showPopconfirm}>{trigger}</span> : (<Button key={actionKey} onClick={showPopconfirm}>{actionName || actionKey}</Button>)}</Popconfirm>
+    >{trigger ? <span key={actionKey} onClick={showPopconfirm}>{trigger}</span> : (<Button key={actionKey} onClick={showPopconfirm} loading={loading}>{actionName || actionKey}</Button>)}</Popconfirm>
 
 }
 

@@ -2,8 +2,9 @@ import * as React from 'react'
 import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProFormUploadButton, ProFormUploadDragger, ProSchema, ProCard } from '@ant-design/pro-components'
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
-import { buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
+import { FastballFieldProvider, buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
 import { Button, Upload, Image, Spin } from 'antd';
+import dayjs from 'dayjs';
 import SubTable, { EDIT_ID } from '../../common/components/SubTable';
 import Address from '../../common/components/Address';
 import { ComponentToPrint } from '../../common/components/Printer';
@@ -156,8 +157,12 @@ class FastballForm extends React.Component<FormProps, FormState> {
             }
             if (field.valueType === 'digit') {
                 formColumn.fieldProps = Object.assign(formColumn.formItemProps || {}, {
-                    style: { width: '100%' }
+                    style: { width: '100%' },
+                    precision: 2
                 })
+            }
+            if (!readonly && (field.valueType === 'dateTime' || field.valueType === 'date')) {
+                formColumn.initialValue = dayjs()
             }
             if (field.valueType === 'SubFields' && field.subFields) {
                 formColumn.valueType = 'group'
@@ -180,7 +185,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.dependencies = field.expression.fields;
                 formColumn.formItemProps = (formInstance, config): any => {
                     const getParent = (level?: number) => {
-                        if ( !parentDataPath) {
+                        if (!parentDataPath) {
                             return formInstance.getFieldsValue();
                         }
                         let parentLevel = level;
@@ -344,83 +349,9 @@ class FastballForm extends React.Component<FormProps, FormState> {
         }
         return (
             <ComponentToPrint ref={this.componentRef}>
-                <ProConfigProvider
-                    valueTypeMap={{
-                        SubTable: {
-                            render: (data, props) => {
-                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                return <SubTable size="small" {...props} {...props.fieldProps} name={name} readonly />
-                            },
-                            renderFormItem: (data, props, dom) => {
-                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                return <SubTable size="small" {...props} {...props?.fieldProps} name={name} />
-                            }
-                        },
-                        TableForm: {
-                            render: (data, props) => {
-                                return <FastballTableForm {...props} {...props.fieldProps} readonly />
-                            },
-                            renderFormItem: (data, props) => {
-                                return <FastballTableForm {...props} {...props?.fieldProps} />
-                            }
-                        },
-                        Address: {
-                            render: (value, props) => <Address {...props} {...props?.fieldProps} value={value} readonly />,
-                            renderFormItem: (text, props, dom) => <Address {...props} {...props?.fieldProps} />
-                        },
-                        AutoComplete: {
-                            render: (text) => text,
-                            renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} input={props?.record} />
-                        },
-                        RichText: {
-                            render: (text) => <RichText {...props} {...props?.fieldProps} readOnly />,
-                            renderFormItem: (text, props, dom) => <RichText {...props} {...props?.fieldProps} />
-                        },
-                        Attachment: {
-                            render: (value) => {
-                                return <Image src={value?.url} />
-                            },
-                            renderFormItem: (value, props) => {
-                                const fieldProps = Object.assign({}, props?.fieldProps)
-                                fieldProps.customRequest = upload;
-                                fieldProps.previewFile = preview;
-                                fieldProps.multiple = true;
-                                fieldProps.listType = 'picture-card';
-                                fieldProps.onChange = (values) => {
-                                    console.log('onChange', values)
-                                    props?.fieldProps?.onChange?.(values.fileList[0])
-                                }
-                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                const fieldValue = value ? [value] : []
-                                return <ProFormUploadButton max={1} {...props} name={name} fieldProps={fieldProps} value={fieldValue} />
-                            }
-                        },
-                        MultiAttachment: {
-                            render: (value, props) => {
-                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                const fieldValue = Array.isArray(value) ? value : value.fileList
-                                const fieldProps = { showUploadList: { showRemoveIcon: false } }
-                                return <ProFormUploadButton {...props} name={name} value={fieldValue} fieldProps={fieldProps} readonly />
-                            },
-                            renderFormItem: (value, props) => {
-                                const fieldProps = Object.assign({}, props?.fieldProps)
-                                fieldProps.customRequest = upload;
-                                fieldProps.previewFile = preview;
-                                fieldProps.multiple = true;
-                                fieldProps.listType = 'picture-card';
-                                fieldProps.onChange = (values) => {
-                                    console.log('onChange', values)
-                                    props?.fieldProps?.onChange?.(values.fileList)
-                                }
-                                const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
-                                const fieldValue = Array.isArray(value) ? value : value.fileList
-                                return <ProFormUploadButton {...props} name={name} fieldProps={fieldProps} value={fieldValue} />
-                            }
-                        }
-                    }}
-                >
+                <FastballFieldProvider>
                     <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
-                </ProConfigProvider>
+                </FastballFieldProvider>
             </ComponentToPrint>
         )
     }

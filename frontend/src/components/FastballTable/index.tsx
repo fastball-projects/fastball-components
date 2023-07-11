@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { ProTable, ProConfigProvider } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo, ApiActionInfo } from '../../../types';
-import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField } from '../../common';
+import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField, buildTableColumns, FastballFieldProvider } from '../../common';
 import { Button, Dropdown, MenuProps, Space, Image } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import Address from '../../common/components/Address';
@@ -29,39 +29,9 @@ const buildMockData = (columns: ColumnInfo[]) => {
 
 const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
-    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { labelWidth: "auto", filterType: lightQuery ? 'light' : 'query'} };
+    const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, rowKey: 'id', search: { labelWidth: "auto", filterType: lightQuery ? 'light' : 'query' } };
     const proTableColumns: ProTableColumn[] = [];
     const [searchState, setSearchState] = useState({});
-
-    const buildTableColumns = (field: ColumnInfo, parentDataIndex?: string[]) => {
-        if (field.valueType === 'Array') {
-            return;
-        }
-        if (field.valueType === 'SubTable') {
-            return;
-        }
-        if (field.valueType === 'RichText') {
-            return;
-        }
-        if (field.valueType === 'MultiAttachment') {
-            return;
-        }
-        const column: ProTableColumn = {}
-        Object.assign(column, field, { hideInSearch: true });
-        processingField(field, column, __designMode);
-        if (parentDataIndex) {
-            column.dataIndex = [...parentDataIndex, ...field.dataIndex]
-        }
-        if (field.valueType === 'SubFields' && field.subFields) {
-            field.subFields.forEach(subField => buildTableColumns(subField, field.dataIndex))
-            return;
-        }
-        if (field.valueType === 'textarea') {
-            column.ellipsis = true
-        }
-        column.sorter = field.sortable
-        proTableColumns.push(column);
-    }
 
     if (__designMode === 'design') {
         proTableProps.dataSource = buildMockData(columns);
@@ -90,13 +60,13 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         }
     }
 
-    if(showRowIndex) {
+    if (showRowIndex) {
         proTableColumns.push({
             title: '序号',
             dataIndex: '__row_index',
             readonly: true,
             renderText: (_dom, _entity, index, { pageInfo }) => {
-                if(!pageInfo) {
+                if (!pageInfo) {
                     return index + 1;
                 }
                 return (pageInfo.current - 1) * pageInfo.pageSize + index + 1
@@ -104,16 +74,9 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         })
     }
 
-    columns.filter(filterEnabled).forEach(field => buildTableColumns(field));
+    buildTableColumns(proTableColumns, columns, queryFields, __designMode)
 
-    if (queryFields) {
-        queryFields.filter(filterEnabled).forEach(field => {
-            const proTableColumn: ProTableColumn = {};
-            processingField(field, proTableColumn, __designMode);
-            Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
-            proTableColumns.push(proTableColumn);
-        });
-    } else {
+    if(!queryFields) {
         proTableProps.search = false;
     }
 
@@ -153,6 +116,9 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                     return { key: actionKey, label: buildAction(actionInfo) }
                 }).filter(action => action != null) : [];
 
+                if (!items?.length) {
+                    return null;
+                }
                 return (
                     <Dropdown menu={{ items }}>
                         <a onClick={(e) => e.preventDefault()}>
@@ -177,7 +143,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
 
     proTableProps.expandable = {}
 
-    if(!pageable) {
+    if (!pageable) {
         proTableProps.pagination = false
     }
 
@@ -203,16 +169,9 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         }
     }
 
-    return <ProConfigProvider valueTypeMap={{
-        Address: {
-            render: (value, props) => <Address {...props} {...props?.fieldProps} value={value} readonly />,
-        },
-        Attachment: {
-            render: (value) => <Image src={value?.url} />
-        }
-    }} >
+    return <FastballFieldProvider>
         <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
-    </ProConfigProvider>
+    </FastballFieldProvider>
 }
 
 

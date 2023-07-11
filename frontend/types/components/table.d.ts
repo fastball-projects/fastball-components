@@ -4,6 +4,7 @@ import { BasicComponentProps, MultiDataComponent } from '../component'
 export type ColumnInfo = {
     sortable?: boolean
     copyable?: boolean
+    width?: number
 } & FieldInfo
 
 export type TableRecordActionInfo = ApiActionInfo & PopupActionInfo

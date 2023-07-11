@@ -9,6 +9,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableField {
 
+    int width() default 100;
+
     boolean copyable() default false;
 
     boolean sortable() default false;

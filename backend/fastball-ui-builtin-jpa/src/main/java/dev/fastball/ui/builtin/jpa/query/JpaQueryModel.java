@@ -22,6 +22,8 @@ public abstract class JpaQueryModel<T> {
         return this::toPredicate;
     }
 
+    protected abstract Class<T> modelClass();
+
     protected abstract Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder);
 
     protected Predicate equalPredicate(Object value, String fieldName, Root<?> root, CriteriaBuilder criteriaBuilder) {

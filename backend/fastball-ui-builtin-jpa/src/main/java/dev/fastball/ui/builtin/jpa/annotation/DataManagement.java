@@ -6,4 +6,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
 public @interface DataManagement {
+
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.CLASS)
+    @interface QueryIgnore {
+
+    }
 }

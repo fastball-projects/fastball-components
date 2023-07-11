@@ -7,6 +7,8 @@ import FastballForm from "../FastballForm";
 import { buildAction, doApiAction, filterVisibled, processingField } from "../../common";
 import { ComponentToPrint } from "../../common/components/Printer";
 
+const EDIT_ID = '__edit_id';
+
 const buildTableColumn = (field: TableFormFieldInfo, parentDataIndex?: string[], __designMode?: string): ProColumns | undefined => {
     if (field.valueType === 'Array') {
         return;
@@ -55,12 +57,13 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     buildButtons(buttons: any[], actions?: ActionInfo[]) {
-        const { componentKey, closePopup, rowKey, rowSelectable, input } = this.props;
-        const loadData = () => {
+        const { componentKey, closePopup, rowSelectable, input } = this.props;
+        const loadData = async () => {
+            const values = await this.editableFormRef.current!.validateFieldsReturnFormatValue!()
             const { dataSource, selectedRowKeyMap } = this.state;
             let data = dataSource;
             if (rowSelectable) {
-                data = dataSource.filter(record => selectedRowKeyMap[record[rowKey]])
+                data = dataSource.filter(record => selectedRowKeyMap[record[EDIT_ID]])
             }
             return [data, input];
         }
@@ -83,17 +86,17 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
         return buttons;
     }
 
-    onDataSourceChange(dataSource: readonly Data[]) {
-        this.setState({ dataSource: [...dataSource] })
+    onDataSourceChange(dataSource: Data[]) {
+        this.setState({ dataSource })
     }
 
     buildTable() {
-        const { fields, componentKey, onDataLoad, rowKey, rowEditable, rowSelectable, input, __designMode } = this.props;
+        const { fields, componentKey, onDataLoad, rowEditable, rowSelectable, input, __designMode } = this.props;
         const { dataSource } = this.state;
 
         let editable: RowEditableConfig<Record<string, any>> = {
             type: 'multiple',
-            editableKeys: rowKey ? dataSource?.map(record => record[rowKey]) : dataSource?.map((record, i) => i.toString()),
+            editableKeys: dataSource?.map((record, i) => i.toString()),
             actionRender: (_dom, { index }) => [<Button type='link' onClick={() => {
                 this.setState({ dataIndex: index, formOpen: true })
                 this.formRef.current?.resetFields
@@ -105,14 +108,14 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
         }
 
         const tableColumns: ProColumns[] = []
-        fields.filter(({ hideInTable }) => !hideInTable).map(field => ({ ...field })).forEach(field => {
+        fields.filter(filterVisibled).filter(({ hideInTable }) => !hideInTable).map(field => ({ ...field })).forEach(field => {
             const column = buildTableColumn(field, undefined, __designMode)
             if (column) {
                 tableColumns.push(column)
             }
         })
-        const tableProps: ProTableProps<Data, any> = { rowKey, search: false, columns: tableColumns }
-        if(rowEditable) {
+        const tableProps: ProTableProps<Data, any> = { rowKey: EDIT_ID, search: false, columns: tableColumns }
+        if (rowEditable) {
             tableColumns.push({
                 title: '操作', valueType: 'option',
                 render: (_dom, _record, dataIndex) => <Button type='link' onClick={() => {
@@ -121,16 +124,17 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
                 }}>编辑</Button>
             })
         }
-       
+
         tableProps.request = async () => {
             const apiActionInfo: ApiActionInfo = { componentKey, type: 'API', actionKey: 'loadData', data: [input] }
             const result: Data[] = await doApiAction(apiActionInfo)
+            result.forEach((record, i) => record[EDIT_ID] = i.toString())
             if (onDataLoad) {
                 onDataLoad(result);
             }
             const state = { dataSource: result, selectedRowKeyMap: {} }
             if (rowSelectable) {
-                result.forEach(record => state.selectedRowKeyMap[record[rowKey]] = true)
+                result.forEach(record => state.selectedRowKeyMap[record[EDIT_ID]] = true)
             }
             this.setState(state)
             return result;

@@ -88,38 +88,53 @@ const SubTable: React.FC<{
         }
     }
 
+
+
     const tableColumns: ProColumns[] = [{
         title: '序号',
         dataIndex: '__row_index',
         readonly: true,
         renderText: (_dom, _entity, index) => index + 1
-    }, ...columns.filter(({ valueType }) => valueType !== 'SubTable'), {
-        title: '操作',
-        valueType: 'option',
-        render: (_dom, record) => {
-            const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
-                const { actionKey, actionName, refresh } = action;
-                const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
-                if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
+    }, ...columns.filter(({ valueType }) => valueType !== 'SubTable'), ]
+
+    if (recordActions?.length) {
+        tableColumns.push({
+            title: '操作',
+            fixed: 'right',
+            valueType: 'option',
+            render: (_dom, record) => {
+                const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                    const { actionKey, actionName, refresh } = action;
+                    const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
+                    if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
+                        return null;
+                    }
+                    const trigger = actionName || actionKey
+                    const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
+                    return { key: actionKey, label: buildAction(actionInfo) }
+                }).filter(action => action != null) : [];
+                if(!items?.length) {
                     return null;
                 }
-                const trigger = actionName || actionKey
-                const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
-                return { key: actionKey, label: buildAction(actionInfo) }
-            }).filter(action => action != null) : [];
-
-            return (
-                <Dropdown menu={{ items }}>
-                    <a onClick={(e) => e.preventDefault()}>
-                        <Space>
-                            操作
-                            <DownOutlined />
-                        </Space>
-                    </a>
-                </Dropdown>
-            )
-        }
-    }]
+                return (
+                    <Dropdown menu={{ items }}>
+                        <a onClick={(e) => e.preventDefault()}>
+                            <Space>
+                                操作
+                                <DownOutlined />
+                            </Space>
+                        </a>
+                    </Dropdown>
+                )
+            }
+        })
+    } else if(readonly) {
+        tableColumns.push({
+            title: '操作',
+            fixed: 'right',
+            valueType: 'option'
+        })   
+    }
 
     return (
         <EditableProTable<Record<string, any>>

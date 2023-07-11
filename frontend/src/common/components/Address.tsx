@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Cascader } from 'antd';
-import options from '../../data/pcas.json'
+import options from '../../data/pca.json'
 
 const allOption = options as AddressOption[]
 
@@ -66,7 +66,9 @@ const Address: React.FC<{
             if (!code) {
                 return text;
             }
-            text += optionMap[code].name
+            if (optionMap[code]) {
+                text += optionMap[code].name
+            }
         }
         return text;
     }

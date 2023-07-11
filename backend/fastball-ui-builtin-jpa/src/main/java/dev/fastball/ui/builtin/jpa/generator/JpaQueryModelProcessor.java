@@ -47,11 +47,13 @@ public class JpaQueryModelProcessor implements FastballGenerateCompileGenerator 
         TypeSpec.Builder typeBuilder = typeBuilder(element);
         MethodSpec.Builder predicateBuilder = buildPredicateBuilder(element);
         ElementCompileUtils.getFields(element, processingEnv).entrySet().stream()
+                .filter(fieldInfo -> fieldInfo.getValue().getAnnotation(DataManagement.QueryIgnore.class) == null)
                 .map(fieldInfo -> buildQueryField(fieldInfo.getKey(), fieldInfo.getValue(), predicateBuilder, processingEnv))
                 .filter(Objects::nonNull)
                 .forEach(typeBuilder::addField);
         predicateBuilder.addStatement(PREDICATE_METHOD_RETURN, Predicate.class);
         typeBuilder.addMethod(predicateBuilder.build());
+        typeBuilder.addMethod(modelClassBuilder(element));
         JavaFile queryModelFile = JavaFile.builder(getPackageName(element, processingEnv), typeBuilder.build()).build();
         try {
             queryModelFile.writeTo(processingEnv.getFiler());
@@ -69,6 +71,14 @@ public class JpaQueryModelProcessor implements FastballGenerateCompileGenerator 
                 .addParameter(ParameterizedTypeName.get(ClassName.get(CriteriaQuery.class), WildcardTypeName.subtypeOf(Object.class)), "query")
                 .addParameter(CriteriaBuilder.class, "criteriaBuilder")
                 .addStatement("$T<Predicate> predicates = new $T<>()", List.class, ArrayList.class);
+    }
+
+    private MethodSpec modelClassBuilder(TypeElement element) {
+        return MethodSpec.methodBuilder("modelClass")
+                .addModifiers(Modifier.PROTECTED)
+                .addAnnotation(Override.class)
+                .returns(ParameterizedTypeName.get(ClassName.get(Class.class), ClassName.get(element)))
+                .addStatement("return $T.class", ClassName.get(element)).build();
     }
 
     private FieldSpec buildQueryField(String name, VariableElement field, MethodSpec.Builder toPredicateBuilder, ProcessingEnvironment processingEnv) {
@@ -228,6 +238,7 @@ public class JpaQueryModelProcessor implements FastballGenerateCompileGenerator 
         }
         AnnotationSpec.Builder lookupAnnotationBuilder = AnnotationSpec.get(lookupMirror).toBuilder();
         lookupAnnotationBuilder.members.put("value", Collections.singletonList(CodeBlock.of("$L", lookupActionElement.getQualifiedName() + ".class")));
+        lookupAnnotationBuilder.members.put("extraFillFields", Collections.singletonList(CodeBlock.of("$L", "{}")));
         toPredicateBuilder
                 .beginControlFlow("if ($L != null)", name)
                 .addStatement("predicates.add(inPredicate($L, $S, root, criteriaBuilder))", name, name)
