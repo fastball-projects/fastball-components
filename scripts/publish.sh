@@ -22,15 +22,13 @@ publish_frontend() {
     echo "installing dependency..."
     # pnpm i
     npx pnpm@7 install
-    # yarn
     echo "build & publish fastball component frontend ..."
-    # if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
-    #     npm run prepublish && npm publish
-    # else
-    #     # npm run prepublish && npm publish --registry http://82.157.239.41:7777/repository/npm-hosted/
+    if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
+        npm run prepublish && npm publish
+    else
+        # npm run prepublish && npm publish --registry http://82.157.239.41:7777/repository/npm-hosted/
         npm run prepublish && npm publish --registry https://bitbean-npm.pkg.coding.net/fastball/npm
-    # fi
-    # npm run prepublish && npm publish --registry https://registry.npmjs.org
+    fi
     echo "fastball component frontend published."
     npm_version_line=$(grep -n 'npmVersion' ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml | cut -d ':' -f1)
     sed -i '' "${npm_version_line}s/.*/npmVersion: $frontend_version/" ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml
