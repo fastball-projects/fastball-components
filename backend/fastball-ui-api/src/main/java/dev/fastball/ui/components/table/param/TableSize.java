@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @since 2023/1/30
  */
 public enum TableSize {
+    Default(""),
     Small("small"),
     Middle("middle"),
     Large("large");

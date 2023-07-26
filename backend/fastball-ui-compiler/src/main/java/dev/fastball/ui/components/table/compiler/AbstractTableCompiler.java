@@ -12,6 +12,7 @@ import dev.fastball.ui.components.table.ColumnInfo;
 import dev.fastball.ui.components.table.TableProps_AutoValue;
 import dev.fastball.ui.components.table.config.*;
 import dev.fastball.ui.components.table.param.TableSearchParam;
+import dev.fastball.ui.components.table.param.TableSize;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -70,7 +71,9 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
             if (!tableConfig.childrenFieldName().isEmpty()) {
                 props.childrenFieldName(tableConfig.childrenFieldName());
             }
-            props.size(tableConfig.size());
+            if (tableConfig.size() != TableSize.Default) {
+                props.size(tableConfig.size());
+            }
             props.keywordSearch(tableConfig.keywordSearch());
             props.lightQuery(tableConfig.lightQuery());
             props.pageable(tableConfig.pageable());
@@ -92,7 +95,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         }
 
         props.columns(props.columns().stream().sorted().collect(Collectors.toList()));
-        if (props.queryFields() != null) {
+        if (props.queryFields() != null && (tableConfig == null || tableConfig.queryable())) {
             props.queryFields(props.queryFields().stream().sorted().collect(Collectors.toList()));
         }
     }

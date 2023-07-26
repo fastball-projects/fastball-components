@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { BetaSchemaForm, EditableFormInstance, ProConfigProvider, ProForm, ProFormUploadButton, ProFormUploadDragger, ProSchema, ProCard } from '@ant-design/pro-components'
+import { EditableFormInstance, ProConfigProvider, ProForm, ProFormUploadButton, ProFormUploadDragger, ProSchema, ProCard } from '@ant-design/pro-components'
+import { BetaSchemaForm } from '@fastball/pro-form';
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@ant-design/pro-components';
 import { ConditionComposeType, Data, FieldDependencyInfo, FieldInfo, FormFieldInfo, FormProps } from '../../../types';
 import { FastballFieldProvider, buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
@@ -157,7 +158,6 @@ class FastballForm extends React.Component<FormProps, FormState> {
             }
             if (field.valueType === 'digit') {
                 formColumn.fieldProps = Object.assign(formColumn.formItemProps || {}, {
-                    style: { width: '100%' },
                     precision: 2
                 })
             }
@@ -176,7 +176,8 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     name: formColumn.name,
                     parentName: parentDataIndex,
                     editableFormRef,
-                    recordActions: field.subTableRecordActions
+                    recordActions: field.subTableRecordActions,
+                    creatorButtonText: field.subTableCreatorButtonText
                 })
                 formColumn.initialValue = []
                 formColumn.title = null;
@@ -243,6 +244,13 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     const groupColumns = getGroupColumns(config);
                     return groupColumns;
                 };
+                if (field.subTableCreatorButtonText) {
+                    formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                        creatorButtonProps: {
+                            creatorButtonText: field.subTableCreatorButtonText
+                        }
+                    })
+                }
                 formColumn.columns = [subFieldColumn]
                 if (readonly || field.readonly) {
                     formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {

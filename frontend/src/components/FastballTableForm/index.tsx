@@ -2,7 +2,8 @@ import { ActionInfo, ApiActionInfo, Data, FormProps, TableFormFieldInfo, TableFo
 import React from "react";
 import { MD5 } from 'object-hash'
 import { Button, Drawer, Space } from "antd";
-import { EditableFormInstance, EditableProTable, ProColumns, ProFormInstance, ProTable, ProTableProps, RowEditableConfig } from "@ant-design/pro-components";
+import { EditableFormInstance, ProColumns, ProFormInstance, ProTable, ProTableProps, RowEditableConfig } from "@ant-design/pro-components";
+import { EditableProTable } from '@fastball/pro-table'
 import FastballForm from "../FastballForm";
 import { buildAction, doApiAction, filterVisibled, processingField } from "../../common";
 import { ComponentToPrint } from "../../common/components/Printer";

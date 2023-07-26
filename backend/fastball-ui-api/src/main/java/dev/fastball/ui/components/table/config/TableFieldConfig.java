@@ -16,7 +16,7 @@ public @interface TableFieldConfig {
 
     int order() default 0;
 
-    int width() default 100;
+    int width() default 0;
 
     boolean copyable() default false;
 

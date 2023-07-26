@@ -52,3 +52,19 @@
     box-sizing: border-box;
     cursor: se-resize;
 }
+// 用来覆盖有颜色的枚举, 以呈现可点击的交互
+.fb-popup-trigger .ant-badge.ant-badge-status span.ant-badge-status-text {
+    color:#1677ff
+}
+
+.light-row {
+
+}
+
+.dark-row {
+    background-color: #f8f8f8;
+}
+
+.row-expanded-component {
+    margin-left: 40px;
+}

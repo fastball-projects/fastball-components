@@ -7,6 +7,12 @@ export type ColumnInfo = {
     width?: number
 } & FieldInfo
 
+export type SummaryField = {
+    index: number
+    colSpan: number
+    value: any
+} & FieldInfo
+
 export type TableRecordActionInfo = ApiActionInfo & PopupActionInfo
 
 export type TableProps = {
@@ -24,21 +30,6 @@ export type TableProps = {
     actions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
     originalOptionRender?: (Data, number) => ReactNode
-    rowExpandedComponent?: ReferencedComponent
-} & BasicComponentProps & MultiDataComponent
-
-
-
-export type TableProps = {
-    headerTitle?: string
-    childrenFieldName?: string
-    wrappedSearch: boolean
-    keywordSearch: boolean
-    size: TableSize
-    columns: ColumnInfo[]
-    queryFields: FieldInfo[]
-    actions?: ActionInfo[]
-    recordActions?: TableRecordActionInfo[]
     rowExpandedComponent?: ReferencedComponent
 } & BasicComponentProps & MultiDataComponent
 

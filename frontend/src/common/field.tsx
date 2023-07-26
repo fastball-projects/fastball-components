@@ -79,11 +79,13 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         }
         if (field.lookup.columns?.length) {
             if (field.valueType == 'treeSelect') {
-                fieldProps.treeCheckable = lookupAction.multiple
                 column.valueType = 'TreeLookup'
             } else {
                 column.valueType = 'Lookup'
             }
+        }
+        if (field.valueType == 'treeSelect') {
+            fieldProps.treeCheckable = lookupAction.multiple
         }
         if (lookupAction.multiple) {
             fieldProps.mode = "multiple";
@@ -168,7 +170,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                 dom = <ProFormField mode="read" {...fieldConfig} />
             }
             const popupInfo = field.popupInfo!;
-            const props: PopupProps = { trigger: <a>{dom}</a>, popupInfo }
+            const props: PopupProps = { trigger: <a className='fb-popup-trigger'>{dom}</a>, popupInfo }
             if (popupInfo.popupComponent.currentFieldInput) {
                 props.input = getByPaths(record, field.dataIndex)
             } else {

@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableField {
 
-    int width() default 100;
+    int width() default 0;
 
     boolean copyable() default false;
 

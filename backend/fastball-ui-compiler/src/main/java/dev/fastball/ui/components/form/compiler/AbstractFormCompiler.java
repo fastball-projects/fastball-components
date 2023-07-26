@@ -6,7 +6,6 @@ import dev.fastball.compile.exception.CompilerException;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.annotation.Field;
-import dev.fastball.core.annotation.RecordAction;
 import dev.fastball.core.component.Component;
 import dev.fastball.core.component.DownloadFile;
 import dev.fastball.core.info.action.ActionInfo;
@@ -17,7 +16,6 @@ import dev.fastball.ui.components.form.config.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -193,6 +191,10 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         if (fieldDependency != null) {
             fieldInfo.setFieldDependencyType(fieldDependency.type());
             fieldInfo.setFieldDependencyInfoList(Collections.singletonList(buildFieldDependencyInfo(fieldDependency)));
+        }
+        FormListConfig formListConfig = variableElement.getAnnotation(FormListConfig.class);
+        if (formListConfig != null) {
+            fieldInfo.setSubTableCreatorButtonText(formListConfig.creatorButtonText());
         }
     }
 

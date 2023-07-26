@@ -18,6 +18,7 @@ export type FormProps = {
 } & BasicComponentProps & PopupComponentProps
 
 export type FormFieldInfo = {
+    subTableCreatorButtonText?: String
     subTableRecordActions?: ActionInfo[]
     fieldDependencyInfoList?: FieldDependencyInfo[]
     conditionComposeType?: ConditionComposeType

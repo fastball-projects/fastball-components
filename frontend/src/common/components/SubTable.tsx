@@ -1,4 +1,5 @@
-import { EditableFormInstance, EditableProTable, ProColumns, RowEditableConfig } from '@ant-design/pro-components'
+import { EditableFormInstance, ProColumns, RowEditableConfig } from '@ant-design/pro-components'
+import { EditableProTable } from '@fastball/pro-table'
 import React from 'react';
 import { useState } from 'react';
 import { ActionInfo } from '../../../types';
@@ -14,6 +15,7 @@ const SubTable: React.FC<{
     parentName?: string | string[];
     title?: string;
     noAdd?: boolean;
+    creatorButtonText?: boolean;
     readonly?: boolean;
     recordActions?: ActionInfo[];
     value?: Record<string, any>[];
@@ -22,7 +24,7 @@ const SubTable: React.FC<{
     ) => void;
     columns: ProColumns[]
     editableFormRef?: React.RefObject<EditableFormInstance>
-}> = ({ name, parentName, title, readonly, recordActions, value, onChange, columns, editableFormRef, noAdd }) => {
+}> = ({ name, parentName, title, creatorButtonText, readonly, recordActions, value, onChange, columns, editableFormRef, noAdd }) => {
     // console.log('SubTable', name, value)
     // if (onChange && value?.find((item) => item[EDIT_ID] === undefined || item[EDIT_ID] === null)) {
     //     let nextEditId = 1;
@@ -59,7 +61,7 @@ const SubTable: React.FC<{
                 }).filter(action => action != null) : [];
 
                 return (
-                    <Dropdown menu={{ items: [{ key: '__delete', label: defaultDoms.delete || defaultDoms.cancel}, ...items] }}>
+                    <Dropdown menu={{ items: [{ key: '__delete', label: defaultDoms.delete || defaultDoms.cancel }, ...items] }}>
                         <a onClick={(e) => e.preventDefault()}>
                             <Space>
                                 操作
@@ -76,9 +78,10 @@ const SubTable: React.FC<{
                 onChange?.(recordList);
             },
         }
-        if(noAdd !== true) {
+        if (noAdd !== true) {
             recordCreatorProps = {
                 newRecordType: 'dataSource',
+                creatorButtonText: (creatorButtonText || '新增一行数据'),
                 record: (index?: number) => {
                     return {
                         [EDIT_ID]: index?.toString() || '0',
@@ -95,7 +98,7 @@ const SubTable: React.FC<{
         dataIndex: '__row_index',
         readonly: true,
         renderText: (_dom, _entity, index) => index + 1
-    }, ...columns.filter(({ valueType }) => valueType !== 'SubTable'), ]
+    }, ...columns.filter(({ valueType }) => valueType !== 'SubTable'),]
 
     if (recordActions?.length) {
         tableColumns.push({
@@ -113,7 +116,7 @@ const SubTable: React.FC<{
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
                     return { key: actionKey, label: buildAction(actionInfo) }
                 }).filter(action => action != null) : [];
-                if(!items?.length) {
+                if (!items?.length) {
                     return null;
                 }
                 return (
@@ -128,12 +131,12 @@ const SubTable: React.FC<{
                 )
             }
         })
-    } else if(readonly) {
+    } else if (readonly) {
         tableColumns.push({
             title: '操作',
             fixed: 'right',
             valueType: 'option'
-        })   
+        })
     }
 
     return (
@@ -141,6 +144,7 @@ const SubTable: React.FC<{
             cardBordered
             controlleds
             editableFormRef={editableFormRef}
+            creatorButtonText={creatorButtonText}
             name={name}
             parentName={parentName}
             headerTitle={title}

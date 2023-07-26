@@ -20,4 +20,6 @@ public class FormFieldInfo extends FieldInfo {
 
     private List<ActionInfo> subTableRecordActions;
 
+    private String subTableCreatorButtonText;
+
 }

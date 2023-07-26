@@ -20,7 +20,7 @@ public @interface TableConfig {
     /**
      * @return 表格的大小, 默认为最小
      */
-    TableSize size() default TableSize.Small;
+    TableSize size() default TableSize.Default;
 
     /**
      * 如果希望是一个树状列表, 可以配置自己录字段名, 并保证该字段类型为当前类型的集合
@@ -42,6 +42,13 @@ public @interface TableConfig {
      * @return 是否开启表格分页
      */
     boolean pageable() default true;
+
+    /**
+     * 是否开启查询, 默认为 True
+     *
+     * @return 是否开启查询
+     */
+    boolean queryable() default true;
 
     /**
      * 是否开启数据序号显示
