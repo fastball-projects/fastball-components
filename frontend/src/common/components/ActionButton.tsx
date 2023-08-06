@@ -20,9 +20,15 @@ const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
 
     const handleOk = async () => {
         setConfirmLoading(true);
-        await execute();
-        setOpen(false);
-        setConfirmLoading(false);
+        try {
+            await execute();
+            setOpen(false);
+            setConfirmLoading(false);
+        } catch (error) {
+            setConfirmLoading(false);
+        } finally {
+            setConfirmLoading(false);
+        }
     };
 
     const handleCancel = () => {

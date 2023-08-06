@@ -41,7 +41,10 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         if (config != null) {
             props.showReset(config.showReset());
             props.column(config.column());
-            props.readonly(config.readonly());
+            if (config.readonly()) {
+                props.readonly(true);
+                props.showReset(false);
+            }
         } else {
             props.column(3);
             props.showReset(true);
