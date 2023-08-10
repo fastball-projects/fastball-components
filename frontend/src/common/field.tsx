@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect } from "@ant-design/pro-components";
+import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect, ProFormColumnsType } from "@ant-design/pro-components";
 import { Tag, Image } from "antd";
 import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem, ColumnInfo, Data, ReactComponent } from "../../types";
 import { doLookupAction } from "./action";
@@ -60,9 +60,6 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
             </Tag>
         )
         column.fieldProps = Object.assign(column.fieldProps || {}, { tagRender })
-    }
-    if (field.autoComplete) {
-        column.fieldProps = Object.assign(column.fieldProps || {}, field.autoComplete)
     }
     if (field.lookup) {
         const lookupAction: LookupActionInfo = field.lookup;
@@ -146,6 +143,8 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                 console.log('lookup param', record, rootValues, requestParam, config)
                 return requestParam
             }
+        } else {
+            column.params = { timestamp: Math.random() }
         }
 
         column.request = (params, props) => {
@@ -289,7 +288,7 @@ export const FastballFieldProvider: FC<{ children: React.ReactNode }> = ({ child
             },
             AutoComplete: {
                 render: (text) => text,
-                renderFormItem: (text, props, dom) => <AutoComplete {...props} {...props?.fieldProps} input={props?.record} />
+                renderFormItem: (value, props, dom) => <AutoComplete {...props} {...props?.fieldProps} value={value} />
             },
             RichText: {
                 render: (text) => <RichText {...props} {...props?.fieldProps} readOnly />,

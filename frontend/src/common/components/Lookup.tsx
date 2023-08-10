@@ -3,6 +3,7 @@ import { LookupProps } from "../../../types";
 import { SelectableTable } from "./LookupSelectableTable";
 import { ProFormSelect } from "@ant-design/pro-components";
 import type { ProFormSelectProps } from "@ant-design/pro-components";
+import { Drawer } from "antd";
 
 const LookupComponent: React.FC<LookupProps> = ({ lookup, value, onChange, ...otherProps }) => {
     const [open, setOpen] = useState(false);
@@ -13,20 +14,29 @@ const LookupComponent: React.FC<LookupProps> = ({ lookup, value, onChange, ...ot
         ...otherProps,
         value,
         fieldProps: {
-            open,
-            onDropdownVisibleChange: (visible) => setOpen(visible),
+            open: false,
+            // onDropdownVisibleChange: (visible) => setOpen(visible),
             showSearch: false,
-            popupMatchSelectWidth: 600,
+            popupMatchSelectWidth: 1,
             fieldNames: {
                 label: labelField,
                 value: valueField
             },
-            dropdownRender: () => <SelectableTable closeDropdown={closeDropdown} value={value} onChange={onChange} lookup={lookup} />,
+            onClick: (e) => {
+                setOpen(true)
+                e.preventDefault();
+                e.stopPropagation();
+            },
             mode: multiple ? 'multiple' : undefined
         }
     }
     //     options: data
-    return <ProFormSelect {...selectProps} />;
+    return <>
+        <Drawer width="75%" open={open} onClose={() => setOpen(false)}>
+            <SelectableTable closeDropdown={closeDropdown} value={value} onChange={onChange} lookup={lookup} />
+        </Drawer>
+        <ProFormSelect {...selectProps} />
+    </>;
 };
 
 export default LookupComponent;

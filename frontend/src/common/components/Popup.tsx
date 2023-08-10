@@ -56,7 +56,10 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
             setOpen(true)
         }}>{trigger}</span>;
     } else {
-        triggerComponent = <span onClick={() => setOpen(true)}>{trigger}</span>;
+        triggerComponent = <span onClick={(e) => {
+            e.stopPropagation()
+            setOpen(true)
+        }}>{trigger}</span>;
     }
 
     let popupWrapperComponent;

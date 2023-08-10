@@ -182,6 +182,29 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.initialValue = []
                 formColumn.title = null;
             }
+            if (field.autoComplete) {
+                
+                if (field.autoComplete.dependencyFields?.length) {
+                    formColumn.dependencies = field.autoComplete.dependencyFields
+                    formColumn.fieldProps = (formInstance, config): any => {
+                        const { rowIndex } = config;
+                        let input;
+                        if (editableFormRef && rowIndex !== undefined) {
+                            const rowData = editableFormRef.current?.getRowData?.(rowIndex);
+                            input = rowData
+                        } else if (formInstance) {
+                            if (parentDataPath) {
+                                input = formInstance.getFieldValue?.(parentDataPath) || {};
+                            } else {
+                                input = formInstance.getFieldsValue?.() || {};
+                            }
+                        }
+                        return Object.assign(formColumn.fieldProps || {}, field.autoComplete, { input });
+                    }
+                } else {
+                    formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, field.autoComplete)
+                }
+            }
             if (field.expression) {
                 formColumn.dependencies = field.expression.fields;
                 formColumn.formItemProps = (formInstance, config): any => {

@@ -18,19 +18,19 @@ export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDro
         onRow: (record) => {
             return {
                 onClick: () => {
-                    const recordValue = record[valueField]
-                    if (multiple === true) {
-                        const selectedValueSet = new Set(value);
-                        if (selectedValueSet.has(recordValue)) {
-                            selectedValueSet.delete(recordValue);
-                        } else {
-                            selectedValueSet.add(recordValue);
-                        }
-                        onChange?.(selectedValueSet.values());
-                    } else {
-                        onChange?.(recordValue)
-                        closeDropdown()
-                    }
+                    // const recordValue = record[valueField]
+                    // if (multiple === true) {
+                    //     const selectedValueSet = new Set(value);
+                    //     if (selectedValueSet.has(recordValue)) {
+                    //         selectedValueSet.delete(recordValue);
+                    //     } else {
+                    //         selectedValueSet.add(recordValue);
+                    //     }
+                    //     onChange?.(selectedValueSet.values());
+                    // } else {
+                    //     onChange?.(recordValue)
+                    //     closeDropdown()
+                    // }
                 }
             };
         },
@@ -38,6 +38,7 @@ export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDro
             type: multiple === true ? "checkbox" : "radio",
             selectedRowKeys: value ? multiple === true ? value : [value] : [],
             onChange: (selectedRowKeys: any) => {
+                console.log(selectedRowKeys)
                 if (!multiple) {
                     onChange?.(selectedRowKeys[0]);
                     closeDropdown()

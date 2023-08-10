@@ -109,6 +109,7 @@ export type AutoCompleteActionInfo = {
     autoCompleteKey: string
     inputType: 'Number' | 'Text';
     valueField: string;
+    dependencyFields: string[];
     fields: { name: string, title: string }[];
 }
 

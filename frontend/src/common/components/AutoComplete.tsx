@@ -83,7 +83,7 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
         }
         useEffect(() => {
             loadOptions()
-        }, [dependencyFields, valuesHash])
+        }, [dependencyFields, valuesHash, input])
     }
 
     return <AntDAutoComplete
