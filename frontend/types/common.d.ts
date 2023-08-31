@@ -213,6 +213,7 @@ export type LookupSelectableTableProps = {
     lookup: LookupActionInfo
     multiple?: boolean
     closeDropdown: Function
+    onSelect: Function?
 } & ProFieldFCRenderProps
 
 export type TreeLookupProps = {

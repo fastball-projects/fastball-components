@@ -33,7 +33,8 @@ const LookupComponent: React.FC<LookupProps> = ({ lookup, value, onChange, ...ot
     //     options: data
     return <>
         <Drawer width="75%" open={open} onClose={() => setOpen(false)}>
-            <SelectableTable closeDropdown={closeDropdown} value={value} onChange={onChange} lookup={lookup} />
+            <SelectableTable closeDropdown={closeDropdown} value={value} onChange={onChange} 
+        onSelect={otherProps.fieldProps?.onSelect} lookup={lookup} />
         </Drawer>
         <ProFormSelect {...selectProps} />
     </>;

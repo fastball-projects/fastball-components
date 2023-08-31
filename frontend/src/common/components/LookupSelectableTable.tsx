@@ -5,7 +5,7 @@ import { Data, LookupSelectableTableProps } from "../../../types";
 import { ProColumnGroupType, ProTableProps } from "@ant-design/pro-table/es/typing";
 import { doLookupAction } from "../action";
 
-export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDropdown, lookup, multiple, value, onChange }) => {
+export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDropdown, lookup, multiple, value, onChange, onSelect }) => {
     const { columns, queryFields, valueField, showSearch } = lookup
     const proTableColumns: (ProColumnGroupType<Data, "text"> | ProColumnType<Data, "text">)[] = []
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = {
@@ -37,9 +37,10 @@ export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDro
         rowSelection: {
             type: multiple === true ? "checkbox" : "radio",
             selectedRowKeys: value ? multiple === true ? value : [value] : [],
-            onChange: (selectedRowKeys: any) => {
+            onChange: (selectedRowKeys: any, selectedRows: Record<string, any>[]) => {
                 console.log(selectedRowKeys)
                 if (!multiple) {
+                    onSelect?.(selectedRowKeys[0], selectedRows[0])
                     onChange?.(selectedRowKeys[0]);
                     closeDropdown()
                 } else {
