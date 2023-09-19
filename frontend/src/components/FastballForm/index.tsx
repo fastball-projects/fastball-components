@@ -50,6 +50,46 @@ type FormState = {
     dataSource: Data[] | null,
 }
 
+const buildGetParent = (formInstance: ProFormInstance, parentDataPath?: string[]) => (level?: number) => {
+    if (!parentDataPath) {
+        return formInstance.getFieldsValue();
+    }
+    let parentLevel = level;
+    if (!parentLevel) {
+        return formInstance.getFieldValue(parentDataPath || []);
+
+    }
+    if (parentLevel < 0 || parentDataPath.length < parentLevel) {
+        return formInstance.getFieldsValue();
+    }
+    return formInstance.getFieldValue(parentDataPath.slice(0, parentDataPath.length - parentLevel));
+};
+const fieldChangeFunc = (field: FormFieldInfo, config: ProSchema<any>, formInstance: ProFormInstance, editableFormRef?: EditableFormInstance, parentDataPath?: string[]) => {
+    const { dataIndex, rowIndex } = config;
+    if (editableFormRef && rowIndex !== undefined) {
+        const rowData = editableFormRef.current?.getRowData?.(rowIndex);
+        if (!rowData) {
+            return;
+        }
+        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(buildGetParent(formInstance, parentDataPath), rowData);
+        if (getByPaths(rowData, dataIndex) !== value) {
+            setByPaths(rowData, dataIndex, value);
+            editableFormRef.current?.setRowData?.(rowIndex, rowData);
+        }
+        // const dataPath = [rowIndex, ...dataIndex]
+        // editableFormRef.current?.setFieldValue(dataPath, value)
+    } else if (formInstance) {
+        const rowData = formInstance.getFieldsValue?.() || {};
+        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(buildGetParent(formInstance, parentDataPath), rowData);
+        if (getByPaths(rowData, dataIndex) !== value) {
+            setByPaths(rowData, dataIndex, value);
+            formInstance.setFieldsValue?.(rowData);
+        }
+    }
+}
+
+const fieldChangeTimerMap: Record<string, any> = {}
+
 class FastballForm extends React.Component<FormProps, FormState> {
     formRef: React.RefObject<ProFormInstance>;
     componentRef = React.createRef();
@@ -183,7 +223,6 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 formColumn.title = null;
             }
             if (field.autoComplete) {
-                
                 if (field.autoComplete.dependencyFields?.length) {
                     formColumn.dependencies = field.autoComplete.dependencyFields
                     formColumn.fieldProps = (formInstance, config): any => {
@@ -208,41 +247,9 @@ class FastballForm extends React.Component<FormProps, FormState> {
             if (field.expression) {
                 formColumn.dependencies = field.expression.fields;
                 formColumn.formItemProps = (formInstance, config): any => {
-                    const getParent = (level?: number) => {
-                        if (!parentDataPath) {
-                            return formInstance.getFieldsValue();
-                        }
-                        let parentLevel = level;
-                        if (!parentLevel) {
-                            return formInstance.getFieldValue(parentDataPath || []);
-
-                        }
-                        if (parentLevel < 0 || parentDataPath.length < parentLevel) {
-                            return formInstance.getFieldsValue();
-                        }
-                        return formInstance.getFieldValue(parentDataPath.slice(0, parentDataPath.length - parentLevel));
-                    };
-                    const { dataIndex, rowIndex } = config;
-                    if (editableFormRef && rowIndex !== undefined) {
-                        const rowData = editableFormRef.current?.getRowData?.(rowIndex);
-                        if (!rowData) {
-                            return;
-                        }
-                        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(getParent, rowData);
-                        if (getByPaths(rowData, dataIndex) !== value) {
-                            setByPaths(rowData, dataIndex, value);
-                            editableFormRef.current?.setRowData?.(rowIndex, rowData);
-                        }
-                        // const dataPath = [rowIndex, ...dataIndex]
-                        // editableFormRef.current?.setFieldValue(dataPath, value)
-                    } else if (formInstance) {
-                        const rowData = formInstance.getFieldsValue?.() || {};
-                        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(getParent, rowData);
-                        if (getByPaths(rowData, dataIndex) !== value) {
-                            setByPaths(rowData, dataIndex, value);
-                            formInstance.setFieldsValue?.(rowData);
-                        }
-                    }
+                    const fieldKey = `${parentDataPath?.join('.')}:${config.rowIndex}:${field.dataIndex.join('.')}`
+                    clearTimeout(fieldChangeTimerMap[fieldKey])
+                    fieldChangeTimerMap[fieldKey] = setTimeout(() => fieldChangeFunc(field, config, formInstance, editableFormRef, parentDataPath), 300);
                     return formColumn.formItemProps;
                 }
             }

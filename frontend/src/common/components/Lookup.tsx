@@ -5,11 +5,10 @@ import { ProFormSelect } from "@ant-design/pro-components";
 import type { ProFormSelectProps } from "@ant-design/pro-components";
 import { Drawer } from "antd";
 
-const LookupComponent: React.FC<LookupProps> = ({ lookup, value, onChange, ...otherProps }) => {
+const LookupComponent: React.FC<LookupProps> = ({ lookup, value, onChange, params, ...otherProps }) => {
     const [open, setOpen] = useState(false);
     const closeDropdown = () => setOpen(false);
     const { multiple, valueField, labelField } = lookup
-    console.log('LookupComponent', lookup)
     const selectProps: ProFormSelectProps = {
         ...otherProps,
         value,
@@ -34,9 +33,9 @@ const LookupComponent: React.FC<LookupProps> = ({ lookup, value, onChange, ...ot
     return <>
         <Drawer width="75%" open={open} onClose={() => setOpen(false)}>
             <SelectableTable closeDropdown={closeDropdown} value={value} onChange={onChange} 
-        onSelect={otherProps.fieldProps?.onSelect} lookup={lookup} />
+        onSelect={otherProps.fieldProps?.onSelect} lookup={lookup} params={params} />
         </Drawer>
-        <ProFormSelect {...selectProps} />
+        <ProFormSelect {...selectProps} params={params} />
     </>;
 };
 

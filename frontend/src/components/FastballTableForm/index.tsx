@@ -103,7 +103,6 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
                 this.formRef.current?.resetFields
             }}>编辑</Button>],
             onValuesChange: (record, recordList) => {
-                console.log('onValuesChangege', recordList)
                 this.onDataSourceChange(recordList);
             },
         }
@@ -146,7 +145,6 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
             rowSelection = {
                 type: 'checkbox',
                 onChange: (selectedRowKeys: React.Key[], selectedRows: Data[]) => {
-                    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
                     const selectedRowKeyMap: Record<string, boolean> = {};
                     selectedRowKeys.forEach(k => selectedRowKeyMap[k] = true)
                     this.setState({ selectedRowKeyMap })
@@ -182,8 +180,6 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
             <Button onClick={() => onSave()}>保存</Button>
             <Button onClick={() => this.closeForm()}>取消</Button>
         </Space>
-
-        console.log(dataSource, value, onChange)
 
         return <ComponentToPrint ref={this.ref}>
             <Drawer placement="right" width="75%" onClose={() => this.closeForm()} open={formOpen} footer={footerButtons}>

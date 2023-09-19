@@ -16,6 +16,8 @@ import LookupComponent from './components/Lookup';
 import TreeLookupComponent from './components/TreeLookup';
 import { preview, upload } from './upload';
 
+import { loadCache, setCache } from './cache';
+
 const formOnlyField: Record<string, boolean> = {
     group: true, formList: true, formSet: true, divider: true, dependency: true,
 }
@@ -98,7 +100,6 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                                 rowData[targetField] = selectedItem[fromField]
                             }
                         })
-                        console.log('onSelect', rowIndex, rowData, parentDataIndex, config)
                         editableFormRef.current?.setRowData?.(rowIndex, rowData)
                         // editableFormRef.current?.resetFields
                     }
@@ -117,7 +118,6 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                                 record[targetField] = selectedItem[fromField]
                             }
                         })
-                        console.log('onSelect', dataIndex, rowIndex, rowData, parentDataIndex, config)
                         // formInstance.setFieldValue(dataIndex, record)
                         formInstance.setFieldsValue?.({ ...rowData })
                     }
@@ -131,25 +131,30 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         if (lookupAction.dependencyParams?.length) {
             column.dependencies = lookupAction.dependencyParams.map(dependencyParam => dependencyParam.paramPath)
             column.params = (record, config) => {
-                const requestParam = {}
+                const search = {}
                 const rootValues = config?.getRootValues?.()
                 lookupAction.dependencyParams?.forEach(dependencyParam => {
                     if (dependencyParam.rootValue && rootValues) {
-                        requestParam[dependencyParam.paramKey] = getByPaths(rootValues, dependencyParam.paramPath)
+                        search[dependencyParam.paramKey] = getByPaths(rootValues, dependencyParam.paramPath)
                     } else {
-                        requestParam[dependencyParam.paramKey] = getByPaths(record, dependencyParam.paramPath)
+                        search[dependencyParam.paramKey] = getByPaths(record, dependencyParam.paramPath)
                     }
                 })
-                console.log('lookup param', record, rootValues, requestParam, config)
-                return requestParam
+                return { search }
             }
-        } else {
-            column.params = { timestamp: Math.random() }
+            // } else {
+            //     column.params = { timestamp: Math.random() }
         }
 
-        column.request = (params, props) => {
-            console.log('lookup request params', params, props)
-            return doLookupAction(lookupAction, params, __designMode);
+        column.request = async (params, props) => {
+            const lookupCacheKey = 'lookup||' + lookupAction.lookupKey + '||' + JSON.stringify(params)
+            const cachedOptions = loadCache(lookupCacheKey);
+            if (cachedOptions != null) {
+                return cachedOptions;
+            }
+            const lookupOptions = await doLookupAction(lookupAction, params, __designMode)
+            setCache(lookupCacheKey, lookupOptions);
+            return lookupOptions;
         }
     }
     if (field.fieldType === 'popup' && field.popupInfo) {
@@ -305,7 +310,6 @@ export const FastballFieldProvider: FC<{ children: React.ReactNode }> = ({ child
                     fieldProps.multiple = true;
                     fieldProps.listType = 'picture-card';
                     fieldProps.onChange = (values) => {
-                        console.log('onChange', values)
                         props?.fieldProps?.onChange?.(values.fileList[0])
                     }
                     const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
@@ -327,7 +331,6 @@ export const FastballFieldProvider: FC<{ children: React.ReactNode }> = ({ child
                     fieldProps.multiple = true;
                     fieldProps.listType = 'picture-card';
                     fieldProps.onChange = (values) => {
-                        console.log('onChange', values)
                         props?.fieldProps?.onChange?.(values.fileList)
                     }
                     const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name

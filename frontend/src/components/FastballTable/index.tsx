@@ -135,6 +135,13 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                 )
             }
         })
+    } else {
+        proTableColumns.push({
+            title: '操作',
+            dataIndex: '__option',
+            valueType: 'option',
+            align: 'left',
+        })
     }
 
     proTableProps.columns = proTableColumns

@@ -1,7 +1,6 @@
 import { buildJsonRequestInfo, callApi, doApiAction } from "./action";
 
 export const upload = async ({ file, onSuccess, onError }) => {
-    console.log('upload', file)
     const resp = await callApi('/api/fastball/storage/generateUploadUrl')
     const requestInfo = {
         method: 'PUT',

@@ -24,7 +24,7 @@ public class QueryUtils {
 
     public static Pageable pageable(TableSearchParam<?> param) {
         if (param == null) {
-            return Pageable.unpaged();
+            return Unpaged.unpaged(Sort.by(Sort.Order.desc("createdAt")));
         }
         Sort sort;
         if (!CollectionUtils.isEmpty(param.getSortFields())) {

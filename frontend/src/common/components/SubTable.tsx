@@ -74,7 +74,6 @@ const SubTable: React.FC<{
             onValuesChange: (record, recordList) => {
                 // const values: any[] = editableFormRef?.current?.getRowsData?.() || []
                 // const newRecordList = recordList.map((formRecord, index) => Object.assign({}, values[index], formRecord))
-                console.log(record, recordList)
                 onChange?.(recordList);
             },
         }
@@ -131,7 +130,8 @@ const SubTable: React.FC<{
                 )
             }
         })
-    } else if (readonly) {
+    } else  {
+        //if (readonly)
         tableColumns.push({
             title: '操作',
             fixed: 'right',

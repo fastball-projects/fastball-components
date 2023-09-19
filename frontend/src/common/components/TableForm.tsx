@@ -89,7 +89,6 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
                 this.formRef.current?.resetFields
             }}>编辑</Button>],
             onValuesChange: (record, recordList) => {
-                console.log('onValuesChangege', recordList)
                 onChange?.(recordList);
             },
         }

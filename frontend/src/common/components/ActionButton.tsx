@@ -10,7 +10,11 @@ const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
     const { actionKey, actionName, trigger, confirmMessage, uploadFileAction } = props;
     const execute = async () => {
         setLoading(true)
-        await doApiAction(props);
+        try {
+            await doApiAction(props);
+        } catch (error) {
+            console.error('Execute button action error', error)
+        }
         setLoading(false)
     }
 

@@ -22,10 +22,6 @@ public class Unpaged implements Pageable {
         return new Unpaged(sort);
     }
 
-    public boolean isPaged() {
-        return false;
-    }
-
     @Override
     public Pageable previousOrFirst() {
         return this;
@@ -48,17 +44,17 @@ public class Unpaged implements Pageable {
 
     @Override
     public int getPageSize() {
-        throw new UnsupportedOperationException();
+        return Integer.MAX_VALUE;
     }
 
     @Override
     public int getPageNumber() {
-        throw new UnsupportedOperationException();
+        return 0;
     }
 
     @Override
     public long getOffset() {
-        throw new UnsupportedOperationException();
+        return 0;
     }
 
     @Override

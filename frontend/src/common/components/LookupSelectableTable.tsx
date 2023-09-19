@@ -5,7 +5,7 @@ import { Data, LookupSelectableTableProps } from "../../../types";
 import { ProColumnGroupType, ProTableProps } from "@ant-design/pro-table/es/typing";
 import { doLookupAction } from "../action";
 
-export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDropdown, lookup, multiple, value, onChange, onSelect }) => {
+export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDropdown, lookup, multiple, value, params, onChange, onSelect }) => {
     const { columns, queryFields, valueField, showSearch } = lookup
     const proTableColumns: (ProColumnGroupType<Data, "text"> | ProColumnType<Data, "text">)[] = []
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = {
@@ -38,7 +38,6 @@ export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDro
             type: multiple === true ? "checkbox" : "radio",
             selectedRowKeys: value ? multiple === true ? value : [value] : [],
             onChange: (selectedRowKeys: any, selectedRows: Record<string, any>[]) => {
-                console.log(selectedRowKeys)
                 if (!multiple) {
                     onSelect?.(selectedRowKeys[0], selectedRows[0])
                     onChange?.(selectedRowKeys[0]);
@@ -56,19 +55,18 @@ export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ closeDro
     //     proTableProps.search = false;
     // }
 
-    proTableProps.request = async (params, sortFields, filter) => {
+    proTableProps.request = async (requestParam, sortFields, filter) => {
         let request;
-        if (queryFields) {
-            const { pageSize, current, keyword, ...searchFields } = params
-            const searchParam = { sortFields, pageSize, current, keywords: keyword };
-            const search = Object.assign({}, searchFields, filter);
-            Object.assign(searchParam, { search });
-            request = searchParam
-        }
+        // if (queryFields) {
+        const { pageSize, current, keyword, ...searchFields } = requestParam
+        const searchParam = { sortFields, pageSize, current, keywords: keyword };
+        const search = Object.assign({}, params?.search, searchFields, filter);
+        Object.assign(searchParam, { search });
+        request = searchParam
+        // }
         const data = await doLookupAction(lookup, request);
         return { success: true, data };
     }
-    console.log(proTableProps)
     return <FastballFieldProvider>
         <ProTable {...proTableProps} />
     </FastballFieldProvider>

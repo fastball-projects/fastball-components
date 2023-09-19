@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { MD5 } from 'object-hash'
 import { doAutoCompleteAction } from "../action";
+import { loadCache, setCache } from "../cache";
 
 type AutoCompleteType = {
     autoCompleteKey: string;
@@ -34,7 +35,7 @@ const renderItem = (valueField: string, fields: { name: string, title: string }[
     </Row>
 });
 
-const CustomInputNumber = ({ onChange, ...rest }) => {
+const CustomInputNumber = ({ onChange, inputValue, ...rest }) => {
     const handleChange = value => {
         onChange({
             target: {
@@ -43,13 +44,13 @@ const CustomInputNumber = ({ onChange, ...rest }) => {
         });
     };
 
-    return <InputNumber onChange={handleChange} {...rest} />;
+    return <InputNumber onChange={handleChange} {...rest} value={inputValue}/>;
 }
 
 const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, dependencyFields, value, inputType, readonly, valueField, fields, onChange }: AutoCompleteType) => {
     let inputComponent;
     if (inputType == 'Number') {
-        inputComponent = <CustomInputNumber value={value} readOnly={readonly} />
+        inputComponent = <CustomInputNumber inputValue={value} readOnly={readonly} />
     } else {
         inputComponent = <Input value={value} readOnly={readonly} />
     }
@@ -61,11 +62,17 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
     const [dependencyValuesHash, setDependencyValuesHash] = useState<string>();
 
     const loadOptions = async () => {
+        const cacheKey = `AutoComplete||${autoCompleteKey}||${JSON.stringify(input)}`
+        const cache = loadCache(cacheKey);
+        if (cache == null) {
+            return cache;
+        }
         const result = await doAutoCompleteAction(autoCompleteKey, input);
         const option = {
             label: renderTitle(fields),
             options: result.map((item: Record<string, any>) => renderItem(valueField, fields, item))
         }
+        setCache(cacheKey, option);
         setOptions([option]);
     }
     if (Array.isArray(dependencyFields) && dependencyFields.length > 0) {
@@ -78,7 +85,7 @@ const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, depe
             })
         }
         const valuesHash = MD5(dependencyValues)
-        if(dependencyValuesHash != valuesHash) {
+        if (dependencyValuesHash != valuesHash) {
             setDependencyValuesHash(valuesHash)
         }
         useEffect(() => {
