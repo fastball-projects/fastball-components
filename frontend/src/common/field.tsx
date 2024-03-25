@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect, ProFormColumnsType } from "@ant-design/pro-components";
+import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect, ProFormColumnsType } from "@fastball/pro-components";
 import { Tag, Image } from "antd";
 import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem, ColumnInfo, Data, ReactComponent } from "../../types";
 import { doLookupAction } from "./action";
@@ -35,13 +35,20 @@ export const filterEnabled = (item: Displayable) => item.display !== 'Disabled'
 
 export const filterVisibled = (item: Displayable) => item.display !== 'Disabled' && item.display !== 'Hidden'
 
-export const processingField = (field: FieldInfo, column: ProSchema, parentDataIndex?: string[], __designMode?: string, editableFormRef?: React.RefObject<EditableFormInstance>) => {
+export const processingField = (componentKey: string, field: FieldInfo, column: ProSchema, parentDataIndex?: string[], __designMode?: string, editableFormRef?: React.RefObject<EditableFormInstance>) => {
     if (field.display === 'Hidden') {
         column.hideInForm = true;
         column.hideInDescriptions = true;
         column.hideInSearch = true;
         column.hideInTable = true;
     }
+
+    if (parentDataIndex?.length) {
+        column.cacheKey = parentDataIndex.join('.') + '.' + field.dataIndex.join('.')
+    } else {
+        column.cacheKey = field.dataIndex.join('.')
+    }
+
     column.initialValue = field.defaultValue
     if (field.valueType == 'multiSelect') {
         column.valueType = 'select'
@@ -55,6 +62,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
     } else if (field.valueType == 'dateYearRange') {
         setDateRangeFieldProps(column, { picker: "year", format: "YYYY" })
     }
+
     if (field.valueType == 'select' || field.valueType == 'multiSelect') {
         const tagRender = ({ label, value, closable, onClose }: CustomTagProps) => (
             <Tag color={field.valueEnum?.[value]?.color} closable={closable} onClose={onClose}>
@@ -67,6 +75,8 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         const lookupAction: LookupActionInfo = field.lookup;
         const fieldProps = {
             ...(column.fieldProps || {}),
+            componentKey,
+            proFieldKey: componentKey + "." + column.cacheKey,
             popupMatchSelectWidth: false,
             showSearch: lookupAction.showSearch,
             fieldNames: {
@@ -89,6 +99,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
         if (lookupAction.multiple) {
             fieldProps.mode = "multiple";
         }
+        fieldProps.colProps = null;
         if (lookupAction.extraFillFields && lookupAction.extraFillFields.length > 0) {
             column.fieldProps = (formInstance, config) => {
                 const { dataIndex, rowIndex, entity } = config;
@@ -97,7 +108,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                         const rowData = editableFormRef.current?.getRowData?.(rowIndex) || {};
                         lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
                             if (rowData[targetField] === undefined || rowData[targetField] === null || !onlyEmpty) {
-                                rowData[targetField] = selectedItem[fromField]
+                                rowData[targetField] = selectedItem?.[fromField]
                             }
                         })
                         editableFormRef.current?.setRowData?.(rowIndex, rowData)
@@ -115,7 +126,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
                         }
                         lookupAction.extraFillFields.forEach(({ fromField, targetField, onlyEmpty }) => {
                             if (record[targetField] === undefined || record[targetField] === null || !onlyEmpty) {
-                                record[targetField] = selectedItem[fromField]
+                                record[targetField] = selectedItem?.[fromField]
                             }
                         })
                         // formInstance.setFieldValue(dataIndex, record)
@@ -175,10 +186,15 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
             }
             const popupInfo = field.popupInfo!;
             const props: PopupProps = { trigger: <a className='fb-popup-trigger'>{dom}</a>, popupInfo }
-            if (popupInfo.popupComponent.currentFieldInput) {
+
+            if (popupInfo.dynamicPopup) {
+                props.input = record;
+            } else if (popupInfo.popupComponent?.currentFieldInput) {
                 props.input = getByPaths(record, field.dataIndex)
-            } else {
+            } else if (popupInfo.popupComponent?.dataPath?.length) {
                 props.input = getByPaths(record, popupInfo.popupComponent.dataPath)
+            } else {
+                props.input = record;
             }
             return <FastballPopup {...props} />;
         }
@@ -210,7 +226,7 @@ export const processingField = (field: FieldInfo, column: ProSchema, parentDataI
     }
 }
 
-export const buildTableColumn = (proTableColumns: ProTableColumn[], field: ColumnInfo, parentDataIndex?: string[], __designMode?: boolean) => {
+export const buildTableColumn = (componentKey: string, proTableColumns: ProTableColumn[], field: ColumnInfo, parentDataIndex?: string[], __designMode?: boolean) => {
     if (field.valueType === 'Array') {
         return;
     }
@@ -225,12 +241,12 @@ export const buildTableColumn = (proTableColumns: ProTableColumn[], field: Colum
     }
     const column: ProTableColumn = {}
     Object.assign(column, field, { hideInSearch: true });
-    processingField(field, column, __designMode);
+    processingField(componentKey, field, column, __designMode);
     if (parentDataIndex) {
         column.dataIndex = [...parentDataIndex, ...field.dataIndex]
     }
     if (field.valueType === 'SubFields' && field.subFields) {
-        field.subFields.forEach(subField => buildTableColumn(proTableColumns, subField, field.dataIndex))
+        field.subFields.forEach(subField => buildTableColumn(componentKey, proTableColumns, subField, field.dataIndex))
         return;
     }
     if (field.valueType === 'textarea') {
@@ -239,17 +255,20 @@ export const buildTableColumn = (proTableColumns: ProTableColumn[], field: Colum
     if (field.width) {
         column.width = field.width
     }
+    if (field.valueType === 'Attachment') {
+        column.width = 120;
+    }
     column.sorter = field.sortable
     return column;
 }
 
-export const buildTableColumns = (proTableColumns: ProTableColumn[], columns?: ColumnInfo[], queryFields?: FieldInfo[], __designMode?: string) => {
-    columns?.filter(filterEnabled).map(field => buildTableColumn(proTableColumns, field)).filter(Boolean).forEach(field => proTableColumns.push(field));
+export const buildTableColumns = (componentKey: string, proTableColumns: ProTableColumn[], columns?: ColumnInfo[], queryFields?: FieldInfo[], __designMode?: string) => {
+    columns?.filter(filterEnabled).map(field => buildTableColumn(componentKey, proTableColumns, field)).filter(Boolean).forEach(field => proTableColumns.push(field));
 
     queryFields?.filter(filterEnabled).forEach(field => {
         const proTableColumn: ProTableColumn = {};
         Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
-        processingField(field, proTableColumn, __designMode);
+        processingField(componentKey, field, proTableColumn, null, __designMode);
         proTableColumns.push(proTableColumn);
     });
 }
@@ -301,7 +320,7 @@ export const FastballFieldProvider: FC<{ children: React.ReactNode }> = ({ child
             },
             Attachment: {
                 render: (value) => {
-                    return <Image src={value?.url} />
+                    return <Image width={104} src={value?.url} />
                 },
                 renderFormItem: (value, props) => {
                     const fieldProps = Object.assign({}, props?.fieldProps)

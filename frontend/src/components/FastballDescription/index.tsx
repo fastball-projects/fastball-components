@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { ProConfigProvider, ProDescriptions, ProSchema, ProTable } from '@ant-design/pro-components'
-import type { ProTableProps, ProCoreActionType, ProDescriptionsProps, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { ProConfigProvider, ProDescriptions, ProSchema, ProTable } from '@fastball/pro-components'
+import type { ProTableProps, ProCoreActionType, ProDescriptionsProps, ProDescriptionsItemProps } from '@fastball/pro-components';
 import type { FieldInfo, DescriptionProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterFormOnlyField, filterVisibled, getByPaths, processingField } from '../../common';
 import SubTable from '../../common/components/SubTable';

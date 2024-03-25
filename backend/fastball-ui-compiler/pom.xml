@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>dev.fastball</groupId>
-            <artifactId>fastball-ui-api</artifactId>
+            <artifactId>fastball-ui-metadata</artifactId>
         </dependency>
         <dependency>
             <groupId>dev.fastball</groupId>

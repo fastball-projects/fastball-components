@@ -20,4 +20,5 @@ public interface FastballAptJpaConstants {
     String TABLE_EDIT_VIEW_ACTION_NAME = "编辑";
     String TABLE_DELETE_METHOD_NAME = "delete";
     String TABLE_DELETE_ACTION_NAME = "删除";
+    String TABLE_DELETE_ACTION_CONFIRM = "删除后该数据无法恢复, 确定删除吗?";
 }

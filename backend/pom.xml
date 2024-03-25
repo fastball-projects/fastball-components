@@ -21,6 +21,7 @@
         <module>fastball-ui-archetype</module>
         <module>fastball-ui-builtin-jpa</module>
         <module>fastball-ui-builtin-excel</module>
+        <module>fastball-ui-metadata</module>
     </modules>
 
     <properties>
@@ -51,6 +52,11 @@
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-api</artifactId>
+                <version>0.3.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-ui-metadata</artifactId>
                 <version>0.3.1-SNAPSHOT</version>
             </dependency>
             <dependency>

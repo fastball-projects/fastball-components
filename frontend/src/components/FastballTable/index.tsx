@@ -1,11 +1,10 @@
 import React, { useRef, useState } from 'react'
-import { ProTable, ProConfigProvider } from '@ant-design/pro-components'
-import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@ant-design/pro-components'
-import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, FieldInfo, ApiActionInfo } from '../../../types';
-import { buildAction, doApiAction, loadRefComponent, filterEnabled, filterVisibled, processingField, filterFormOnlyField, buildTableColumns, FastballFieldProvider } from '../../common';
-import { Button, Dropdown, MenuProps, Space, Image, Table } from 'antd';
+import { ProTable } from '@fastball/pro-components'
+import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@fastball/pro-components'
+import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, ApiActionInfo } from '../../../types';
+import { buildAction, doApiAction, loadRefComponent, filterVisibled, buildTableColumns, FastballFieldProvider } from '../../common';
+import { Dropdown, MenuProps, Space, Table } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import Address from '../../common/components/Address';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -78,7 +77,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         })
     }
 
-    buildTableColumns(proTableColumns, columns, queryFields, __designMode)
+    buildTableColumns(componentKey, proTableColumns, columns, queryFields, __designMode)
 
     if (!queryFields?.length) {
         proTableProps.search = false;
@@ -98,7 +97,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         }
         return buildAction(actionInfo)
     })
-    if (recordActions.length > 0) {
+    if (recordActions.length > 4) {
         proTableColumns.push({
             title: '操作',
             dataIndex: '__option',
@@ -112,7 +111,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                         return null;
                     }
 
-                    const trigger = actionName || actionKey
+                    const trigger = <a style={{display: "block"}}>{actionName || actionKey}</a>
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
                     if (refresh) {
                         actionInfo.callback = () => ref.current?.reload()
@@ -141,6 +140,21 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
             dataIndex: '__option',
             valueType: 'option',
             align: 'left',
+            render: (_, record) => {
+                return recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                    const { actionKey, actionName, refresh } = action;
+                    const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
+                    if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
+                        return null;
+                    }
+                    const trigger = <a style={{display: "block"}}>{actionName || actionKey}</a>
+                    const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
+                    if (refresh) {
+                        actionInfo.callback = () => ref.current?.reload()
+                    }
+                    return buildAction(actionInfo)
+                }).filter(action => action != null) : [];
+            }
         })
     }
 

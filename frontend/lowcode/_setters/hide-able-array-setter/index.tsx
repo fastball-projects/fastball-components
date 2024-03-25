@@ -233,24 +233,24 @@ class ArrayItem extends Component<{
     );
 
     let showDropdownTrigger;
-    if (field.getValue().display == 'Show') {
+    if (field.getValue().display == 'Disabled') {
       showDropdownTrigger = (
-        <Button size="small" ghost="light" onClick={onHidden} className="lc-listitem-action">
-          <i class="iconfont icon-fastball-eye"></i>
+        <Button size="small" ghost="light" onClick={onShow} className="lc-listitem-action">
+          <CustomIcon type="icon-fastball-disabled" size="small" />
         </Button>
       )
     } else if (field.getValue().display == 'Hidden') {
       showDropdownTrigger = (
         <Button size="small" ghost="light" onClick={onShow} className="lc-listitem-action">
-          <i class="iconfont icon-fastball-eye-close"></i>
+          <CustomIcon type="icon-fastball-eye-close" size="small" />
         </Button>
       )
     } else {
       showDropdownTrigger = (
-        <Button size="small" ghost="light" onClick={onShow} className="lc-listitem-action">
-          <i class="iconfont icon-fastball-disabled"></i>
+        <Button size="small" ghost="light" onClick={onHidden} className="lc-listitem-action">
+          <CustomIcon type="icon-fastball-eye" size="small" />
         </Button>
-      ) 
+      )
     }
 
     let showButten = <Dropdown

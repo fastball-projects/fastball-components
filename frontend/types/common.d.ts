@@ -5,6 +5,8 @@ import { ValidationRule } from './validation'
 
 export type Data = { [key: string]: unknown }
 
+export type TableData = { children?: TableData[] } & Data
+
 export type Displayable = {
     display?: DisplayType
 }
@@ -69,6 +71,7 @@ export type FieldInfo = {
     tooltip?: string
     placeholder?: string
     defaultValue?: any
+    digitPrecision?: number
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: EnumItem }
     autoComplete?: AutoCompleteActionInfo
@@ -80,6 +83,7 @@ export type FieldInfo = {
     subFields?: FieldInfo[]
     readonly: boolean
     entireRow: boolean
+    order: number
     fieldProps: any
     formItemProps: any
     expression: ExpressionInfo
@@ -155,6 +159,14 @@ export type PopupInfo = {
     popupType: PopupType
     triggerType: TriggerType
     placementType: PlacementType
+    popupComponent?: RefComponentInfo
+    dynamicPopup?: boolean
+    conditionPath?: string[]
+    dynamicPopupRules?: DynamicPopupRule[]
+}
+
+export type DynamicPopupRule = {
+    values: string[]
     popupComponent: RefComponentInfo
 }
 
@@ -204,12 +216,14 @@ export type ExpressionInfo = {
 }
 
 export type LookupProps = {
+    componentKey: string
     lookup: LookupActionInfo
     multiple?: boolean
 } & ProFieldFCRenderProps
 
 
 export type LookupSelectableTableProps = {
+    componentKey: string
     lookup: LookupActionInfo
     multiple?: boolean
     closeDropdown: Function
@@ -217,6 +231,7 @@ export type LookupSelectableTableProps = {
 } & ProFieldFCRenderProps
 
 export type TreeLookupProps = {
+    componentKey: string
     lookup: TreeLookupActionInfo
     multiple?: boolean
 } & ProFieldFCRenderProps

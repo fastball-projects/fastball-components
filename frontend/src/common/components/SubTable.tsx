@@ -1,4 +1,4 @@
-import { EditableFormInstance, ProColumns, RowEditableConfig } from '@ant-design/pro-components'
+import { EditableFormInstance, ProColumns, RowEditableConfig } from '@fastball/pro-components'
 import { EditableProTable } from '@fastball/pro-table'
 import React from 'react';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import { buildAction } from '../action';
 import { filterVisibled } from '../field';
 import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import { getByPaths, setByPaths } from '../utils';
 
 export const EDIT_ID = '__edit_id'
 
@@ -48,29 +49,41 @@ const SubTable: React.FC<{
         editable = {
             type: 'multiple',
             editableKeys: value?.map((record, i) => i.toString()),
-            actionRender: (record, config, defaultDoms) => {
-                const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
-                    const { actionKey, actionName, refresh } = action;
-                    const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
-                    if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
-                        return null;
-                    }
-                    const trigger = actionName || actionKey
-                    const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
-                    return { key: actionKey, label: buildAction(actionInfo) }
-                }).filter(action => action != null) : [];
-
-                return (
-                    <Dropdown menu={{ items: [{ key: '__delete', label: defaultDoms.delete || defaultDoms.cancel }, ...items] }}>
-                        <a onClick={(e) => e.preventDefault()}>
-                            <Space>
-                                操作
-                                <DownOutlined />
-                            </Space>
-                        </a>
-                    </Dropdown>
-                )
-            },
+            actionRender: (record, config, defaultDoms) => recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                const { actionKey, actionName, refresh } = action;
+                const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
+                if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
+                    return null;
+                }
+                const trigger = <a>{actionName || actionKey}</a>
+                const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
+                return { key: actionKey, label: buildAction(actionInfo) }
+            }).filter(action => action != null) : [
+                <a
+                    key="delete"
+                    onClick={() => {
+                        const formValue = editableFormRef?.current?.getFieldsValue();
+                        if (!formValue) {
+                            return;
+                        }
+                        let dataIndex: string[] = [];
+                        if (parentName?.length) {
+                            dataIndex = [...parentName]
+                        }
+                        if (Array.isArray(name)) {
+                            dataIndex = [...dataIndex, ...name]
+                        } else if (name) {
+                            dataIndex.push(name);
+                        }
+                        const tableDataSource = getByPaths(formValue, dataIndex)
+                        setByPaths(formValue, dataIndex, tableDataSource.filter((item: Record<string, any>) => item[EDIT_ID] !== record?.[EDIT_ID]))
+                        console.log(tableDataSource, formValue, dataIndex)
+                        editableFormRef?.current?.setFieldsValue(formValue);
+                    }}
+                >
+                    删除
+                </a>,
+            ],
             onValuesChange: (record, recordList) => {
                 // const values: any[] = editableFormRef?.current?.getRowsData?.() || []
                 // const newRecordList = recordList.map((formRecord, index) => Object.assign({}, values[index], formRecord))
@@ -90,51 +103,38 @@ const SubTable: React.FC<{
         }
     }
 
-
+    columns.filter(({ valueType }) => valueType === 'Attachment').forEach(column => column.width = 120)
 
     const tableColumns: ProColumns[] = [{
         title: '序号',
         dataIndex: '__row_index',
         readonly: true,
         renderText: (_dom, _entity, index) => index + 1
-    }, ...columns.filter(({ valueType }) => valueType !== 'SubTable'),]
+    }, ...columns.filter(({ valueType }) => valueType !== 'SubTable' && valueType !== 'group'),]
 
     if (recordActions?.length) {
         tableColumns.push({
             title: '操作',
             fixed: 'right',
+            width: 100,
             valueType: 'option',
-            render: (_dom, record) => {
-                const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
-                    const { actionKey, actionName, refresh } = action;
-                    const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
-                    if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
-                        return null;
-                    }
-                    const trigger = actionName || actionKey
-                    const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
-                    return { key: actionKey, label: buildAction(actionInfo) }
-                }).filter(action => action != null) : [];
-                if (!items?.length) {
+            render: (_dom, record) => recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                const { actionKey, actionName, refresh } = action;
+                const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
+                if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
                     return null;
                 }
-                return (
-                    <Dropdown menu={{ items }}>
-                        <a onClick={(e) => e.preventDefault()}>
-                            <Space>
-                                操作
-                                <DownOutlined />
-                            </Space>
-                        </a>
-                    </Dropdown>
-                )
-            }
+                const trigger = <a>{actionName || actionKey}</a>
+                const actionInfo: ActionInfo = Object.assign({}, action, { trigger, data: record });
+                return buildAction(actionInfo)
+            }).filter(action => action != null) : []
         })
-    } else  {
+    } else {
         //if (readonly)
         tableColumns.push({
             title: '操作',
             fixed: 'right',
+            width: 100,
             valueType: 'option'
         })
     }

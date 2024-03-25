@@ -1,26 +1,48 @@
 import * as React from 'react'
 import { Modal, Drawer, Popover, PopoverProps, ModalProps, DrawerProps, Space } from 'antd';
 
-import type { PopupProps, RefComponentInfo } from '../../../types'
+import type { PopupInfo, PopupProps, RefComponentInfo } from '../../../types'
 import { loadRefComponent } from '../component'
 import { getByPaths } from '../utils';
 
-const buildPopupComponent = ({ propsKey, dataPath, componentInfo }: RefComponentInfo, props: Record<string, any>, input?: any) => {
+const loadPopupComponent = (popupInfo: PopupInfo, input?: any): RefComponentInfo | null => {
+    const { popupComponent, dynamicPopup, dynamicPopupRules, conditionPath } = popupInfo;
+    if (!dynamicPopup && popupComponent) {
+        return popupComponent;
+    }
+    if (dynamicPopupRules?.length) {
+        let conditionValue = input;
+        if (conditionPath?.length) {
+            conditionValue = getByPaths(input, conditionPath);
+        }
+        for (let index = 0; index < dynamicPopupRules.length; index++) {
+            const { values, popupComponent } = dynamicPopupRules[index];
+            if (values.find((value: any) => conditionValue === value)) {
+                return popupComponent
+            }
+        }
+    }
+    return null
+}
+
+const buildPopupComponent = (popupComponent: RefComponentInfo, props: Record<string, any>, input?: any) => {
     const popupProps: Record<string, any> = {
         ...props
     }
     if (input) {
-        if (dataPath && dataPath.length > 0) {
-            popupProps[propsKey] = getByPaths(input, dataPath)
+        if (popupComponent.dataPath?.length > 0) {
+            popupProps[popupComponent.propsKey] = getByPaths(input, popupComponent.dataPath)
         } else {
-            popupProps[propsKey] = input
+            popupProps[popupComponent.propsKey] = input
         }
     }
-    return loadRefComponent(componentInfo, popupProps);
+    return loadRefComponent(popupComponent.componentInfo, popupProps);
 }
 
-const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, input, __designMode }) => {
-    const { triggerType, placementType, popupType, popupComponent, title, width } = popupInfo;
+
+
+const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, input, loadInput, __designMode }) => {
+    const { triggerType, placementType, popupType, title, width } = popupInfo;
     const [open, setOpen] = React.useState(false);
     const [actions, setActions] = React.useState<React.ReactNode>([]);
 
@@ -29,6 +51,11 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
         if (onClose) {
             onClose();
         }
+    }
+    const popupComponent = loadPopupComponent(popupInfo, input);
+
+    if(!popupComponent) {
+        return trigger
     }
 
     if (popupType === 'Popover') {
@@ -64,9 +91,9 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
 
     let popupWrapperComponent;
 
-    const titleClick = () => { 
-        navigator.clipboard.writeText(popupComponent?.componentInfo?.componentClass); 
-        console.log('Component class: ',popupComponent?.componentInfo?.componentClass) 
+    const titleClick = () => {
+        navigator.clipboard.writeText(popupComponent.componentInfo.componentClass);
+        console.log('Component class: ', popupComponent.componentInfo.componentClass)
     }
     const content = buildPopupComponent(popupComponent, { closePopup, setActions, __designMode }, input)
     const titleComponent = <div onClick={titleClick}>{title}</div>

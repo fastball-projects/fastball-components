@@ -107,7 +107,6 @@ export const buildAction = (actionInfo: ActionInfo) => {
         return doPopupAction(popupActionInfo)
     } else if (actionInfo.type === 'Print') {
         const printActionInfo = actionInfo as PrintActionInfo
-        debugger
         return doPrintAction(printActionInfo)
     } else {
         return null

@@ -6,15 +6,12 @@ import dev.fastball.compile.FastballPreCompileGenerator;
 import dev.fastball.core.annotation.RecordAction;
 import dev.fastball.core.annotation.UIComponent;
 import dev.fastball.ui.builtin.jpa.BuiltinGenerator;
-import dev.fastball.ui.builtin.jpa.annotation.DataManagement;
 import dev.fastball.ui.components.form.Form;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-
-import java.util.Set;
 
 import static dev.fastball.ui.builtin.jpa.FastballAptJpaConstants.*;
 

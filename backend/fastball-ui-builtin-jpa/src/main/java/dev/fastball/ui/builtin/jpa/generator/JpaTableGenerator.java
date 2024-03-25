@@ -91,6 +91,7 @@ public class JpaTableGenerator extends BuiltinGenerator {
         AnnotationSpec recordActionAnnotation = AnnotationSpec.builder(RecordAction.class)
                 .addMember("key", "$S", TABLE_DELETE_METHOD_NAME)
                 .addMember("name", "$S", TABLE_DELETE_ACTION_NAME)
+                .addMember("confirmMessage", "$S", TABLE_DELETE_ACTION_CONFIRM)
                 .build();
         return MethodSpec.methodBuilder(TABLE_DELETE_METHOD_NAME)
                 .addAnnotation(recordActionAnnotation)

@@ -28,6 +28,7 @@ export type FormFieldInfo = {
 export type TableFormProps = {
     fields: TableFormFieldInfo[]
     rowKey: string
+    childrenFieldName: string
     rowEditable: boolean
     rowSelectable: boolean
     defaultSelected?: boolean

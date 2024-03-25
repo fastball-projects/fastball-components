@@ -17,6 +17,13 @@ public @interface TableFormConfig {
 
     String rowKey() default "id";
 
+    /**
+     * 如果希望是一个树状列表, 可以配置自己录字段名, 并保证该字段类型为当前类型的集合
+     *
+     * @return 属性表格的子记录字段名
+     */
+    String childrenFieldName() default "";
+
     boolean rowEditable() default false;
 
     boolean rowSelectable() default false;

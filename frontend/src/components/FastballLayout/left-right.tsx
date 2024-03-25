@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ProCard } from '@ant-design/pro-components'
+import { ProCard } from '@fastball/pro-components'
 import { MD5 } from 'object-hash'
 import { loadRefComponent } from '../../common'
 import { LeftAndRightLayoutProps } from '../../../types'
