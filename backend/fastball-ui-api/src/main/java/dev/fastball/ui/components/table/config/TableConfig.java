@@ -1,5 +1,6 @@
 package dev.fastball.ui.components.table.config;
 
+import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.component.Component;
 import dev.fastball.ui.components.table.param.TableSize;
 
@@ -75,6 +76,8 @@ public @interface TableConfig {
     TableFieldConfig[] columnsConfig() default {};
 
     TableFieldConfig[] queryFieldsConfig() default {};
+
+    ViewAction[] selectionViewActions() default {};
 
     Class<? extends Component> rowExpandedComponent() default Component.class;
 }

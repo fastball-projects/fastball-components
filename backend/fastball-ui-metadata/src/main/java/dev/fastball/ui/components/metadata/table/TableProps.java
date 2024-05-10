@@ -1,6 +1,7 @@
 package dev.fastball.ui.components.metadata.table;
 
 import dev.fastball.auto.value.annotation.AutoValue;
+import dev.fastball.core.info.action.ActionInfo;
 import dev.fastball.core.info.basic.FieldInfo;
 import dev.fastball.core.info.component.ComponentProps;
 import dev.fastball.core.info.component.ReferencedComponentInfo;
@@ -40,4 +41,8 @@ public interface TableProps extends ComponentProps {
     List<ColumnInfo> columns();
 
     List<FieldInfo> queryFields();
+
+    List<ActionInfo> selectionActions();
+
+    List<ActionInfo> selectionViewActions();
 }

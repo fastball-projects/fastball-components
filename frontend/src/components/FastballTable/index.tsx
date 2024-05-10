@@ -26,7 +26,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], selectionActions = [], selectionViewActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, tableLayout: 'fixed', rowKey: 'id', search: { labelWidth: "auto", filterType: lightQuery ? 'light' : 'query' } };
     const proTableColumns: ProTableColumn[] = [];
@@ -97,6 +97,38 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
         }
         return buildAction(actionInfo)
     })
+
+    if ((selectionActions.length + selectionViewActions.length) > 0) {
+        proTableProps.rowSelection = {
+            selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+            defaultSelectedRowKeys: [],
+        }
+        proTableProps.tableAlertOptionRender = ({ selectedRows }) => {
+            const multipleSelectionActions = selectionActions.map(action => {
+                const { actionKey, actionName, refresh } = action;
+                const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
+                const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: selectedRows });
+                if (refresh) {
+                    actionInfo.callback = () => ref.current?.reload()
+                }
+                return buildAction(actionInfo)
+            })
+            selectionViewActions.forEach(action => {
+                const { actionKey, actionName, refresh } = action;
+                const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
+                const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: selectedRows });
+                if (refresh) {
+                    actionInfo.callback = () => ref.current?.reload()
+                }
+                multipleSelectionActions.push(buildAction(actionInfo))
+            })
+            return (
+                <Space size={16}>
+                    {multipleSelectionActions}
+                </Space>
+            );
+        }
+    }
     if (recordActions.length > 4) {
         proTableColumns.push({
             title: '操作',
@@ -111,7 +143,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                         return null;
                     }
 
-                    const trigger = <a style={{display: "block"}}>{actionName || actionKey}</a>
+                    const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
                     if (refresh) {
                         actionInfo.callback = () => ref.current?.reload()
@@ -147,7 +179,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ onRecordClick, component
                     if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
                         return null;
                     }
-                    const trigger = <a style={{display: "block"}}>{actionName || actionKey}</a>
+                    const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
                     if (refresh) {
                         actionInfo.callback = () => ref.current?.reload()

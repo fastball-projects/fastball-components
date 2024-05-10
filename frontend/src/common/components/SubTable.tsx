@@ -109,6 +109,7 @@ const SubTable: React.FC<{
         title: '序号',
         dataIndex: '__row_index',
         readonly: true,
+        width: 44,
         renderText: (_dom, _entity, index) => index + 1
     }, ...columns.filter(({ valueType }) => valueType !== 'SubTable' && valueType !== 'group'),]
 
@@ -116,7 +117,7 @@ const SubTable: React.FC<{
         tableColumns.push({
             title: '操作',
             fixed: 'right',
-            width: 100,
+            width: 80,
             valueType: 'option',
             render: (_dom, record) => recordActions ? recordActions.filter(filterVisibled).map((action) => {
                 const { actionKey, actionName, refresh } = action;

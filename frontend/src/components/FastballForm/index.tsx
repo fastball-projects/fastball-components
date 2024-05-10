@@ -253,7 +253,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     const fieldKey = `${parentDataPath?.join('.')}:${config.rowIndex}:${field.dataIndex.join('.')}`
                     clearTimeout(fieldChangeTimerMap[fieldKey])
                     fieldChangeTimerMap[fieldKey] = setTimeout(() => fieldChangeFunc(field, config, formInstance, editableFormRef, parentDataPath), 300);
-                    return formColumn.formItemProps;
+                    return config.formItemProps;
                 }
             }
             if (field.valueType === 'Array' && field.subFields) {

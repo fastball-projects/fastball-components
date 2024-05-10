@@ -5,8 +5,8 @@ import { Data, LookupSelectableTableProps } from "../../../types";
 import { ProColumnGroupType, ProTableProps } from "@ant-design/pro-table/es/typing";
 import { doLookupAction } from "../action";
 
-export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ componentKey, closeDropdown, lookup, multiple, value, params, onChange, onSelect }) => {
-    const { columns, queryFields, valueField, showSearch } = lookup
+export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ componentKey, closeDropdown, lookup, value, params, onChange, onSelect }) => {
+    const { columns, queryFields, valueField, showSearch, multiple } = lookup
     const proTableColumns: (ProColumnGroupType<Data, "text"> | ProColumnType<Data, "text">)[] = []
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = {
         size: 'small',

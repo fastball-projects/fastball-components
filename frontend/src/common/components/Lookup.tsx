@@ -5,12 +5,14 @@ import { ProFormSelect } from "@fastball/pro-components";
 import type { ProFormSelectProps } from "@fastball/pro-components";
 import { Drawer } from "antd";
 
-const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, onChange, params, ...otherProps }) => {
+const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, onChange, params, request,  ...otherProps }) => {
     const [open, setOpen] = useState(false);
+    const [initialValue, setInitialValue] = useState();
     const closeDropdown = () => setOpen(false);
-    const { multiple, valueField, labelField } = lookup
+    const { multiple, valueField, labelField, selectedFirst } = lookup
     const selectProps: ProFormSelectProps = {
         ...otherProps,
+        request,
         value,
         style: { width: '100%' },
         fieldProps: {
@@ -30,6 +32,18 @@ const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, o
             mode: multiple ? 'multiple' : undefined
         }
     }
+    if(selectedFirst) {
+        selectProps.request = async (params: any) => {
+            const data = await request(params);
+            if(data?.length) {
+                setInitialValue(data[0][valueField]);
+            }
+            return data;
+        }
+        selectProps.key = initialValue
+        selectProps.initialValue = initialValue
+    }
+    
     //     options: data
     return <>
         <Drawer width="75%" open={open} onClose={() => setOpen(false)}>

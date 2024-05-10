@@ -28,6 +28,8 @@ export type TableProps = {
     columns: ColumnInfo[]
     queryFields: FieldInfo[]
     actions?: ActionInfo[]
+    selectionActions?: ActionInfo[]
+    selectionViewActions?: ActionInfo[]
     recordActions?: TableRecordActionInfo[]
     originalOptionRender?: (Data, number) => ReactNode
     rowExpandedComponent?: ReferencedComponent

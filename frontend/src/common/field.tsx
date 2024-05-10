@@ -17,6 +17,7 @@ import TreeLookupComponent from './components/TreeLookup';
 import { preview, upload } from './upload';
 
 import { loadCache, setCache } from './cache';
+import SelectComponent from './components/Select';
 
 const formOnlyField: Record<string, boolean> = {
     group: true, formList: true, formSet: true, divider: true, dependency: true,
@@ -92,6 +93,8 @@ export const processingField = (componentKey: string, field: FieldInfo, column: 
             } else {
                 column.valueType = 'Lookup'
             }
+        } else if (field.valueType == 'select') {
+            column.valueType = 'Select'
         }
         if (field.valueType == 'treeSelect') {
             fieldProps.treeCheckable = lookupAction.multiple
@@ -302,6 +305,12 @@ export const FastballFieldProvider: FC<{ children: React.ReactNode }> = ({ child
                 render: (value, props) => <ProFormSelect {...props} {...props?.fieldProps} value={value} readonly />,
                 renderFormItem: (text, props, dom) => {
                     return <LookupComponent {...props} {...props?.fieldProps} />
+                }
+            },
+            Select: {
+                render: (value, props) => <ProFormSelect {...props} {...props?.fieldProps} value={value} readonly />,
+                renderFormItem: (text, props, dom) => {
+                    return <SelectComponent {...props} {...props?.fieldProps} />
                 }
             },
             TreeLookup: {
