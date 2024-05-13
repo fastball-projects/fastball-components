@@ -10,8 +10,6 @@ import dev.fastball.ui.components.chart.config.BarChartConfig;
 import dev.fastball.ui.components.chart.config.ColumnChartConfig;
 import dev.fastball.ui.components.chart.config.LineChartConfig;
 
-import static dev.fastball.compile.utils.ElementCompileUtils.getReferencedComponentInfo;
-
 /**
  * @author gr@fastball.dev
  * @since 2022/12/9

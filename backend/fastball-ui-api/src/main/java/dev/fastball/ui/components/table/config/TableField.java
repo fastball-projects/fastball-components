@@ -1,6 +1,6 @@
 package dev.fastball.ui.components.table.config;
 
-import dev.fastball.core.info.basic.DisplayType;
+import dev.fastball.meta.basic.DisplayType;
 
 import java.lang.annotation.*;
 

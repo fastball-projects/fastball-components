@@ -9,9 +9,9 @@ import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.core.annotation.Field;
 import dev.fastball.core.annotation.Lookup;
 import dev.fastball.core.annotation.TreeLookup;
-import dev.fastball.core.component.Range;
-import dev.fastball.core.info.basic.DisplayType;
-import dev.fastball.core.info.basic.ValueType;
+import dev.fastball.core.field.Range;
+import dev.fastball.meta.basic.DisplayType;
+import dev.fastball.meta.basic.ValueType;
 import dev.fastball.ui.builtin.jpa.annotation.DataManagement;
 import dev.fastball.ui.builtin.jpa.query.JpaQueryModel;
 import lombok.Getter;
@@ -31,7 +31,7 @@ import javax.persistence.criteria.Root;
 import java.io.IOException;
 import java.util.*;
 
-import static dev.fastball.core.info.basic.ValueType.*;
+import static dev.fastball.meta.basic.ValueType.*;
 
 /**
  * @author GR

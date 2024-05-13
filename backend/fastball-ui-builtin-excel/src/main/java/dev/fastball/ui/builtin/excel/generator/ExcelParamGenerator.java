@@ -15,7 +15,7 @@ import dev.fastball.compile.FastballCompileGenerator;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.core.annotation.Field;
 import dev.fastball.core.annotation.Model;
-import dev.fastball.core.info.basic.DisplayType;
+import dev.fastball.meta.basic.DisplayType;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;

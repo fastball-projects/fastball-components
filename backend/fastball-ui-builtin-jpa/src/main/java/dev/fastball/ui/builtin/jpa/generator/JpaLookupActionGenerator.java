@@ -8,12 +8,10 @@ import dev.fastball.core.component.LookupAction;
 import dev.fastball.core.component.LookupActionParam;
 import dev.fastball.ui.builtin.jpa.BuiltinGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.ClassUtils;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-
 import java.util.Collection;
 
 import static dev.fastball.ui.builtin.jpa.FastballAptJpaConstants.*;

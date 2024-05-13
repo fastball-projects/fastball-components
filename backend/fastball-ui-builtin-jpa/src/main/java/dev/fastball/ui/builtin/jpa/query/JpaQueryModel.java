@@ -1,6 +1,6 @@
 package dev.fastball.ui.builtin.jpa.query;
 
-import dev.fastball.core.component.Range;
+import dev.fastball.core.field.Range;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.Specification;

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 version=$1
-hosted=$2
 
 if [ ! -n "$version" ]; then
     echo "version is empty."
@@ -10,6 +9,7 @@ fi
 
 if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
     frontend_version=${version%-SNAPSHOT*}-$(date +%s)
+    # frontend_version=${version%-SNAPSHOT*}-999
 else
     frontend_version=$version
 fi
@@ -17,14 +17,18 @@ fi
 publish_frontend() {
     cd frontend
     echo "change fastball component frontend version to $frontend_version"
-    pnpm version $frontend_version
+    # pnpm version $frontend_version
+    npm version $frontend_version
     echo "installing dependency..."
-    pnpm i
+    # pnpm need node 16, but lowcode-engine depends node-saas need node 14... WTF...
+    # pnpm i
+    yarn
     echo "build & publish fastball component frontend ..."
-    if [ ! -n "$hosted" ]; then
-        npm run prepublish && npm publish
+    if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
+        npm run prepublish && npm publish --registry https://registry.npmjs.org
     else
-        npm run prepublish && npm publish --registry http://82.157.239.41:7777/repository/npm-hosted/
+        # npm run prepublish && npm publish --registry http://82.157.239.41:7777/repository/npm-hosted/
+        npm run prepublish && npm publish --registry https://bitbean-npm.pkg.coding.net/fastball/npm
     fi
     echo "fastball component frontend published."
     npm_version_line=$(grep -n 'npmVersion' ../backend/fastball-ui-compiler/src/main/resources/fastball-material.yml | cut -d ':' -f1)

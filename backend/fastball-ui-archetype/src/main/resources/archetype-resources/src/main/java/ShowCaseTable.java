@@ -1,4 +1,4 @@
-package ${package};
+package $
 
 import dev.fastball.core.annotation.UIComponent;
 import dev.fastball.core.component.DataResult;

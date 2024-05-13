@@ -5,7 +5,7 @@
     <parent>
         <artifactId>fastball-ui</artifactId>
         <groupId>dev.fastball</groupId>
-        <version>0.3.1-SNAPSHOT</version>
+        <version>0.5.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,6 +19,10 @@
         <dependency>
             <groupId>dev.fastball</groupId>
             <artifactId>fastball-ui-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.fastball</groupId>
+            <artifactId>fastball-ui-metadata</artifactId>
         </dependency>
         <dependency>
             <groupId>dev.fastball</groupId>
