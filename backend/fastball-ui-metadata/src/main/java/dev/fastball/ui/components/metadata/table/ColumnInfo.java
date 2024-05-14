@@ -1,6 +1,6 @@
 package dev.fastball.ui.components.metadata.table;
 
-import dev.fastball.core.info.basic.FieldInfo;
+import dev.fastball.meta.basic.FieldInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -2,7 +2,7 @@ package dev.fastball.ui.components.metadata.chart;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.component.ComponentProps;
+import dev.fastball.meta.component.ComponentProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

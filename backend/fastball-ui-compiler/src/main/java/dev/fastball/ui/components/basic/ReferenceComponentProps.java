@@ -1,8 +1,8 @@
 package dev.fastball.ui.components.basic;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.component.ComponentProps;
-import dev.fastball.core.info.component.ReferencedComponentInfo;
+import dev.fastball.meta.component.ComponentProps;
+import dev.fastball.meta.component.ReferencedComponentInfo;
 
 /**
  * @author gr@fastball.dev

@@ -1,8 +1,9 @@
 package dev.fastball.ui.components.metadata.layout;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.component.ComponentProps;
-import dev.fastball.core.info.component.ReferencedComponentInfo;
+import dev.fastball.meta.component.ComponentProps;
+import dev.fastball.meta.component.ReferencedComponentInfo;
 
 import java.util.List;
 
@@ -10,52 +11,16 @@ import java.util.List;
  * @author gr@fastball.dev
  * @since 2022/12/19
  */
+@JsonDeserialize(using = LayoutPropsDeserializer.class)
 public interface LayoutProps extends ComponentProps {
     LayoutType layoutType();
 
     boolean interlocking();
 }
 
-@AutoValue
-interface GridLayoutProps extends LayoutProps {
-    LayoutType layoutType = LayoutType.Grid;
 
-    int cols();
 
-    int rowHeight();
 
-    boolean resizable();
 
-    boolean draggable();
 
-    List<GridCellProps_AutoValue> cells();
-}
 
-@AutoValue
-interface LeftAndRightLayoutProps extends LayoutProps {
-    LayoutType layoutType = LayoutType.LeftAndRight;
-
-    ReferencedComponentInfo left();
-
-    ReferencedComponentInfo right();
-}
-
-@AutoValue
-interface TopAndBottomLayoutProps extends LayoutProps {
-    LayoutType layoutType = LayoutType.TopAndBottom;
-
-    ReferencedComponentInfo top();
-
-    ReferencedComponentInfo bottom();
-}
-
-@AutoValue
-interface LeftAndTopBottomLayoutProps extends LayoutProps {
-    LayoutType layoutType = LayoutType.LeftAndTopBottom;
-
-    ReferencedComponentInfo left();
-
-    ReferencedComponentInfo top();
-
-    ReferencedComponentInfo bottom();
-}

@@ -1,6 +1,6 @@
 package dev.fastball.ui.components.metadata.tableform;
 
-import dev.fastball.core.info.basic.FieldInfo;
+import dev.fastball.meta.basic.FieldInfo;
 import dev.fastball.ui.components.metadata.form.FieldDependencyInfo;
 import dev.fastball.ui.components.form.config.ConditionComposeType;
 import dev.fastball.ui.components.form.config.FieldDependencyType;

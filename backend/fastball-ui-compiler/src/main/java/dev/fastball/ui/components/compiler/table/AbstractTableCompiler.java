@@ -9,9 +9,9 @@ import dev.fastball.core.annotation.RecordAction;
 import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.component.Component;
 import dev.fastball.core.component.DownloadFile;
-import dev.fastball.core.info.action.ActionInfo;
-import dev.fastball.core.info.action.ApiActionInfo;
-import dev.fastball.core.info.basic.FieldInfo;
+import dev.fastball.meta.action.ActionInfo;
+import dev.fastball.meta.action.ApiActionInfo;
+import dev.fastball.meta.basic.FieldInfo;
 import dev.fastball.ui.components.metadata.table.ColumnInfo;
 import dev.fastball.ui.components.metadata.table.TableProps_AutoValue;
 import dev.fastball.ui.components.table.config.*;
@@ -115,7 +115,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
     }
 
     @Override
-    protected String getComponentName() {
+    public String getComponentName() {
         return COMPONENT_TYPE;
     }
 

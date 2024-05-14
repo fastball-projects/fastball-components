@@ -5,7 +5,7 @@ import dev.fastball.compile.AbstractComponentCompiler;
 import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.ComponentCompiler;
 import dev.fastball.compile.exception.CompilerException;
-import dev.fastball.core.info.component.ReferencedComponentInfo;
+import dev.fastball.meta.component.ReferencedComponentInfo;
 import dev.fastball.ui.components.basic.ReferenceComponent;
 import dev.fastball.ui.components.basic.ReferenceComponentProps_AutoValue;
 import dev.fastball.ui.components.basic.config.ReferenceComponentConfig;
@@ -42,7 +42,7 @@ public class ReferenceComponentCompiler extends AbstractComponentCompiler<Refere
     }
 
     @Override
-    protected String getComponentName() {
+    public String getComponentName() {
         return "ReferenceComponent";
     }
 }

@@ -1,10 +1,10 @@
 package dev.fastball.ui.components.metadata.table;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.action.ActionInfo;
-import dev.fastball.core.info.basic.FieldInfo;
-import dev.fastball.core.info.component.ComponentProps;
-import dev.fastball.core.info.component.ReferencedComponentInfo;
+import dev.fastball.meta.action.ActionInfo;
+import dev.fastball.meta.basic.FieldInfo;
+import dev.fastball.meta.component.ComponentProps;
+import dev.fastball.meta.component.ReferencedComponentInfo;
 import dev.fastball.ui.components.table.param.TableSize;
 
 import java.util.List;

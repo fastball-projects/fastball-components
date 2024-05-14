@@ -1,8 +1,8 @@
 package dev.fastball.ui.components.metadata.timeline;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.action.ActionInfo;
-import dev.fastball.core.info.component.ComponentProps;
+import dev.fastball.meta.action.ActionInfo;
+import dev.fastball.meta.component.ComponentProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,8 +1,9 @@
 package dev.fastball.ui.components.metadata.form;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.basic.PopupType;
-import dev.fastball.core.info.component.ComponentProps;
+import dev.fastball.meta.annotation.PropertyDescription;
+import dev.fastball.meta.basic.PopupType;
+import dev.fastball.meta.component.ComponentProps;
 
 import java.util.List;
 
@@ -12,18 +13,23 @@ import java.util.List;
  */
 @AutoValue
 public interface FormProps extends ComponentProps {
+    @PropertyDescription("Form column number, default 3")
     int column();
 
+    @PropertyDescription("表单标题")
     String headerTitle();
 
     boolean variableForm();
 
+    @PropertyDescription("Is a read-only form")
     boolean readonly();
 
+    @PropertyDescription("Display Reset Button")
     Boolean showReset();
 
     PopupType popupType();
 
+    @PropertyDescription("Form Fields")
     List<FormFieldInfo> fields();
 
     List<ValueChangeHandlerInfo> valueChangeHandlers();

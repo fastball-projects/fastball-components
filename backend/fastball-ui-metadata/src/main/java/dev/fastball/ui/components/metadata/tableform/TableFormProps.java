@@ -1,8 +1,8 @@
 package dev.fastball.ui.components.metadata.tableform;
 
 import dev.fastball.auto.value.annotation.AutoValue;
-import dev.fastball.core.info.basic.PopupType;
-import dev.fastball.core.info.component.ComponentProps;
+import dev.fastball.meta.basic.PopupType;
+import dev.fastball.meta.component.ComponentProps;
 
 import java.util.List;
 
