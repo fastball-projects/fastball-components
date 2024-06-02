@@ -5,7 +5,7 @@ import type { FieldInfo, DescriptionProps } from '../../../types';
 import { buildAction, doApiAction, filterEnabled, filterFormOnlyField, filterVisibled, getByPaths, processingField } from '../../common';
 import SubTable from '../../common/components/SubTable';
 import { ComponentToPrint } from '../../common/components/Printer';
-import { ContainerContextProvider } from '../../common/ContainerContext';
+import { FastballContext } from '../FastballContext';
 
 
 type DescriptionState = {
@@ -13,6 +13,8 @@ type DescriptionState = {
 }
 
 class FastballDescription extends React.Component<DescriptionProps, DescriptionState> {
+    static contextType = FastballContext;
+
     ref = React.createRef<ProCoreActionType>();
     componentRef = React.createRef();
 
@@ -107,7 +109,12 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
     }
 
     render(): React.ReactNode {
-        const { componentKey, container, input, column, variableDescription, setActions, onDataLoad, __designMode, ...props } = this.props;
+        const { componentKey, input, column, variableDescription, setActions, onDataLoad, __designMode, ...props } = this.props;
+        
+        let container = this.props.container;
+        if(container) {
+            container = this.context?.container;
+        }
 
         const proDescriptionsProps: ProDescriptionsProps = { column };
         proDescriptionsProps.size = 'small'
@@ -143,7 +150,6 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
 
         const getPopupContainer = container ? () => container : undefined;
         return <ComponentToPrint ref={this.componentRef}>
-            <ContainerContextProvider container={container}>
                 <ProConfigProvider
                     getPopupContainer={getPopupContainer}
                     valueTypeMap={{
@@ -157,7 +163,6 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
                 >
                     <ProDescriptions size="small" actionRef={this.ref} {...proDescriptionsProps} {...props} />
                 </ProConfigProvider>
-            </ContainerContextProvider>
         </ComponentToPrint>
     }
 }

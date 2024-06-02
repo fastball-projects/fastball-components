@@ -4,13 +4,13 @@ import { FastballFieldProvider, buildTableColumns } from "../field";
 import { Data, LookupSelectableTableProps } from "../../../types";
 import { ProColumnGroupType, ProTableProps } from "@ant-design/pro-table/es/typing";
 import { doLookupAction } from "../action";
-import { ContainerContext } from "../ContainerContext";
+import { FastballContext } from "../../components/FastballContext";
 
 export const SelectableTable: React.FC<LookupSelectableTableProps> = ({ componentKey, closeDropdown, lookup, value, params, onChange, onSelect }) => {
     const { columns, queryFields, valueField, showSearch, multiple } = lookup
     const proTableColumns: (ProColumnGroupType<Data, "text"> | ProColumnType<Data, "text">)[] = []
 
-    const containerContext = useContext(ContainerContext)
+    const containerContext = useContext(FastballContext)
     const container = containerContext?.container
 
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = {

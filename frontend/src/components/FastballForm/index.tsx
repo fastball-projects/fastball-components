@@ -8,7 +8,8 @@ import { Button, Spin } from 'antd';
 import dayjs from 'dayjs';
 import { EDIT_ID } from '../../common/components/SubTable';
 import { ComponentToPrint } from '../../common/components/Printer';
-import { ContainerContextProvider } from '../../common/ContainerContext';
+import { useContext } from 'react';
+import { FastballContext } from '../FastballContext';
 
 dayjs.extend((option, dayjsClass, dayjsFactory) => {
     dayjsClass.prototype.toJSON = function () {
@@ -95,6 +96,8 @@ const fieldChangeFunc = (field: FormFieldInfo, config: ProSchema<any>, formInsta
 const fieldChangeTimerMap: Record<string, any> = {}
 
 class FastballForm extends React.Component<FormProps, FormState> {
+    static contextType = FastballContext;
+
     formRef: React.RefObject<ProFormInstance>;
     componentRef = React.createRef();
 
@@ -173,7 +176,13 @@ class FastballForm extends React.Component<FormProps, FormState> {
     }
 
     buildColumns(componentKey: string, fields: FormFieldInfo[], parentDataIndex?: string[], parentDataPath?: string[], editableFormRef?: React.RefObject<EditableFormInstance>, ignoreParentDataIndex?: boolean): ProFormColumnsType<any, 'text'>[] {
-        const { readonly, column, container } = this.props;
+        const { readonly, column } = this.props;
+        
+        let container = this.props.container;
+        if(container) {
+            container = this.context?.container;
+        }
+        
         const columnSpan = 24 / (column || 2);
         const getRootValues = () => this.formRef.current?.getFieldsValue()
         return fields.filter(filterEnabled).filter(field => field.valueType).sort((f1, f2) => f1.order - f2.order).map(field => {
@@ -270,7 +279,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 subFieldColumn.columns = (config) => {
                     const getGroupColumns = (groupFieldProps: any) => {
                         const parentPath = (Array.isArray(parentDataPath) ? [...parentDataPath] : []).concat(field.dataIndex).concat(groupFieldProps.rowIndex)
-                        return this.buildColumns(container, componentKey, field.subFields!, field.dataIndex, parentPath, undefined, true).map(c => {
+                        return this.buildColumns(componentKey, field.subFields!, field.dataIndex, parentPath, undefined, true).map(c => {
                             c.rowIndex = groupFieldProps.rowIndex;
                             return c;
                         })
@@ -337,9 +346,10 @@ class FastballForm extends React.Component<FormProps, FormState> {
     }
 
     render(): React.ReactNode {
-        const { container, componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
+        const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
         props['@class'] = null;
         const { dataSource } = this.state;
+        const container = this.context?.container;
         const proFormProps: ProFormProps = { size, grid: true, layout: "horizontal", rowProps: { gutter: [16, 16] }, scrollToFirstError: true };
 
         if (variableForm && __designMode !== 'design') {
@@ -397,11 +407,9 @@ class FastballForm extends React.Component<FormProps, FormState> {
         }
         return (
             <ComponentToPrint ref={this.componentRef}>
-                <ContainerContextProvider container={container}>
-                    <FastballFieldProvider container={container}>
-                        <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
-                    </FastballFieldProvider>
-                </ContainerContextProvider>
+                <FastballFieldProvider container={container}>
+                    <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
+                </FastballFieldProvider>
             </ComponentToPrint>
         )
     }

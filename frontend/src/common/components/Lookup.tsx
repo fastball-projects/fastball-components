@@ -4,7 +4,7 @@ import { SelectableTable } from "./LookupSelectableTable";
 import { ProFormSelect } from "@fastball/pro-components";
 import type { ProFormSelectProps } from "@fastball/pro-components";
 import { Drawer } from "antd";
-import { ContainerContext } from "../ContainerContext";
+import { FastballContext } from "../../components/FastballContext";
 
 const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, onChange, params, request,  ...otherProps }) => {
     const [open, setOpen] = useState(false);
@@ -12,7 +12,7 @@ const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, o
     const closeDropdown = () => setOpen(false);
     const { multiple, valueField, labelField, selectedFirst } = lookup
 
-    const containerContext = useContext(ContainerContext)
+    const containerContext = useContext(FastballContext)
     const container = containerContext?.container
     const getContainer = container ? () => container : undefined;
 

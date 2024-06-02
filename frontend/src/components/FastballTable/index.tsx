@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { ProTable } from '@fastball/pro-components';
 import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from '@fastball/pro-components'
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, ApiActionInfo } from '../../../types';
 import { buildAction, doApiAction, loadRefComponent, filterVisibled, buildTableColumns, FastballFieldProvider } from '../../common';
 import { Dropdown, MenuProps, Space, Table } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import { ContainerContextProvider } from '../../common/ContainerContext';
+import { FastballContext, FastballContextProvider } from '../FastballContext';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -33,6 +33,10 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
     const proTableColumns: ProTableColumn[] = [];
     const [searchState, setSearchState] = useState({});
     const [summaryFields, setSummaryFields] = useState([]);
+    
+    if(container) {
+        container = useContext(FastballContext)?.container
+    }
 
     if (__designMode === 'design') {
         proTableProps.dataSource = buildMockData(columns);
@@ -246,11 +250,9 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
         }
     }
 
-    return <ContainerContextProvider container={container}>
-        <FastballFieldProvider container={container}>
-            <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
-        </FastballFieldProvider>
-    </ContainerContextProvider>
+    return <FastballFieldProvider container={container}>
+        <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
+    </FastballFieldProvider>
 }
 
 

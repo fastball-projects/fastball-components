@@ -2,7 +2,7 @@ import { Button, Popconfirm, Upload, UploadProps, message } from "antd";
 import React, { useState, useContext } from "react";
 import { ApiActionInfo } from "../../../types";
 import { callApi, doApiAction } from "../action";
-import { ContainerContext } from "../ContainerContext";
+import { FastballContext } from "../../components/FastballContext";
 
 const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
     const [open, setOpen] = useState(false);
@@ -10,7 +10,7 @@ const FastballActionButton: React.FC<ApiActionInfo> = (props) => {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const { actionKey, actionName, trigger, confirmMessage, uploadFileAction } = props;
 
-    const containerContext = useContext(ContainerContext)
+    const containerContext = useContext(FastballContext)
     const container = containerContext?.container
     const getContainer = container ? () => container : undefined;
 

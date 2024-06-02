@@ -7,5 +7,6 @@ export { default as FastballTable } from './components/FastballTable'
 export { default as FastballTableForm } from './components/FastballTableForm'
 export { default as FastballTimeline } from './components/FastballTimeline'
 export { default as FastballTree } from './components/FastballTree'
+export * from './components/FastballContext'
 
 import "./index.scss"

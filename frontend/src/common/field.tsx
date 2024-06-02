@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect, ProFormColumnsType } from "@fastball/pro-components";
-import { Tag, Image } from "antd";
-import { Displayable, FieldInfo, LookupActionInfo, MainFieldComponent, PopupProps, CustomTagProps, EnumItem, ColumnInfo, Data, ReactComponent } from "../../types";
+import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect } from "@fastball/pro-components";
+import { Tag, Image, ConfigProvider } from "antd";
+import { Displayable, FieldInfo, LookupActionInfo, PopupProps, CustomTagProps, ColumnInfo, Data } from "../../types";
 import { doLookupAction } from "./action";
 import FastballPopup from "./components/Popup";
 import { loadRefComponent } from './component';
@@ -281,13 +281,12 @@ export const buildTableColumns = (container: Element, componentKey: string, proT
 
 interface FastballFieldProviderProps {
     children: React.ReactNode
-    container?: Element
+    container?: HTMLElement
 }
 
 export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children, container }) => {
     const getPopupContainer = container ? () => container : undefined;
     return <ProConfigProvider
-        getPopupContainer={getPopupContainer}
         valueTypeMap={{
             SubTable: {
                 render: (data, props) => {
@@ -378,6 +377,8 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
             }
         }}
     >
-        {children}
+        <ConfigProvider getPopupContainer={getPopupContainer}>
+            {children}
+        </ConfigProvider>
     </ProConfigProvider>
 }

@@ -3,7 +3,7 @@ import { Timeline as AntDTimeline, Spin } from 'antd';
 import type { TimelineProps as AntDTimelineProps } from 'antd';
 import { doApiAction } from '../../common'
 import { Data, TimelineProps } from '../../../types';
-import { ContainerContextProvider } from '../../common/ContainerContext';
+import { FastballContextProvider } from '../FastballContext';
 
 const mockData: Data[] = [
     {
@@ -65,11 +65,11 @@ const Timeline: React.FC<TimelineProps> = ({ container, componentKey, onRecordCl
     })
 
     return (
-        <ContainerContextProvider container={container}>
+        <FastballContextProvider container={container}>
             <AntDTimeline mode='left' {...treeProps}>
                 {items}
             </AntDTimeline>
-        </ContainerContextProvider>
+        </FastballContextProvider>
     )
 };
 

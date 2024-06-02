@@ -7,7 +7,7 @@ import { EditableProTable } from '@fastball/pro-components'
 import FastballForm from "../FastballForm";
 import { buildAction, doApiAction, filterVisibled, processingField } from "../../common";
 import { ComponentToPrint } from "../../common/components/Printer";
-import { ContainerContextProvider } from "../../common/ContainerContext";
+import { FastballContext, FastballContextProvider } from "../FastballContext";
 
 const EDIT_ID = '__edit_id';
 
@@ -54,6 +54,7 @@ const dataChangeFunc = (dataSource: TableData[], dataSourceMap: Record<string, T
 })
 
 class FastballTableForm extends React.Component<TableFormProps, TableFormState> {
+    static contextType = FastballContext;
     formRef = React.createRef<ProFormInstance>();
     editableFormRef = React.createRef<EditableFormInstance>();
     ref = React.createRef();
@@ -103,8 +104,9 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     buildTable() {
-        const { container, fields, componentKey, onDataLoad, rowEditable, rowSelectable, childrenFieldName, input, __designMode } = this.props;
+        const { fields, componentKey, onDataLoad, rowEditable, rowSelectable, childrenFieldName, input, __designMode } = this.props;
         const { dataSource, dataSourceMap } = this.state;
+        const container = this.context?.container;
 
         let editable: RowEditableConfig<Record<string, any>> = {
             type: 'multiple',
@@ -225,9 +227,12 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
     }
 
     render(): React.ReactNode {
-        const { container, fields, componentKey, value, onChange } = this.props;
+        const { fields, componentKey, value, onChange } = this.props;
         const { dataSource, dataIndex, formOpen } = this.state;
-
+        let container = this.props.container;
+        if(container) {
+            container = this.context?.container;
+        }
         const input = dataSource?.[dataIndex]
         const formFields = fields.filter(({ hideInForm }) => !hideInForm).map(field => ({ ...field, readonly: !field.editInForm }))
         const formProps: FormProps = { componentKey, formRef: this.formRef, input, fields: formFields, showReset: false, variableForm: false, readonly: false }
@@ -248,12 +253,10 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
         }
 
         return <ComponentToPrint ref={this.ref}>
-            <ContainerContextProvider container={container}>
-                <Drawer placement="right" width="75%" onClose={() => this.closeForm()} open={formOpen} footer={footerButtons} getContainer={getContainer}>
-                    <FastballForm key={input ? MD5(input) : ""} {...formProps} />
-                </Drawer>
-                {this.buildTable()}
-            </ContainerContextProvider>
+            <Drawer placement="right" width="75%" onClose={() => this.closeForm()} open={formOpen} footer={footerButtons} getContainer={getContainer}>
+                <FastballForm key={input ? MD5(input) : ""} {...formProps} />
+            </Drawer>
+            {this.buildTable()}
         </ComponentToPrint>
     }
 

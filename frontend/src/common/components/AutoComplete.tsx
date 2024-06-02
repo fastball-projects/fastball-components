@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { MD5 } from 'object-hash'
 import { doAutoCompleteAction } from "../action";
 import { loadCache, setCache } from "../cache";
-import { ContainerContext } from "../ContainerContext";
+import { FastballContext } from "../../components/FastballContext";
 
 type AutoCompleteType = {
     autoCompleteKey: string;
@@ -50,7 +50,7 @@ const CustomInputNumber = ({ onChange, inputValue, ...rest }) => {
 
 const AutoComplete: React.FC<AutoCompleteType> = ({ autoCompleteKey, input, dependencyFields, value, inputType, readonly, valueField, fields, onChange }: AutoCompleteType) => {
 
-    const containerContext = useContext(ContainerContext)
+    const containerContext = useContext(FastballContext)
     const container = containerContext?.container
     const getContainer = container ? () => container : undefined;
 

@@ -4,7 +4,7 @@ import { Modal, Drawer, Popover, PopoverProps, ModalProps, DrawerProps, Space } 
 import type { PopupInfo, PopupProps, RefComponentInfo } from '../../../types'
 import { loadRefComponent } from '../component'
 import { getByPaths } from '../utils';
-import { ContainerContext } from '../ContainerContext';
+import { FastballContext } from '../../components/FastballContext';
 
 const loadPopupComponent = (popupInfo: PopupInfo, input?: any): RefComponentInfo | null => {
     const { popupComponent, dynamicPopup, dynamicPopupRules, conditionPath } = popupInfo;
@@ -47,19 +47,20 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
     const [open, setOpen] = React.useState(false);
     const [actions, setActions] = React.useState<React.ReactNode>([]);
 
-    const containerContext = useContext(ContainerContext)
+    const containerContext = useContext(FastballContext)
     const container = containerContext?.container
     const getContainer = container ? () => container : undefined;
 
     const popupComponent = loadPopupComponent(popupInfo, input);
 
 
-    const closePopup = () => {
+    const closePopup = React.useCallback(() => {
         setOpen(false);
         if (onClose) {
             onClose();
         }
-    }
+    }, [onClose]);
+    
     if(!popupComponent) {
         return trigger
     }

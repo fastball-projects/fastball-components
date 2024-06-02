@@ -4,8 +4,7 @@ import type { TreeProps as AndDTreeProps, MenuProps } from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { buildAction, doApiAction, filterVisibled } from '../../common'
-import type { ActionInfo, ActionRef, Data, TreeProps, TreeState } from '../../../types'
-import { ContainerContextProvider } from '../../common/ContainerContext';
+import type { ActionInfo, Data, TreeProps, TreeState } from '../../../types'
 
 const mockData: Data[] = [{
     key: "1",
@@ -95,7 +94,7 @@ class Tree extends React.Component<TreeProps, TreeState> {
     }
 
     render(): React.ReactNode {
-        const { container, treeData, loading } = this.state;
+        const { treeData, loading } = this.state;
         if (loading) {
             return <Spin />
         }
@@ -139,9 +138,7 @@ class Tree extends React.Component<TreeProps, TreeState> {
             }
         }
 
-        return <ContainerContextProvider container={container}>
-            <AntDTree {...treeProps} />;
-        </ContainerContextProvider>
+        return <AntDTree {...treeProps} />;
     }
 }
 export default Tree;
