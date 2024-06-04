@@ -230,7 +230,7 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
         const { fields, componentKey, value, onChange } = this.props;
         const { dataSource, dataIndex, formOpen } = this.state;
         let container = this.props.container;
-        if(container) {
+        if(!container) {
             container = this.context?.container;
         }
         const input = dataSource?.[dataIndex]

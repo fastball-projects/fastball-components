@@ -34,7 +34,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
     const [searchState, setSearchState] = useState({});
     const [summaryFields, setSummaryFields] = useState([]);
     
-    if(container) {
+    if(!container) {
         container = useContext(FastballContext)?.container
     }
 

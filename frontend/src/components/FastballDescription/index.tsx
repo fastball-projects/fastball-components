@@ -112,7 +112,7 @@ class FastballDescription extends React.Component<DescriptionProps, DescriptionS
         const { componentKey, input, column, variableDescription, setActions, onDataLoad, __designMode, ...props } = this.props;
         
         let container = this.props.container;
-        if(container) {
+        if(!container) {
             container = this.context?.container;
         }
 

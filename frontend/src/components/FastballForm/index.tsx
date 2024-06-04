@@ -179,7 +179,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
         const { readonly, column } = this.props;
         
         let container = this.props.container;
-        if(container) {
+        if(!container) {
             container = this.context?.container;
         }
         
