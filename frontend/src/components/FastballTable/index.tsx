@@ -88,7 +88,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
         proTableProps.search = false;
     }
 
-    const actionButtons = !actions ? [] : actions.filter(filterVisibled).map(action => {
+    const actionButtons = actions?.filter(filterVisibled)?.map(action => {
         const actionInfo: ActionInfo = { componentKey, ...action };
         if (actionInfo.type === 'API') {
             const apiActionInfo = actionInfo as ApiActionInfo
@@ -103,13 +103,13 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
         return buildAction(actionInfo)
     })
 
-    if ((selectionActions.length + selectionViewActions.length) > 0) {
+    if (((selectionActions?.length || 0) + (selectionViewActions?.length || 0)) > 0) {
         proTableProps.rowSelection = {
             selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
             defaultSelectedRowKeys: [],
         }
         proTableProps.tableAlertOptionRender = ({ selectedRows }) => {
-            const multipleSelectionActions = selectionActions.map(action => {
+            const multipleSelectionActions = selectionActions?.map(action => {
                 const { actionKey, actionName, refresh } = action;
                 const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
                 const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: selectedRows });
@@ -117,8 +117,8 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
                     actionInfo.callback = () => ref.current?.reload()
                 }
                 return buildAction(actionInfo)
-            })
-            selectionViewActions.forEach(action => {
+            }) || []
+            selectionViewActions?.forEach(action => {
                 const { actionKey, actionName, refresh } = action;
                 const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
                 const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: selectedRows });

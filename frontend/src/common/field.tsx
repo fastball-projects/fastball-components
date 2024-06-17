@@ -90,16 +90,10 @@ export const processingField = (container: Element, componentKey: string, field:
         if (container) {
             fieldProps.getPopupContainer = () => container
         }
-        if (field.lookup.columns?.length) {
-            if (field.valueType == 'treeSelect') {
-                column.valueType = 'TreeLookup'
-            } else {
-                column.valueType = 'Lookup'
-            }
-        } else if (field.valueType == 'select') {
+        if (!field.lookup.columns?.length && field.valueType == 'Lookup') {
             column.valueType = 'Select'
         }
-        if (field.valueType == 'treeSelect') {
+        if(field.valueType == 'TreeLookup') {
             fieldProps.treeCheckable = lookupAction.multiple
         }
         if (lookupAction.multiple) {
