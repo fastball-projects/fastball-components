@@ -240,7 +240,7 @@ public class JpaQueryModelProcessor implements FastballGenerateCompileGenerator 
         lookupAnnotationBuilder.members.put("value", Collections.singletonList(CodeBlock.of("$L", lookupActionElement.getQualifiedName() + ".class")));
         lookupAnnotationBuilder.members.put("extraFillFields", Collections.singletonList(CodeBlock.of("$L", "{}")));
         toPredicateBuilder
-                .beginControlFlow("if ($L != null)", name)
+                .beginControlFlow("if ($L != null && !$L.isEmpty())", name, name)
                 .addStatement("predicates.add(inPredicate($L, $S, root, criteriaBuilder))", name, name)
                 .endControlFlow();
         return FieldSpec.builder(typeName, name, Modifier.PRIVATE)
@@ -259,7 +259,7 @@ public class JpaQueryModelProcessor implements FastballGenerateCompileGenerator 
             fieldAnnotationBuilder.addMember("title", "$S", title);
         }
         toPredicateBuilder
-                .beginControlFlow("if ($L != null)", name)
+                .beginControlFlow("if ($L != null && !$L.isEmpty())", name, name)
                 .addStatement("predicates.add(inPredicate($L, $S, root, criteriaBuilder))", name, name)
                 .endControlFlow();
         return FieldSpec.builder(typeName, name, Modifier.PRIVATE)

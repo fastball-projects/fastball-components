@@ -20,6 +20,7 @@ const LookupComponent: React.FC<LookupProps> = ({ componentKey, lookup, value, o
         ...otherProps,
         request,
         value,
+        onChange,
         style: { width: '100%' },
         fieldProps: {
             open: false,
