@@ -317,10 +317,8 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
                 }
             },
             TreeLookup: {
-                render: (value, props) => <ProFormTreeSelect {...props} {...props?.fieldProps} value={value} readonly />,
-                renderFormItem: (text, props, dom) => {
-                    return <TreeLookupComponent {...props} {...props?.fieldProps} />
-                }
+                render: (value, props) => <ProFormTreeSelect {...props} {...props?.fieldProps} value={value}  mode={null} readonly />,
+                renderFormItem: (text, props, dom) => <ProFormTreeSelect {...props} {...props?.fieldProps} mode={null}/>
             },
             AutoComplete: {
                 render: (text) => text,
