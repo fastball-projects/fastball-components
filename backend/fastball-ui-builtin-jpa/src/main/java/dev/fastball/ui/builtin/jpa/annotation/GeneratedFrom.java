@@ -10,4 +10,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.SOURCE)
 public @interface GeneratedFrom {
     Class<?> value();
+    String generatorClass();
+    String date();
 }

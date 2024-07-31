@@ -15,7 +15,7 @@
 
         <fastball.version>0.1.1-SNAPSHOT</fastball.version>
         <fastball-ui.version>0.0.132-SNAPSHOT</fastball-ui.version>
-        <spring-boot.version>2.7.7</spring-boot.version>
+        <spring-boot.version>3.3.1</spring-boot.version>
     </properties>
 
     <dependencies>

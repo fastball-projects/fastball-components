@@ -8,7 +8,6 @@ import dev.fastball.compile.exception.CompilerException;
 import dev.fastball.ui.builtin.jpa.annotation.DataManagement;
 import dev.fastball.ui.builtin.jpa.annotation.GeneratedFrom;
 
-import javax.annotation.Generated;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
@@ -42,15 +41,12 @@ public abstract class BuiltinGenerator implements FastballPreCompileGenerator {
     }
 
     protected TypeSpec buildType(TypeElement element, ProcessingEnvironment processingEnv) {
-        AnnotationSpec generatedAnnotation = AnnotationSpec.builder(Generated.class)
-                .addMember("value", "$S", this.getClass().getName())
-                .addMember("date", "$S", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
-                .build();
         AnnotationSpec generatedFromAnnotation = AnnotationSpec.builder(GeneratedFrom.class)
                 .addMember("value", element.getQualifiedName().toString() + ".class")
+                .addMember("generatorClass", "$S", this.getClass().getName())
+                .addMember("date", "$S", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
                 .build();
         TypeSpec.Builder typeBuilder = typeBuilder(element, processingEnv);
-        typeBuilder.addAnnotation(generatedAnnotation);
         typeBuilder.addAnnotation(generatedFromAnnotation);
         return typeBuilder.build();
     }
