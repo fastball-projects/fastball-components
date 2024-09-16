@@ -5,6 +5,7 @@ import type { PopupInfo, PopupProps, RefComponentInfo } from '../../../types'
 import { loadRefComponent } from '../component'
 import { getByPaths } from '../utils';
 import { FastballContext } from '../../components/FastballContext';
+import ViewWrapper from './ViewWrapper';
 
 const loadPopupComponent = (popupInfo: PopupInfo, input?: any): RefComponentInfo | null => {
     const { popupComponent, dynamicPopup, dynamicPopupRules, conditionPath } = popupInfo;
@@ -26,7 +27,7 @@ const loadPopupComponent = (popupInfo: PopupInfo, input?: any): RefComponentInfo
     return null
 }
 
-const buildPopupComponent = (popupComponent: RefComponentInfo, props: Record<string, any>, input?: any) => {
+const buildPopupComponent = (popupComponent: RefComponentInfo, props: Record<string, any>, input?: any, ownerComponent?: string, actionKey?: string) => {
     const popupProps: Record<string, any> = {
         ...props
     }
@@ -37,12 +38,18 @@ const buildPopupComponent = (popupComponent: RefComponentInfo, props: Record<str
             popupProps[popupComponent.propsKey] = input
         }
     }
-    return loadRefComponent(popupComponent.componentInfo, popupProps);
+    const component = loadRefComponent(popupComponent.componentInfo, popupProps);
+    const fastballViewPath = {
+        actionKey,
+        componentKey: ownerComponent,
+        type: 'ViewAction',
+    }
+    return <ViewWrapper fastballViewPath={fastballViewPath}>{component}</ViewWrapper>
 }
 
 
 
-const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, input, loadInput, __designMode }) => {
+const FastballPopup: React.FC<PopupProps> = ({ actionKey, ownerComponent, trigger, popupInfo, onClose, input, loadInput, __designMode }) => {
     const { triggerType, placementType, popupType, title, width } = popupInfo;
     const [open, setOpen] = React.useState(false);
     const [actions, setActions] = React.useState<React.ReactNode>([]);
@@ -60,13 +67,13 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
             onClose();
         }
     }, [onClose]);
-    
-    if(!popupComponent) {
+
+    if (!popupComponent) {
         return trigger
     }
 
     if (popupType === 'Popover') {
-        const content = buildPopupComponent(popupComponent, { container, closePopup, __designMode }, input)
+        const content = buildPopupComponent(popupComponent, { container, closePopup, __designMode }, input, ownerComponent, actionKey)
         const onOpenChange = (visible: boolean) => visible ? setOpen(true) : closePopup()
         // const forceRender = triggerType === 'Hover'
         const popoverProps: PopoverProps = { title, onOpenChange, open, content, placement: placementType, arrowPointAtCenter: true, getPopupContainer: getContainer, getTooltipContainer: getContainer }
@@ -102,7 +109,7 @@ const FastballPopup: React.FC<PopupProps> = ({ trigger, popupInfo, onClose, inpu
         navigator.clipboard.writeText(popupComponent.componentInfo.componentClass);
         console.log('Component class: ', popupComponent.componentInfo.componentClass)
     }
-    const content = buildPopupComponent(popupComponent, { container, closePopup, setActions, __designMode }, input)
+    const content = buildPopupComponent(popupComponent, { container, closePopup, setActions, __designMode }, input, ownerComponent, actionKey)
     const titleComponent = <div onClick={titleClick}>{title}</div>
     const popupProps: ModalProps = { title: titleComponent, open, footer: <Space>{actions}</Space>, getContainer }
     if (width) {

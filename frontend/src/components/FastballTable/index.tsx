@@ -4,8 +4,9 @@ import type { ProTableProps, ProColumns, ActionType as AntDProActionType } from 
 import type { Data, MockDataComponent, TableProps, ColumnInfo, ActionInfo, ApiActionInfo } from '../../../types';
 import { buildAction, doApiAction, loadRefComponent, filterVisibled, buildTableColumns, FastballFieldProvider } from '../../common';
 import { Dropdown, MenuProps, Space, Table } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
 import { FastballContext, FastballContextProvider } from '../FastballContext';
+import ViewWrapper from '../../common/components/ViewWrapper';
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 
@@ -33,8 +34,8 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
     const proTableColumns: ProTableColumn[] = [];
     const [searchState, setSearchState] = useState({});
     const [summaryFields, setSummaryFields] = useState([]);
-    
-    if(!container) {
+
+    if (!container) {
         container = useContext(FastballContext)?.container
     }
 
@@ -134,63 +135,46 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
             );
         }
     }
-    if (recordActions.length > 4) {
+
+    const activedRecordActions = recordActions?.filter(filterVisibled)
+
+    if (activedRecordActions?.length) {
         proTableColumns.push({
             title: '操作',
             dataIndex: '__option',
             valueType: 'option',
             align: 'left',
+            width: 100,
             render: (_, record) => {
-                const items: MenuProps['items'] = recordActions ? recordActions.filter(filterVisibled).map((action) => {
+                const actionButtons = activedRecordActions.map((action) => {
                     const { actionKey, actionName, refresh } = action;
                     const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
                     if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
                         return null;
                     }
 
-                    const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
-                    const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
-                    if (refresh) {
-                        actionInfo.callback = () => ref.current?.reload()
-                    }
-                    return { key: actionKey, label: buildAction(actionInfo) }
-                }).filter(action => action != null) : [];
-
-                if (!items?.length) {
-                    return null;
-                }
-                return (
-                    <Dropdown menu={{ items }}>
-                        <a onClick={(e) => e.preventDefault()}>
-                            <Space>
-                                操作
-                                <DownOutlined />
-                            </Space>
-                        </a>
-                    </Dropdown>
-                )
-            }
-        })
-    } else {
-        proTableColumns.push({
-            title: '操作',
-            dataIndex: '__option',
-            valueType: 'option',
-            align: 'left',
-            render: (_, record) => {
-                return recordActions ? recordActions.filter(filterVisibled).map((action) => {
-                    const { actionKey, actionName, refresh } = action;
-                    const recordActionAvailableFlags = record.recordActionAvailableFlags as Record<string, boolean>
-                    if (recordActionAvailableFlags && recordActionAvailableFlags[actionKey] === false) {
-                        return null;
-                    }
                     const trigger = <a style={{ display: "block" }}>{actionName || actionKey}</a>
                     const actionInfo: ActionInfo = Object.assign({}, action, { trigger, componentKey, data: record });
                     if (refresh) {
                         actionInfo.callback = () => ref.current?.reload()
                     }
                     return buildAction(actionInfo)
-                }).filter(action => action != null) : [];
+                }).filter(action => action != null)
+
+                if (actionButtons.length < 3) {
+                    return actionButtons
+                }
+
+                const firstAction = actionButtons.shift()
+                const items: MenuProps['items'] = actionButtons.map((action, i) => ({ key: i, label: action }));
+                return <Space size={16}>
+                    {firstAction}
+                    <Dropdown menu={{ items }}>
+                        <a onClick={(e) => e.preventDefault()}>
+                            <MenuOutlined />
+                        </a>
+                    </Dropdown>
+                </Space>
             }
         })
     }
@@ -250,8 +234,16 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
         }
     }
 
+    const fastballViewPath = {
+        componentKey,
+        componentType: 'FastballTable',
+        type: 'Component',
+    }
+
     return <FastballFieldProvider container={container}>
-        <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
+        <ViewWrapper fastballViewPath={fastballViewPath}>
+            <ProTable actionRef={ref} {...proTableProps} {...otherProps} />
+        </ViewWrapper>
     </FastballFieldProvider>
 }
 

@@ -7,8 +7,8 @@ import { FastballFieldProvider, buildAction, doApiAction, filterEnabled, filterV
 import { Button, Spin } from 'antd';
 import dayjs from 'dayjs';
 import { EDIT_ID } from '../../common/components/SubTable';
+import ViewWrapper, { FastballViewPathKey } from '../../common/components/ViewWrapper';
 import { ComponentToPrint } from '../../common/components/Printer';
-import { useContext } from 'react';
 import { FastballContext } from '../FastballContext';
 
 dayjs.extend((option, dayjsClass, dayjsFactory) => {
@@ -177,12 +177,12 @@ class FastballForm extends React.Component<FormProps, FormState> {
 
     buildColumns(componentKey: string, fields: FormFieldInfo[], parentDataIndex?: string[], parentDataPath?: string[], editableFormRef?: React.RefObject<EditableFormInstance>, ignoreParentDataIndex?: boolean): ProFormColumnsType<any, 'text'>[] {
         const { readonly, column } = this.props;
-        
+
         let container = this.props.container;
-        if(!container) {
+        if (!container) {
             container = this.context?.container;
         }
-        
+
         const columnSpan = 24 / (column || 2);
         const getRootValues = () => this.formRef.current?.getFieldsValue()
         return fields.filter(filterEnabled).filter(field => field.valueType).sort((f1, f2) => f1.order - f2.order).map(field => {
@@ -190,9 +190,18 @@ class FastballForm extends React.Component<FormProps, FormState> {
             const parentPath = (Array.isArray(parentDataPath) ? [...parentDataPath] : []).concat(field.dataIndex)
             Object.assign(formColumn, { ...field, parentPath, getRootValues });
             formColumn['@class'] = null;
-            formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                parentPath,
-            })
+            const fieldViewPath = {
+                [FastballViewPathKey]: JSON.stringify({
+                    type: 'Field',
+                    field: field.dataIndex,
+                })
+            }
+            Object.assign(formColumn, field, {
+                hideInSearch: true,
+                'RC_TABLE_INTERNAL_COL_DEFINE': fieldViewPath
+            });
+            formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, { ...fieldViewPath, parentPath })
+            formColumn.formItemProps = Object.assign(formColumn.formItemProps || {}, fieldViewPath)
             formColumn.colProps = { span: field.entireRow ? 24 : columnSpan }
             processingField(container, componentKey, field, formColumn as ProSchema, parentDataIndex, this.props.__designMode, editableFormRef);
             if (!ignoreParentDataIndex && parentDataIndex) {
@@ -403,12 +412,18 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     this.formRef.current?.setFieldsValue({ ...data })
                 }
             }
-
+        }
+        const fastballViewPath = {
+            componentKey,
+            componentType: 'FastballForm',
+            type: 'Component',
         }
         return (
             <ComponentToPrint ref={this.componentRef}>
                 <FastballFieldProvider container={container}>
-                    <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
+                    <ViewWrapper fastballViewPath={fastballViewPath}>
+                        <BetaSchemaForm formRef={this.formRef} {...proFormProps} {...props} />
+                    </ViewWrapper>
                 </FastballFieldProvider>
             </ComponentToPrint>
         )

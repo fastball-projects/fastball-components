@@ -636,7 +636,53 @@ const FastballTableMeta = {
     ],
     supports: {
     },
-    component: {}
+    component: {},
+    advanced: {
+      callbacks: {
+        onNodeAdd: (dragment, currentNode) => {
+          // const comps = [
+          //   'Input',
+          //   'Select',
+          //   'Radio',
+          //   'Checkbox',
+          //   'Switch',
+          //   'Upload',
+          //   'Datepicker',
+          //   'Rate',
+          //   'Transfer',
+          // ];
+
+          // if (
+          //   !dragment ||
+          //   !dragment.componentMeta ||
+          //   !dragment.componentMeta.npm ||
+          //   !dragment.componentMeta.npm.package ||
+          //   dragment.componentMeta.npm.package.indexOf('@alilc/antd-lowcode-materials') === -1 ||
+          //   comps.every((comp) => dragment.componentName.indexOf(comp) === -1)
+          // ) {
+          //   return;
+          // }
+
+          // 为目标元素包裹一层P
+          const layoutPNode = currentNode.document.createNode({
+            componentName: 'FastballTable.Column',
+            props: {
+              label: '表格列: ',
+            },
+            children: [dragment.exportSchema()],
+          });
+          // 当前dragment还未添加入node子节点,需要setTimeout处理
+          setTimeout(() => {
+            currentNode.replaceChild(
+              dragment,
+              layoutPNode.exportSchema(),
+              // 避免生成新的 nodeId
+              { reserveSchemaNodeId: true },
+            );
+          }, 1);
+        },
+      },
+    },
   }
 }
 

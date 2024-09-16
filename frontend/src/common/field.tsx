@@ -18,6 +18,7 @@ import { preview, upload } from './upload';
 
 import { loadCache, setCache } from './cache';
 import SelectComponent from './components/Select';
+import { FastballViewPathKey } from './components/ViewWrapper';
 
 const formOnlyField: Record<string, boolean> = {
     group: true, formList: true, formSet: true, divider: true, dependency: true,
@@ -43,6 +44,14 @@ export const processingField = (container: Element, componentKey: string, field:
         column.hideInSearch = true;
         column.hideInTable = true;
     }
+
+    const fieldViewPath = {
+        [FastballViewPathKey]: JSON.stringify({
+            type: 'Field',
+            field: field.dataIndex,
+        })
+    }
+    column.formItemProps = Object.assign(column.formItemProps || {}, fieldViewPath)
 
     if (parentDataIndex?.length) {
         column.cacheKey = parentDataIndex.join('.') + '.' + field.dataIndex.join('.')
@@ -93,7 +102,7 @@ export const processingField = (container: Element, componentKey: string, field:
         if (!field.lookup.columns?.length && field.valueType == 'Lookup') {
             column.valueType = 'Select'
         }
-        if(field.valueType == 'TreeLookup') {
+        if (field.valueType == 'TreeLookup') {
             fieldProps.treeCheckable = lookupAction.multiple
         }
         if (lookupAction.multiple) {
@@ -240,7 +249,17 @@ export const buildTableColumn = (container: Element, componentKey: string, proTa
         return;
     }
     const column: ProTableColumn = {}
-    Object.assign(column, field, { hideInSearch: true });
+
+    const fieldViewPath = {
+        [FastballViewPathKey]: JSON.stringify({
+            type: 'Field',
+            field: field.dataIndex,
+        })
+    }
+    Object.assign(column, field, {
+        hideInSearch: true,
+        'RC_TABLE_INTERNAL_COL_DEFINE': fieldViewPath
+    });
     processingField(container, componentKey, field, column, __designMode);
     if (parentDataIndex) {
         column.dataIndex = [...parentDataIndex, ...field.dataIndex]
@@ -317,8 +336,8 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
                 }
             },
             TreeLookup: {
-                render: (value, props) => <ProFormTreeSelect {...props} {...props?.fieldProps} value={value}  mode={null} readonly />,
-                renderFormItem: (text, props, dom) => <ProFormTreeSelect {...props} {...props?.fieldProps} mode={null}/>
+                render: (value, props) => <ProFormTreeSelect {...props} {...props?.fieldProps} value={value} mode={null} readonly />,
+                renderFormItem: (text, props, dom) => <ProFormTreeSelect {...props} {...props?.fieldProps} mode={null} />
             },
             AutoComplete: {
                 render: (text) => text,

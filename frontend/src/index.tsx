@@ -9,4 +9,6 @@ export { default as FastballTimeline } from './components/FastballTimeline'
 export { default as FastballTree } from './components/FastballTree'
 export * from './components/FastballContext'
 
+export { default as FastballPopup } from './common/components/Popup'
+
 import "./index.scss"

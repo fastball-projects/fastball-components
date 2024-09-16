@@ -44,7 +44,9 @@ export type EnumItem = {
 }
 
 export type PopupProps = {
-    key?: string
+    key: string
+    actionKey: string
+    ownerComponent?: string
     ref?: MutableRefObject
     input?: any
     loadInput?: LoadDataType

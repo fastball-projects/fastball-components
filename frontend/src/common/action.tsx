@@ -115,6 +115,8 @@ export const buildAction = (actionInfo: ActionInfo) => {
 export const doPopupAction = (popupActionInfo: PopupActionInfo) => {
     const popupProps: PopupProps = {
         key: popupActionInfo.actionKey,
+        actionKey: popupActionInfo.actionKey,
+        ownerComponent: popupActionInfo.componentKey,
         ref: popupActionInfo.ref,
         popupInfo: popupActionInfo.popupInfo,
         onClose: popupActionInfo.callback,

@@ -24,9 +24,10 @@ publish_frontend() {
     npx pnpm@7 install
     echo "build & publish fastball component frontend ..."
     if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
-        npm run prepublish && npm publish
+        npm run prepublish && npm publish --registry https://registry.npmjs.org
     else
         # npm run prepublish && npm publish --registry http://82.157.239.41:7777/repository/npm-hosted/
+        npm run prepublish && npm publish --registry https://registry.npmjs.org
         npm run prepublish && npm publish --registry https://bitbean-npm.pkg.coding.net/fastball/npm
     fi
     echo "fastball component frontend published."
