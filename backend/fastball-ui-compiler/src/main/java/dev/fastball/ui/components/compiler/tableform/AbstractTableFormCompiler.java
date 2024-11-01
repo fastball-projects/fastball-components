@@ -5,9 +5,9 @@ import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.exception.CompilerException;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.component.Component;
-import dev.fastball.ui.components.metadata.form.FieldDependencyInfo;
 import dev.fastball.ui.components.form.config.FieldDependencies;
 import dev.fastball.ui.components.form.config.FieldDependency;
+import dev.fastball.ui.components.metadata.form.FieldDependencyInfo;
 import dev.fastball.ui.components.metadata.tableform.TableFormFieldInfo;
 import dev.fastball.ui.components.metadata.tableform.TableFormProps_AutoValue;
 import dev.fastball.ui.components.tableform.config.TableFormConfig;
@@ -62,6 +62,7 @@ public abstract class AbstractTableFormCompiler<T extends Component> extends Abs
     private void afterFieldBuild(TableFormProps_AutoValue props, VariableElement variableElement, TableFormFieldInfo fieldInfo) {
         TableFormField formField = variableElement.getAnnotation(TableFormField.class);
         if (formField != null) {
+            fieldInfo.setWidth(formField.width());
             fieldInfo.setSortable(formField.sortable());
             fieldInfo.setCopyable(formField.copyable());
             fieldInfo.setHideInTable(formField.hideInTable());

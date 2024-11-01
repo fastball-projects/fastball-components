@@ -16,6 +16,8 @@ import java.lang.annotation.Target;
 public @interface LeftAndRight {
     Class<? extends Component> left();
 
+    String leftWidth() default "30%";
+
     Class<? extends Component> right();
 
     boolean interlocking() default false;

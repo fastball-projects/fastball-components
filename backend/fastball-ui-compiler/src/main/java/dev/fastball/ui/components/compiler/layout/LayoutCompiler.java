@@ -34,6 +34,7 @@ public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, L
             LeftAndRightLayoutProps_AutoValue props = new LeftAndRightLayoutProps_AutoValue();
             props.interlocking(leftAndRight.interlocking());
             props.left(getReferencedComponentInfo(props, leftAndRight::left));
+            props.leftWidth(leftAndRight.leftWidth());
             props.right(getReferencedComponentInfo(props, leftAndRight::right));
             return props;
         }

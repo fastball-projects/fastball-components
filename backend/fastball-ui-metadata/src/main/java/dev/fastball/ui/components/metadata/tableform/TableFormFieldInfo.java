@@ -25,6 +25,8 @@ public class TableFormFieldInfo extends FieldInfo {
 
     private boolean editInForm;
 
+    private int width;
+
     private List<FieldDependencyInfo> fieldDependencyInfoList;
 
     private ConditionComposeType conditionComposeType;

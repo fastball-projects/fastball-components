@@ -11,5 +11,7 @@ interface LeftAndRightLayoutProps extends LayoutProps {
 
     ReferencedComponentInfo left();
 
+    String leftWidth();
+
     ReferencedComponentInfo right();
 }

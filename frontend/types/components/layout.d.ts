@@ -9,6 +9,7 @@ export type LayoutProps = {
 export type LeftAndRightLayoutProps = {
     layoutType?: 'LeftAndRight'
     left: ReferencedComponent
+    leftWidth?: string
     right: ReferencedComponent
 } & LayoutProps
 

@@ -18,7 +18,7 @@ const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayo
                 overflow: 'hidden',
             }}
         >
-            <ProCard colSpan="30%"
+            <ProCard colSpan={props.leftWidth || "30%"}
                 style={{
                     height: '100vh',
                     overflow: 'auto',
