@@ -6,12 +6,19 @@ import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.ComponentCompiler;
 import dev.fastball.compile.exception.CompilerException;
 import dev.fastball.ui.components.layout.LayoutComponent;
-import dev.fastball.ui.components.metadata.layout.*;
 import dev.fastball.ui.components.layout.config.GridLayout;
 import dev.fastball.ui.components.layout.config.LeftAndRight;
 import dev.fastball.ui.components.layout.config.LeftAndTopBottom;
+import dev.fastball.ui.components.layout.config.TabsLayout;
 import dev.fastball.ui.components.layout.config.TopAndBottom;
+import dev.fastball.ui.components.metadata.layout.GridCellProps_AutoValue;
+import dev.fastball.ui.components.metadata.layout.GridLayoutProps_AutoValue;
 import dev.fastball.ui.components.metadata.layout.LayoutProps;
+import dev.fastball.ui.components.metadata.layout.LeftAndRightLayoutProps_AutoValue;
+import dev.fastball.ui.components.metadata.layout.LeftAndTopBottomLayoutProps_AutoValue;
+import dev.fastball.ui.components.metadata.layout.TabItemProps_AutoValue;
+import dev.fastball.ui.components.metadata.layout.TabsLayoutProps_AutoValue;
+import dev.fastball.ui.components.metadata.layout.TopAndBottomLayoutProps_AutoValue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,6 +81,20 @@ public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, L
             props.draggable(gridLayout.draggable());
             return props;
         }
+        TabsLayout tabsLayout = compileContext.getComponentElement().getAnnotation(TabsLayout.class);
+        if (tabsLayout != null) {
+            TabsLayoutProps_AutoValue props = new TabsLayoutProps_AutoValue();
+            props.defaultActiveTab(tabsLayout.defaultActiveTab());
+            List<TabItemProps_AutoValue> items = Arrays.stream(tabsLayout.items()).map(item -> {
+                TabItemProps_AutoValue tabItemProps = new TabItemProps_AutoValue();
+                tabItemProps.label(item.label());
+                tabItemProps.component(getReferencedComponentInfo(props, item::component));
+                return tabItemProps;
+            }).collect(Collectors.toList());
+            props.items(items);
+            return props;
+        }
+
         String message = String.format("LayoutComponent [%s] must add annotation @LeftAndRight, @TopAndBottom, @LeftAndTopBottom or @GridLayout", compileContext.getComponentElement().getQualifiedName());
         throw new CompilerException(message);
     }

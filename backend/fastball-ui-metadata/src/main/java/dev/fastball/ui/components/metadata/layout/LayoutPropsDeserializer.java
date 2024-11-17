@@ -4,11 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import dev.fastball.meta.component.ComponentInfo;
-import dev.fastball.meta.component.ComponentInfo_AutoValue;
-import dev.fastball.meta.component.ComponentProps;
-import dev.fastball.meta.material.UIMaterial;
-import dev.fastball.meta.utils.ComponentPropsTypeRegistry;
 
 import java.io.IOException;
 
@@ -33,6 +28,8 @@ public class LayoutPropsDeserializer extends StdDeserializer<LayoutProps> {
             layoutPropsClass = LeftAndRightLayoutProps_AutoValue.class;
         } else if (layoutType == LayoutType.LeftAndTopBottom) {
             layoutPropsClass = LeftAndTopBottomLayoutProps_AutoValue.class;
+        } else if (layoutType == LayoutType.Tabs) {
+            layoutPropsClass = TabsLayoutProps_AutoValue.class;
         } else {
             throw new IllegalArgumentException("Unsupported layout type: " + layoutType);
         }

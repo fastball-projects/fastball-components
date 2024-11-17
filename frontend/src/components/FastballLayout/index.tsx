@@ -4,6 +4,7 @@ import LeftAndRight from './left-right'
 import TopAndBottom from './top-bottom'
 import LeftAndTopBottom from './left-top-bottom'
 import GridLayout from './grid'
+import TabsLayout from './tabs'
 
 const FastballLayout: React.FC<LayoutProps> = (props: LayoutProps) => {
     let layoutComponent;
@@ -15,6 +16,8 @@ const FastballLayout: React.FC<LayoutProps> = (props: LayoutProps) => {
         layoutComponent = <LeftAndTopBottom {...props as LeftAndTopBottomLayoutProps} />
     } else if (props.layoutType === 'Grid') {
         layoutComponent = <GridLayout {...props as GridLayoutProps} />
+    } else if (props.layoutType === 'Tabs') {
+        layoutComponent = <TabsLayout {...props as TabsLayoutProps} />
     } else {
         return null
     }

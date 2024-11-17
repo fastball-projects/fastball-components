@@ -35,6 +35,16 @@ export type GridLayoutProps = {
     cells: GridCell[]
 } & LayoutProps
 
+export type TabsLayoutProps = {
+    items: TabItemProps[]
+    defaultActiveTab: number
+} & LayoutProps
+
+export type TabItemProps = {
+    label: string
+    component: ReferencedComponent
+}
+
 export type GridCell = {
     x: number
     y: number
