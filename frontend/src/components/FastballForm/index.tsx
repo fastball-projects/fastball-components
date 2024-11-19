@@ -218,7 +218,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     rules: field.validationRules
                 })
             }
-            if (field.valueType === 'digit') {
+            if (field.valueType === 'Digit') {
                 formColumn.fieldProps = Object.assign(formColumn.formItemProps || {}, {
                     precision: field.digitPrecision || 2
                 })

@@ -13,9 +13,9 @@ type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
 const buildMockData = (columns: ColumnInfo[]) => {
     const record: Data = { recordActionAvailableFlags: {} };
     columns.forEach(({ dataIndex, valueType }) => {
-        if (valueType === 'digit') {
+        if (valueType === 'Digit') {
             record[dataIndex] = 9527
-        } else if (valueType === 'text') {
+        } else if (valueType === 'Text') {
             record[dataIndex] = 'Mock 文本'
         } else if (valueType === 'dateTime') {
             record[dataIndex] = Date.now()

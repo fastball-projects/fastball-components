@@ -12,9 +12,9 @@ export const makeMockArray = (fields: FieldInfo[]) => {
 export const makeMockData = (fields: FieldInfo[]) => {
     const record: Data = {};
     fields.forEach(({ dataIndex, valueType }) => {
-        if (valueType === 'digit') {
+        if (valueType === 'Digit') {
             record[dataIndex] = 9527
-        } else if (valueType === 'text') {
+        } else if (valueType === 'Text') {
             record[dataIndex] = 'Mock 文本'
         } else if (valueType === 'dateTime') {
             record[dataIndex] = Date.now()

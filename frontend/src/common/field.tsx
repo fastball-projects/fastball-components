@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect } from "@fastball/pro-components";
-import { Tag, Image, ConfigProvider } from "antd";
-import { Displayable, FieldInfo, LookupActionInfo, PopupProps, CustomTagProps, ColumnInfo, Data } from "../../types";
+import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect, ProFormDigit, ProFormTextArea, ProFormText, ProFieldFCRenderProps } from "@fastball/pro-components";
+import { Tag, Image, ConfigProvider, Input, InputNumber } from "antd";
+import { Displayable, FieldInfo, LookupActionInfo, PopupProps, CustomTagProps, ColumnInfo, Data, ReactComponent } from "../../types";
 import { doLookupAction } from "./action";
 import FastballPopup from "./components/Popup";
 import { loadRefComponent } from './component';
@@ -27,6 +27,18 @@ const formOnlyField: Record<string, boolean> = {
 const setDateRangeFieldProps = (column: ProSchema, fieldProps: Record<string, any>) => {
     column.valueType = 'dateRange'
     column.fieldProps = Object.assign(column.fieldProps || {}, fieldProps)
+}
+
+const OnBlurTriggerChangeModeInputWrapper = (InputComponent: any, valueConvertor?: (value: string) => any) => (text: any, props: ProFieldFCRenderProps, dom: JSX.Element) => {
+    const fieldProps = Object.assign({}, props, props?.fieldProps)
+    const onBlur = fieldProps.onBlur
+    fieldProps.onBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = valueConvertor ? valueConvertor(event.target.value) : event.target.value
+        props.fieldProps.onChange?.(value)
+        onBlur?.(event)
+    }
+    fieldProps.onChange = null
+    return <InputComponent {...fieldProps} />
 }
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
@@ -268,7 +280,7 @@ export const buildTableColumn = (container: Element, componentKey: string, proTa
         field.subFields.forEach(subField => buildTableColumn(container, componentKey, proTableColumns, subField, field.dataIndex))
         return;
     }
-    if (field.valueType === 'textarea') {
+    if (field.valueType === 'Textarea') {
         column.ellipsis = true
     }
     if (field.width) {
@@ -301,6 +313,18 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
     const getPopupContainer = container ? () => container : undefined;
     return <ProConfigProvider
         valueTypeMap={{
+            Text: {
+                render: (text, props, dom) => text,
+                renderFormItem: OnBlurTriggerChangeModeInputWrapper(Input)
+            },
+            Textarea: {
+                render: (text, props, dom) => text,
+                renderFormItem: OnBlurTriggerChangeModeInputWrapper(Input.TextArea)
+            },
+            Digit: {
+                render: (text, props, dom) => text,
+                renderFormItem: OnBlurTriggerChangeModeInputWrapper(InputNumber, Number)
+            },
             SubTable: {
                 render: (data, props) => {
                     const name = Number.isInteger(props.rowIndex) ? [props.rowIndex, ...props.fieldProps.name] : props.fieldProps.name
