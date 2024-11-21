@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect, ProFormDigit, ProFormTextArea, ProFormText, ProFieldFCRenderProps } from "@fastball/pro-components";
+import { ProSchema, ProSchemaComponentTypes, ProFormField, EditableFormInstance, ProColumns, ProConfigProvider, ProFormUploadButton, ProFormSelect, ProFormTreeSelect, ProFormDigit, ProFormTextArea, ProFormText, ProFieldFCRenderProps, ProField } from "@fastball/pro-components";
 import { Tag, Image, ConfigProvider, Input, InputNumber } from "antd";
 import { Displayable, FieldInfo, LookupActionInfo, PopupProps, CustomTagProps, ColumnInfo, Data, ReactComponent } from "../../types";
 import { doLookupAction } from "./action";
@@ -7,7 +7,7 @@ import FastballPopup from "./components/Popup";
 import { loadRefComponent } from './component';
 import { getByPaths } from './utils';
 import AutoComplete from './components/AutoComplete';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import RichText from './components/RichText';
 import SubTable from './components/SubTable';
 import FastballTableForm from '../components/FastballTableForm';
@@ -29,16 +29,38 @@ const setDateRangeFieldProps = (column: ProSchema, fieldProps: Record<string, an
     column.fieldProps = Object.assign(column.fieldProps || {}, fieldProps)
 }
 
-const OnBlurTriggerChangeModeInputWrapper = (InputComponent: any, valueConvertor?: (value: string) => any) => (text: any, props: ProFieldFCRenderProps, dom: JSX.Element) => {
-    const fieldProps = Object.assign({}, props, props?.fieldProps)
+const OnBlurTriggerChangeModeInputNumberWrapper = (text: any, props: ProFieldFCRenderProps, dom: JSX.Element) => {
+    const fieldProps = Object.assign({}, props?.fieldProps)
     const onBlur = fieldProps.onBlur
     fieldProps.onBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = valueConvertor ? valueConvertor(event.target.value) : event.target.value
-        props.fieldProps.onChange?.(value)
+        const value = Number(event.target.value)
         onBlur?.(event)
+        props.fieldProps.onChange?.(value)
     }
     fieldProps.onChange = null
-    return <InputComponent {...fieldProps} />
+    return <InputNumber {...fieldProps} />
+}
+
+const OnBlurTriggerChangeModeInputWrapper = (component: any) =>
+    (text: any, props: ProFieldFCRenderProps, dom: JSX.Element) => <FieldComponentWrapper component={component} {...props} />
+
+const FieldComponentWrapper: FC<{ component: any } & ProFieldFCRenderProps> = ({ component, value, ...props }) => {
+    const [fieldValue, setFieldValue] = useState(value)
+
+    React.useEffect(() => {
+        setFieldValue(value)
+    }, [value])
+
+    const [InputComponent] = useState(component)
+    const fieldProps = Object.assign({}, props?.fieldProps)
+    fieldProps.onBlur = () => {
+        props.fieldProps.onChange?.(fieldValue)
+    }
+    fieldProps.onChange = (event: any) => {
+        setFieldValue(event.target.value)
+    }
+
+    return <InputComponent {...fieldProps} value={fieldValue} />
 }
 
 type ProTableColumn<ValueType = 'text'> = ProColumns<Data, ValueType>
@@ -314,16 +336,16 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
     return <ProConfigProvider
         valueTypeMap={{
             Text: {
-                render: (text, props, dom) => text,
+                render: (text) => <ProField text={text} valueType="text" mode="read" />,
                 renderFormItem: OnBlurTriggerChangeModeInputWrapper(Input)
             },
             Textarea: {
-                render: (text, props, dom) => text,
+                render: (text) => <ProField text={text} valueType="textarea" mode="read" />,
                 renderFormItem: OnBlurTriggerChangeModeInputWrapper(Input.TextArea)
             },
             Digit: {
-                render: (text, props, dom) => text,
-                renderFormItem: OnBlurTriggerChangeModeInputWrapper(InputNumber, Number)
+                render: (text) => <ProField text={text} valueType="digit" mode="read" />,
+                renderFormItem: OnBlurTriggerChangeModeInputNumberWrapper
             },
             SubTable: {
                 render: (data, props) => {
