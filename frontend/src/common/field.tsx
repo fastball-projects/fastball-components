@@ -42,10 +42,10 @@ const OnBlurTriggerChangeModeInputNumberWrapper = (text: any, props: ProFieldFCR
 }
 
 const OnBlurTriggerChangeModeInputWrapper = (component: any) =>
-    (text: any, props: ProFieldFCRenderProps, dom: JSX.Element) => <FieldComponentWrapper component={component} {...props} />
+    (text: any, props: ProFieldFCRenderProps, dom: JSX.Element) => <FieldComponentWrapper component={component} {...props} value={text} />
 
 const FieldComponentWrapper: FC<{ component: any } & ProFieldFCRenderProps> = ({ component, value, ...props }) => {
-    const [fieldValue, setFieldValue] = useState(value)
+    const [fieldValue, setFieldValue] = useState(props)
 
     React.useEffect(() => {
         setFieldValue(value)
@@ -344,7 +344,10 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
                 renderFormItem: OnBlurTriggerChangeModeInputWrapper(Input.TextArea)
             },
             Digit: {
-                render: (text) => <ProField text={text} valueType="digit" mode="read" />,
+                render: (text, props) => {
+                    const precision = props?.fieldProps?.precision || 2
+                    return text?.toFixed(precision)
+                },
                 renderFormItem: OnBlurTriggerChangeModeInputNumberWrapper
             },
             SubTable: {

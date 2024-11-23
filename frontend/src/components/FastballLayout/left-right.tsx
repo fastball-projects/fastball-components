@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { ProCard } from '@fastball/pro-components'
+import { Splitter } from 'antd'
 import { MD5 } from 'object-hash'
 import { loadRefComponent } from '../../common'
 import { LeftAndRightLayoutProps } from '../../../types'
@@ -9,28 +10,14 @@ const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayo
     const left = loadRefComponent(props.left, { onRecordClick: setRecord, onDataLoad: props.interlocking ? setRecord : null, __designMode: props.__designMode, input: props.input })
     const right = loadRefComponent(props.right, { key: MD5(record), __designMode: props.__designMode, input: record })
     return (
-        <ProCard
-            split="vertical"
-            bordered
-            headerBordered
-            style={{
-                height: '100vh',
-                overflow: 'hidden',
-            }}
-        >
-            <ProCard colSpan={props.leftWidth || "30%"}
-                style={{
-                    height: '100vh',
-                    overflow: 'auto',
-                }}
-            >{left}</ProCard>
-            <ProCard
-                style={{
-                    height: '100vh',
-                    overflow: 'auto',
-                }}
-            >{right}</ProCard>
-        </ProCard>
+        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+            <Splitter.Panel defaultSize={props.leftWidth || "30%"}>
+                {left}
+            </Splitter.Panel>
+            <Splitter.Panel>
+                {right}
+            </Splitter.Panel>
+        </Splitter>
     )
 }
 

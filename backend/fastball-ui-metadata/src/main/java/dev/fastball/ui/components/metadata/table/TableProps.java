@@ -32,6 +32,8 @@ public interface TableProps extends ComponentProps {
 
     boolean keywordSearch();
 
+    boolean horizontalScroll();
+
     TableSize size();
 
     int pageSize();

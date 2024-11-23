@@ -38,6 +38,13 @@ public @interface TableConfig {
     boolean keywordSearch() default false;
 
     /**
+     * 是否开启横向滚动, 如果开启, 列表将会自动适应宽度, 默认为 False
+     *
+     * @return 是否开启横向滚动
+     */
+    boolean horizontalScroll() default false;
+
+    /**
      * 是否开启表格分页, 默认为 True
      *
      * @return 是否开启表格分页

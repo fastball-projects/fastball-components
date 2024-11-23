@@ -28,7 +28,7 @@ const buildMockData = (columns: ColumnInfo[]) => {
     return [record]
 }
 
-const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], selectionActions = [], selectionViewActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, onDataLoad, __designMode, ...otherProps }) => {
+const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick, componentKey, size, lightQuery, pageable, showRowIndex, searchable, queryFields, columns, actions = [], recordActions = [], selectionActions = [], selectionViewActions = [], input, value, rowExpandedComponent, childrenFieldName, wrappedSearch, keywordSearch, horizontalScroll, onDataLoad, __designMode, ...otherProps }) => {
     const ref = useRef<AntDProActionType>();
     const proTableProps: ProTableProps<Data, { keyWord?: string }> = { size, tableLayout: 'fixed', rowKey: 'id', search: { labelWidth: "auto", filterType: lightQuery ? 'light' : 'query' } };
     const proTableColumns: ProTableColumn[] = [];
@@ -89,6 +89,10 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
         proTableProps.search = false;
     }
 
+    if (horizontalScroll === true) {
+        proTableProps.scroll = { x: "max-content" }
+    }
+
     const actionButtons = actions?.filter(filterVisibled)?.map(action => {
         const actionInfo: ActionInfo = { componentKey, ...action };
         if (actionInfo.type === 'API') {
@@ -144,6 +148,7 @@ const FastballTable: MockDataComponent<TableProps> = ({ container, onRecordClick
             dataIndex: '__option',
             valueType: 'option',
             align: 'left',
+            fixed: "right",
             width: 100,
             render: (_, record) => {
                 const actionButtons = activedRecordActions.map((action) => {

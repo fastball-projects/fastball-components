@@ -24,6 +24,7 @@ export type TableProps = {
     searchable: boolean
     wrappedSearch: boolean
     keywordSearch: boolean
+    horizontalScroll: boolean
     size: TableSize
     columns: ColumnInfo[]
     queryFields: FieldInfo[]
