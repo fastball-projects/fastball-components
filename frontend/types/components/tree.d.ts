@@ -6,8 +6,10 @@ export type TreeProps = {
         key: string
         title: string
         children: string
+        searchDataTitle: string
     }
     asyncTree: boolean
+    searchable: boolean
     defaultExpandAll: boolean
     data?: Data[]
     recordActions?: ApiActionInfo[]
@@ -16,4 +18,9 @@ export type TreeProps = {
 export type TreeState = {
     treeData?: Data[]
     loading?: boolean
+}
+
+export type ExpandedTreeData = {
+    data: Data[]
+    expandedKeys: React.Key[]
 }

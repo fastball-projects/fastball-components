@@ -32,10 +32,16 @@ public abstract class AbstractTreeCompiler<T extends Component> extends Abstract
 
     @Override
     protected void compileProps(TreeProps_AutoValue props, CompileContext compileContext) {
+//        if (asyncTree()) {
+//            List<? extends TypeMirror> genericTypes = getGenericTypes(compileContext);
+//            TypeElement searchType = (TypeElement) compileContext.getProcessingEnv().getTypeUtils().asElement(genericTypes.get(1));
+//            props.searchDataTableFields(TypeCompileUtils.compileTypeFields(searchType, compileContext.getProcessingEnv(), props));
+//        }
+
         TreeConfig config = compileContext.getComponentElement().getAnnotation(TreeConfig.class);
         TreeProps.TreeFieldNames fieldNames = TreeProps.TreeFieldNames.DEFAULT;
         if (config != null) {
-            fieldNames = new TreeProps.TreeFieldNames(config.keyField(), config.titleField(), config.childrenField());
+            fieldNames = new TreeProps.TreeFieldNames(config.keyField(), config.titleField(), config.childrenField(), config.searchTitleField());
             props.defaultExpandAll(config.defaultExpandAll());
         }
         props.fieldNames(fieldNames);

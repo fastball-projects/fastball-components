@@ -1,10 +1,10 @@
-import React from 'react';
-import { Tree as AntDTree, Spin, Dropdown } from 'antd';
-import type { TreeProps as AndDTreeProps, MenuProps } from 'antd';
+import React, { FC, useEffect, useMemo, useState } from 'react';
+import { Tree as AntDTree, Spin, Dropdown, Input, AutoComplete } from 'antd';
+import type { TreeProps as AndDTreeProps, MenuProps, TreeDataNode } from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { buildAction, doApiAction, filterVisibled } from '../../common'
-import type { ActionInfo, Data, TreeProps, TreeState } from '../../../types'
+import type { ActionInfo, Data, ExpandedTreeData, SearchTreeData, TreeProps, TreeState } from '../../../types'
 
 const mockData: Data[] = [{
     key: "1",
@@ -25,6 +25,21 @@ const mockData: Data[] = [{
         }]
     }]
 }]
+
+const getParentKey = (key: React.Key, tree: TreeDataNode[]): React.Key => {
+    let parentKey: React.Key;
+    for (let i = 0; i < tree.length; i++) {
+        const node = tree[i];
+        if (node.children) {
+            if (node.children.some((item) => item.key === key)) {
+                parentKey = node.key;
+            } else if (getParentKey(key, node.children)) {
+                parentKey = getParentKey(key, node.children);
+            }
+        }
+    }
+    return parentKey!;
+};
 
 const updateTreeData = (list: Data[], parent: Data, children: Data[], fieldNames: TreeProps['fieldNames']): Data[] =>
     list.map((node) => {
@@ -47,98 +62,119 @@ const updateTreeData = (list: Data[], parent: Data, children: Data[], fieldNames
         return node;
     });
 
-class Tree extends React.Component<TreeProps, TreeState> {
+const FastballTree: FC<TreeProps> = (props: TreeProps) => {
+    const [treeData, setTreeData] = useState<any[]>([]);
+    const [searchOptions, setSearchOptions] = useState<any[]>([]);
+    const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+    const [autoExpandParent, setAutoExpandParent] = useState(true);
+    const [loading, setLoading] = useState(true);
 
-    constructor(props: TreeProps) {
-        super(props)
-        const treeData: Data[] | undefined = props.__designMode === 'design' ? mockData : props.data
-        this.state = { treeData, loading: !treeData }
+    const { componentKey, onRecordClick, __designMode, fieldNames, asyncTree, searchable, defaultExpandAll, recordActions, input } = props;
+
+
+    const initLoadData = async () => {
+        const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [null, input] })
+        setTreeData(res.data || []);
+        setLoading(false);
     }
 
-    componentDidMount(): void {
-        if (!this.state.treeData) {
-            this.loadData()
-        }
+    useEffect(() => {
+        initLoadData()
+    }, [input])
+
+    if (loading) {
+        return <Spin />
     }
 
-    loadData = async (parent?: Data) => {
-        let treeData: Data[];
-        if (this.props.asyncTree) {
-            treeData = await this.asyncLoadData(parent);
-        } else {
-            treeData = await this.loadAllData();
-        }
-        this.setState({ treeData, loading: false });
-    }
+    const treeProps: AndDTreeProps = { treeData, blockNode: true, defaultExpandAll }
 
-    reloadData = async () => {
-
-    }
-
-    asyncLoadData = async (parent?: Data) => {
-        const { componentKey, fieldNames, input } = this.props;
-        const { treeData } = this.state
+    const asyncLoadData = async (parent?: Data) => {
         const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [parent, input] })
         const childrenNodes = res?.data || []
         let newTreeData: Data[] = childrenNodes;
         if (treeData && parent) {
             newTreeData = updateTreeData(treeData, parent, childrenNodes, fieldNames);
         }
-        return newTreeData
+        setTreeData(newTreeData);
+        setLoading(false);
     }
 
-    loadAllData = async () => {
-        const { componentKey, input } = this.props;
-        const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [input] })
-        return res?.data || []
+    treeProps.treeData = treeData;
+
+    if (searchable) {
+        treeProps.selectable = true;
     }
 
-    render(): React.ReactNode {
-        const { treeData, loading } = this.state;
-        if (loading) {
-            return <Spin />
-        }
-        const { componentKey, onRecordClick, __designMode, fieldNames, asyncTree, defaultExpandAll, recordActions } = this.props;
-        const treeProps: AndDTreeProps = { treeData, blockNode: true, defaultExpandAll }
+    if (asyncTree) {
+        treeProps.loadData = asyncLoadData;
+    }
 
-        if (asyncTree) {
-            treeProps.loadData = this.loadData;
+    if (__designMode !== 'design') {
+        treeProps.fieldNames = fieldNames;
+    }
+    if (onRecordClick) {
+        treeProps.onSelect = (_, { node }) => {
+            onRecordClick(node)
         }
-
-        if (__designMode !== 'design') {
-            treeProps.fieldNames = fieldNames;
-        }
-        if (onRecordClick) {
-            treeProps.onSelect = (_, { node }) => {
-                onRecordClick(node)
-            }
-        }
-        if (recordActions && recordActions.length > 0) {
-            treeProps.titleRender = (node) => {
-                const items: MenuProps["items"] = recordActions.filter(filterVisibled).map(action => {
-                    const actionInfo: ActionInfo = { trigger: <div>{action.actionName || action.actionKey}</div>, componentKey, ...action, data: node };
-                    if (action.refresh) {
-                        actionInfo.callback = () => this.reloadData()
-                    }
-                    return ({
-                        key: action.actionKey,
-                        label: buildAction(actionInfo)
-                    })
+    }
+    if (recordActions && recordActions.length > 0) {
+        treeProps.titleRender = (node) => {
+            const items: MenuProps["items"] = recordActions.filter(filterVisibled).map(action => {
+                const actionInfo: ActionInfo = { trigger: <div>{action.actionName || action.actionKey}</div>, componentKey, ...action, data: node };
+                if (action.refresh) {
+                    // actionInfo.callback = () => reloadData()
+                }
+                return ({
+                    key: action.actionKey,
+                    label: buildAction(actionInfo)
                 })
-                return (
-                    <>
-                        <span>{node[fieldNames.title]}</span>
-                        <span style={{ float: 'right' }}>
-                            <Dropdown menu={{ items }} trigger={["hover"]}>
-                                <MoreOutlined />
-                            </Dropdown>
-                        </span>
-                    </>
-                )
-            }
+            })
+            return (
+                <>
+                    <span>{node[fieldNames.title]}</span>
+                    <span style={{ float: 'right' }}>
+                        <Dropdown menu={{ items }} trigger={["hover"]}>
+                            <MoreOutlined />
+                        </Dropdown>
+                    </span>
+                </>
+            )
+        }
+    }
+
+    if (searchable) {
+        const onSearch = async (text: string) => {
+            const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadSearchData', data: [text, input] })
+            const options = res?.data?.map((item: any) => ({
+                value: item[fieldNames.searchDataTitle],
+                record: item
+            })) || []
+            setSearchOptions(options)
         }
 
-        return <AntDTree {...treeProps} />;
+        const onExpand = (newExpandedKeys: React.Key[]) => {
+            setExpandedKeys(newExpandedKeys);
+            setAutoExpandParent(false);
+          };
+
+        const onSelect = async (value: string, item: { record: any }) => {
+            const expandedTreeData: ExpandedTreeData = await doApiAction({ componentKey, type: 'API', actionKey: 'loadExpandedTreeData', data: [item.record, input] })
+            setTreeData(expandedTreeData.data)
+            setExpandedKeys(expandedTreeData.expandedKeys)
+            setLoading(false);
+            setAutoExpandParent(true);
+        }
+        treeProps.onExpand = onExpand;
+        treeProps.expandedKeys = expandedKeys;
+        treeProps.autoExpandParent = autoExpandParent;
+
+        return <div>
+            {searchable && <AutoComplete style={{ width: '100%' }} options={searchOptions} onSelect={onSelect} onSearch={onSearch} placeholder="快速查询" />}
+            <AntDTree {...treeProps} />
+        </div>
     }
+    return <AntDTree {...treeProps} />
 }
-export default Tree;
+
+
+export default FastballTree;

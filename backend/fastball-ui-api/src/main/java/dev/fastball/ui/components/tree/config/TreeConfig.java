@@ -29,6 +29,11 @@ public @interface TreeConfig {
     String childrenField();
 
     /**
+     * @return 搜索数据的展示字段
+     */
+    String searchTitleField() default "title";
+
+    /**
      * @return 是否默认展开所有节点, 仅在同步树情况下生效
      */
     boolean defaultExpandAll() default false;

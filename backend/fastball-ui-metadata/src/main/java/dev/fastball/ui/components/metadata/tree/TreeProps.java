@@ -1,10 +1,13 @@
 package dev.fastball.ui.components.metadata.tree;
 
 import dev.fastball.auto.value.annotation.AutoValue;
+import dev.fastball.meta.basic.FieldInfo;
 import dev.fastball.meta.component.ComponentProps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * @author gr@fastball.dev
@@ -17,6 +20,8 @@ public interface TreeProps extends ComponentProps {
 
     TreeFieldNames fieldNames();
 
+    List<FieldInfo> searchDataTableFields();
+
     boolean defaultExpandAll();
 
     boolean searchable();
@@ -27,10 +32,11 @@ public interface TreeProps extends ComponentProps {
     @NoArgsConstructor
     @AllArgsConstructor
     final class TreeFieldNames {
-        public static final TreeFieldNames DEFAULT = new TreeFieldNames("id", "title", "children");
+        public static final TreeFieldNames DEFAULT = new TreeFieldNames("id", "title", "children", "title");
 
         private String key;
         private String title;
         private String children;
+        private String searchDataTitle;
     }
 }

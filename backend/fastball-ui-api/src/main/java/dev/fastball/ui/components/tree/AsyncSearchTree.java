@@ -6,18 +6,18 @@ import dev.fastball.core.component.DataResult;
 import dev.fastball.ui.components.tree.param.ExpandedTreeData;
 
 /**
- * @author gr@fastball.dev
- * @since 2022/12/20
+ * @author Geng Rong
  */
-public interface SearchTree<T, S> extends Component {
+public interface AsyncSearchTree<T, S> extends Component {
 
     /**
      * 树形组件获取数据的接口
      *
+     * @param parent 用于查询的父节点, 如果为 null, 则查询根节点
      * @return 返回的数据
      */
     @UIApi
-    DataResult<T> loadData();
+    DataResult<T> loadData(T parent);
 
     /**
      * 根据搜索关键字, 加载可被搜索的数据
