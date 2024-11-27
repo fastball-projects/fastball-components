@@ -17,5 +17,5 @@ import java.util.List;
 public class ExpandedTreeData<T> {
     private List<T> data;
     private List<?> expandedKeys;
-    private Object selectedKey;
+    private T selectedRecord;
 }

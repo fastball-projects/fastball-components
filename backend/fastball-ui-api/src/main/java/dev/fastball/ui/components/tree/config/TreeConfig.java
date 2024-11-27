@@ -29,6 +29,11 @@ public @interface TreeConfig {
     String childrenField();
 
     /**
+     * @return 搜索数据的标识字段, 默认是 id
+     */
+    String searchKeyField() default "id";
+
+    /**
      * @return 搜索数据的展示字段
      */
     String searchTitleField() default "title";

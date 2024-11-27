@@ -66,6 +66,7 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
     const [treeData, setTreeData] = useState<any[]>([]);
     const [searchOptions, setSearchOptions] = useState<any[]>([]);
     const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+    const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
     const [autoExpandParent, setAutoExpandParent] = useState(true);
     const [loading, setLoading] = useState(true);
 
@@ -86,7 +87,7 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
         return <Spin />
     }
 
-    const treeProps: AndDTreeProps = { treeData, blockNode: true, defaultExpandAll }
+    const treeProps: AndDTreeProps<TreeDataNode> = { treeData, blockNode: true, defaultExpandAll }
 
     const asyncLoadData = async (parent?: Data) => {
         const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [parent, input] })
@@ -99,10 +100,12 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
         setLoading(false);
     }
 
+    treeProps.selectable = true;
     treeProps.treeData = treeData;
-
-    if (searchable) {
-        treeProps.selectable = true;
+    treeProps.selectedKeys = selectedKeys;
+    treeProps.onSelect = (_, { node, selectedNodes }) => {
+        onRecordClick?.(node)
+        setSelectedKeys(selectedNodes.map(item => item[fieldNames.key]).filter(Boolean))
     }
 
     if (asyncTree) {
@@ -112,11 +115,7 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
     if (__designMode !== 'design') {
         treeProps.fieldNames = fieldNames;
     }
-    if (onRecordClick) {
-        treeProps.onSelect = (_, { node }) => {
-            onRecordClick(node)
-        }
-    }
+
     if (recordActions && recordActions.length > 0) {
         treeProps.titleRender = (node) => {
             const items: MenuProps["items"] = recordActions.filter(filterVisibled).map(action => {
@@ -146,6 +145,7 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
         const onSearch = async (text: string) => {
             const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadSearchData', data: [text, input] })
             const options = res?.data?.map((item: any) => ({
+                key: item[fieldNames.searchDataKey],
                 value: item[fieldNames.searchDataTitle],
                 record: item
             })) || []
@@ -155,12 +155,14 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
         const onExpand = (newExpandedKeys: React.Key[]) => {
             setExpandedKeys(newExpandedKeys);
             setAutoExpandParent(false);
-          };
+        };
 
         const onSelect = async (value: string, item: { record: any }) => {
             const expandedTreeData: ExpandedTreeData = await doApiAction({ componentKey, type: 'API', actionKey: 'loadExpandedTreeData', data: [item.record, input] })
             setTreeData(expandedTreeData.data)
             setExpandedKeys(expandedTreeData.expandedKeys)
+            setSelectedKeys([expandedTreeData.selectedRecord[fieldNames.key]])
+            onRecordClick?.(expandedTreeData.selectedRecord)
             setLoading(false);
             setAutoExpandParent(true);
         }

@@ -6,6 +6,7 @@ export type TreeProps = {
         key: string
         title: string
         children: string
+        searchDataKey: string
         searchDataTitle: string
     }
     asyncTree: boolean
@@ -23,4 +24,5 @@ export type TreeState = {
 export type ExpandedTreeData = {
     data: Data[]
     expandedKeys: React.Key[]
+    selectedRecord: Data
 }

@@ -41,7 +41,7 @@ public abstract class AbstractTreeCompiler<T extends Component> extends Abstract
         TreeConfig config = compileContext.getComponentElement().getAnnotation(TreeConfig.class);
         TreeProps.TreeFieldNames fieldNames = TreeProps.TreeFieldNames.DEFAULT;
         if (config != null) {
-            fieldNames = new TreeProps.TreeFieldNames(config.keyField(), config.titleField(), config.childrenField(), config.searchTitleField());
+            fieldNames = new TreeProps.TreeFieldNames(config.keyField(), config.titleField(), config.childrenField(), config.searchKeyField(), config.searchTitleField());
             props.defaultExpandAll(config.defaultExpandAll());
         }
         props.fieldNames(fieldNames);
