@@ -4,6 +4,7 @@ import { Splitter } from 'antd'
 import { MD5 } from 'object-hash'
 import { loadRefComponent } from '../../common'
 import { LeftAndRightLayoutProps } from '../../../types'
+import "./index.scss"
 
 const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayoutProps) => {
     const [record, setRecord] = React.useState(null)
@@ -12,12 +13,16 @@ const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayo
     return (
         <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel defaultSize={props.leftWidth || "30%"}>
-                {left}
+                <div className="layout-panel">
+                    {left}
+                </div>
             </Splitter.Panel>
             <Splitter.Panel>
-                {right}
+                <div className="layout-panel">
+                    {right}
+                </div>
             </Splitter.Panel>
-        </Splitter>
+        </Splitter >
     )
 }
 
