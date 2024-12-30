@@ -2,18 +2,49 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>fastball-parent</artifactId>
-        <groupId>dev.fastball</groupId>
-        <version>0.6.0-SNAPSHOT</version>
-    </parent>
+    <groupId>dev.fastball</groupId>
+    <artifactId>fastball-ui</artifactId>
+    <version>0.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
 
-    <version>0.6.0-SNAPSHOT</version>
-
-    <artifactId>fastball-ui</artifactId>
-
     <packaging>pom</packaging>
+
+    <url>https://github.com/fastball-projects/fastball-components</url>
+
+    <name>Fastball UI components</name>
+    <description>Fastball Web UI components.</description>
+
+    <organization>
+        <name>FanShu Inc.</name>
+        <url>https://fastball.dev</url>
+    </organization>
+
+    <scm>
+        <url>https://github.com/fastball-projects/fastball-components</url>
+        <connection>git://github.com/fastball-projects/fastball-components.git</connection>
+        <developerConnection>git@github.com:fastball-projects/fastball-components.git</developerConnection>
+    </scm>
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/fastball-projects/fastball-components/issues</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>gr</id>
+            <name>GengRong</name>
+            <email>gr@fastball.dev</email>
+            <roles>
+                <role>lead</role>
+            </roles>
+        </developer>
+    </developers>
 
     <modules>
         <module>fastball-ui-api</module>
@@ -30,10 +61,19 @@
         <auto-service.version>1.0.1</auto-service.version>
         <javapoet.version>1.13.0</javapoet.version>
         <easyexcel.version>3.2.1</easyexcel.version>
+        <spring-boot.version>3.3.1</spring-boot.version>
+        <fastball.version>0.6.0-SNAPSHOT</fastball.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
@@ -48,6 +88,66 @@
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
                 <version>${auto-service.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-meta</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-core</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-compile</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-generator</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-runtime-spring-configure</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>spring-boot-starter-fastball</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-maven-plugin</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-runtime-spring-devtools</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-orm-jpa</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-minio</artifactId>
+                <version>${fastball.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-apt</artifactId>
+                <version>${fastball.version}</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
@@ -76,5 +176,59 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.10.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.6.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
