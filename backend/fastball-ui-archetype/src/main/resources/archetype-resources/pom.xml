@@ -9,12 +9,12 @@
     <version>${version}</version>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <fastball.version>0.1.1-SNAPSHOT</fastball.version>
-        <fastball-ui.version>0.0.132-SNAPSHOT</fastball-ui.version>
+        <fastball.version>0.6.2</fastball.version>
+        <fastball-ui.version>0.6.2</fastball-ui.version>
         <spring-boot.version>3.3.1</spring-boot.version>
     </properties>
 
