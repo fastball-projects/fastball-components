@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <groupId>dev.fastball</groupId>
     <artifactId>fastball-ui</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>pom</packaging>
@@ -152,27 +152,27 @@
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-api</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-metadata</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-compiler</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-builtin-jpa</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-builtin-excel</artifactId>
-                <version>0.6.0-SNAPSHOT</version>
+                <version>0.7.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
