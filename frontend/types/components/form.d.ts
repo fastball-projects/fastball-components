@@ -18,6 +18,8 @@ export type FormProps = {
 } & BasicComponentProps & PopupComponentProps
 
 export type FormFieldInfo = {
+    addonBefore?: string
+    addonAfter?: string
     subTableCreatorButtonText?: String
     subTableRecordActions?: ActionInfo[]
     fieldDependencyInfoList?: FieldDependencyInfo[]

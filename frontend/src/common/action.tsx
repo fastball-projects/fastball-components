@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button, message } from 'antd';
+import { getCurrentBusinessContextId, CurrentBusinessContextHeaderKey } from 'fastball-frontend-common';
 import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo, PrintActionInfo, PrintProps } from '../../types'
 import FastballPopup from './components/Popup'
 import FastballActionButton from './components/ActionButton';
@@ -8,7 +9,6 @@ import FastballPrint from './components/Printer';
 const TOKEN_LOCAL_KEY = 'fastball_token';
 
 export const buildJsonRequestInfo = (): RequestInit => {
-
     const tokenJson = localStorage.getItem(TOKEN_LOCAL_KEY)
     let authorization: string = '';
     if (tokenJson) {
@@ -22,7 +22,8 @@ export const buildJsonRequestInfo = (): RequestInit => {
     const request = {
         method: 'POST',
         headers: {
-            Authorization: authorization
+            Authorization: authorization,
+            [CurrentBusinessContextHeaderKey] : getCurrentBusinessContextId()
         }
     }
     return request;

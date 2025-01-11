@@ -22,4 +22,7 @@ public class FormFieldInfo extends FieldInfo {
 
     private String subTableCreatorButtonText;
 
+    private String addonBefore;
+
+    private String addonAfter;
 }

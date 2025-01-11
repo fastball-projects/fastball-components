@@ -11,15 +11,35 @@ import dev.fastball.core.component.DownloadFile;
 import dev.fastball.meta.action.ActionInfo;
 import dev.fastball.meta.action.ApiActionInfo;
 import dev.fastball.meta.basic.FieldInfo;
-import dev.fastball.ui.components.form.config.*;
-import dev.fastball.ui.components.metadata.form.*;
+import dev.fastball.ui.components.form.config.FieldDependencies;
+import dev.fastball.ui.components.form.config.FieldDependency;
+import dev.fastball.ui.components.form.config.FormConfig;
+import dev.fastball.ui.components.form.config.FormField;
+import dev.fastball.ui.components.form.config.FormFieldConfig;
+import dev.fastball.ui.components.form.config.FormListConfig;
+import dev.fastball.ui.components.form.config.SubTableRecordAction;
+import dev.fastball.ui.components.form.config.SubTableRecordViewAction;
+import dev.fastball.ui.components.form.config.ValueChangeHandler;
+import dev.fastball.ui.components.metadata.form.FieldConfigOverrideInfo;
+import dev.fastball.ui.components.metadata.form.FieldDependencyInfo;
+import dev.fastball.ui.components.metadata.form.FormFieldInfo;
+import dev.fastball.ui.components.metadata.form.FormProps_AutoValue;
+import dev.fastball.ui.components.metadata.form.ValueChangeHandlerInfo;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -179,6 +199,8 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
             } else {
                 fieldInfo.setDisplay(formField.editableDisplay());
             }
+            fieldInfo.setAddonBefore(formField.addonBefore());
+            fieldInfo.setAddonAfter(formField.addonAfter());
         }
         FieldDependencies fieldDependencies = variableElement.getAnnotation(FieldDependencies.class);
         FieldDependency fieldDependency = variableElement.getAnnotation(FieldDependency.class);

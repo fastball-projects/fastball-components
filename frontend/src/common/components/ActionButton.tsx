@@ -1,7 +1,8 @@
 import { Button, Popconfirm, Upload, UploadProps, message } from "antd";
 import React, { useState, useContext } from "react";
+import { currentBusinessContextId } from "fastball-frontend-common";
 import { ApiActionInfo } from "../../../types";
-import { callApi, doApiAction } from "../action";
+import { doApiAction } from "../action";
 import { FastballContext } from "../../components/FastballContext";
 
 const FastballActionButton: React.FC<ApiActionInfo> = (props) => {

@@ -14,6 +14,7 @@ specifiers:
   build-plugin-component-multiple: ^1.0.0-beta.5
   classnames: ^2.3.2
   dayjs: ^1.11.9
+  fastball-frontend-common: 0.2.2
   less-loader: ^7.3.0
   lodash: ^4.17.21
   moment: ^2.30.1
@@ -37,6 +38,7 @@ dependencies:
   antd: 5.22.2_gjkhxvvboafp2pyyxr2wuvoqdu
   classnames: 2.5.1
   dayjs: 1.11.13
+  fastball-frontend-common: 0.2.2
   less-loader: 7.3.0
   lodash: 4.17.21
   moment: 2.30.1
@@ -12704,6 +12706,13 @@ packages:
   /fast-uri/3.0.3:
     resolution: {integrity: sha512-aLrHthzCjH5He4Z2H9YZ+v6Ujb9ocRuW6ZzkJQOrTxleEijANq4v1TsaPaVG1PZcuurEzrLcWRyYBYXD5cEiaw==}
     dev: true
+
+  /fastball-frontend-common/0.2.2:
+    resolution: {integrity: sha512-1XmdT0Ubq/+o1XTm+n+Y+9fv6x0Nc8VjW7+5iBir6moAWwGIXfKuAPaRnqb8vTH/GGvoubq50xFEp6v3/p46cg==}
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1_react@18.3.1
+    dev: false
 
   /fastparse/1.1.2:
     resolution: {integrity: sha512-483XLLxTVIwWK3QTrMGRqUfUpoOs/0hbQrl2oz4J0pAcm3A3bu84wxTFqGqkJzewCLdME38xJLJAxBABfQT8sQ==}
