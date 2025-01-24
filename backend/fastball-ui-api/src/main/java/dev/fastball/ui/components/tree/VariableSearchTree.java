@@ -17,7 +17,7 @@ public interface VariableSearchTree<T, S, P> extends Component {
      * @param searchText 用于搜索的关键字
      * @return 返回的数据
      */
-    @UIApi
+    @UIApi(needRecordFilter = true)
     DataResult<S> loadSearchData(String searchText, P param);
 
     /**

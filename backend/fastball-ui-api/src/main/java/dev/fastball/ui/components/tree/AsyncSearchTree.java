@@ -16,7 +16,7 @@ public interface AsyncSearchTree<T, S> extends Component {
      * @param parent 用于查询的父节点, 如果为 null, 则查询根节点
      * @return 返回的数据
      */
-    @UIApi
+    @UIApi(needRecordFilter = true)
     DataResult<T> loadData(T parent);
 
     /**
@@ -25,7 +25,7 @@ public interface AsyncSearchTree<T, S> extends Component {
      * @param searchText 用于搜索的关键字
      * @return 返回的数据
      */
-    @UIApi
+    @UIApi(needRecordFilter = true)
     DataResult<S> loadSearchData(String searchText);
 
     /**
@@ -34,6 +34,6 @@ public interface AsyncSearchTree<T, S> extends Component {
      * @param search 被选中的搜索数据
      * @return 返回的数据
      */
-    @UIApi
+    @UIApi(needRecordFilter = true)
     ExpandedTreeData<T> loadExpandedTreeData(S search);
 }

@@ -29,6 +29,11 @@ public @interface TreeConfig {
     String childrenField();
 
     /**
+     * @return 是否有子节点, 用于声明树形数据是否有子节点的字段, 为 false 时, 树无法再展看也不现实展开按钮
+     */
+    String hasChildrenField() default "hasChildren";
+
+    /**
      * @return 搜索数据的标识字段, 默认是 id
      */
     String searchKeyField() default "id";

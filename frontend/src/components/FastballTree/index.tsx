@@ -1,10 +1,10 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
-import { Tree as AntDTree, Spin, Dropdown, Input, AutoComplete } from 'antd';
+import React, { FC, useEffect, useState } from 'react';
+import { Tree as AntDTree, Spin, Dropdown, AutoComplete } from 'antd';
 import type { TreeProps as AndDTreeProps, MenuProps, TreeDataNode } from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { buildAction, doApiAction, filterVisibled } from '../../common'
-import type { ActionInfo, Data, ExpandedTreeData, SearchTreeData, TreeProps, TreeState } from '../../../types'
+import type { ActionInfo, Data, ExpandedTreeData, TreeProps } from '../../../types'
 
 const mockData: Data[] = [{
     key: "1",
@@ -92,6 +92,11 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
     const asyncLoadData = async (parent?: Data) => {
         const res = await doApiAction({ componentKey, type: 'API', actionKey: 'loadData', data: [parent, input] })
         const childrenNodes = res?.data || []
+        childrenNodes.forEach((node: any) => {
+            if (node[fieldNames.hasChildren] === false) {
+                node.isLeaf = true
+            }
+        });
         let newTreeData: Data[] = childrenNodes;
         if (treeData && parent) {
             newTreeData = updateTreeData(treeData, parent, childrenNodes, fieldNames);
@@ -120,14 +125,22 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
         treeProps.titleRender = (node) => {
             const items: MenuProps["items"] = recordActions.filter(filterVisibled).map(action => {
                 const actionInfo: ActionInfo = { trigger: <div>{action.actionName || action.actionKey}</div>, componentKey, ...action, data: node };
+                const recordActionAvailableFlags = node.recordActionAvailableFlags as Record<string, boolean>
+                if (recordActionAvailableFlags && recordActionAvailableFlags[action.actionKey] === false) {
+                    return null;
+                }
                 if (action.refresh) {
-                    // actionInfo.callback = () => reloadData()
+                    if (asyncTree) {
+                        actionInfo.callback = () => asyncLoadData(node)
+                    } else {
+                        actionInfo.callback = () => initLoadData()
+                    }
                 }
                 return ({
                     key: action.actionKey,
                     label: buildAction(actionInfo)
                 })
-            })
+            }).filter(Boolean)
             return (
                 <>
                     <span>{node[fieldNames.title]}</span>

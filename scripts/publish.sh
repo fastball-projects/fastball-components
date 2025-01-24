@@ -43,7 +43,7 @@ publish_backend() {
     ./mvnw versions:set -DnewVersion=$version
     echo "deploy fastball component backend ..."
     if [[ "$version" =~ .*-SNAPSHOT$ ]]; then
-        ./mvnw clean deploy -P dev
+        ./mvnw clean deploy -P dev -Dgpg.skip
     else
         ./mvnw clean deploy -P release
     fi

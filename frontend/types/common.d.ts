@@ -66,6 +66,12 @@ export type PrintProps = {
     __designMode?: string
 }
 
+export type DateFieldDefaultValueInfo = {
+    defaultValue: DateDefaultValue
+    offset: number
+    offsetUnit: DateOffsetUnit
+}
+
 export type FieldInfo = {
     dataIndex: string[]
     valueType: string
@@ -74,6 +80,7 @@ export type FieldInfo = {
     placeholder?: string
     defaultValue?: any
     digitPrecision?: number
+    dateDefaultValue?: DateFieldDefaultValueInfo
     validationRules?: ValidationRule[]
     valueEnum?: { [key: string]: EnumItem }
     autoComplete?: AutoCompleteActionInfo
@@ -239,6 +246,11 @@ export type TreeLookupProps = {
 } & ProFieldFCRenderProps
 
 export type LoadDataType = () => any
+
+export type DateDefaultValue = 'NOW' | 'TODAY' | 'MONTH_START' | 'MONTH_END' | 'YEAR_START' | 'YEAR_END' | 'CURRENT_WEEK_MONDAY' | 'CURRENT_WEEK_TUESDAY' | 'CURRENT_WEEK_WEDNESDAY' | 'CURRENT_WEEK_THURSDAY' | 'CURRENT_WEEK_FRIDAY' | 'CURRENT_WEEK_SATURDAY' | 'CURRENT_WEEK_SUNDAY'
+
+export type DateOffsetUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
+
 
 export type ActionType = 'API' | 'Rest' | 'Popup' | 'Digit' | 'Print'
 

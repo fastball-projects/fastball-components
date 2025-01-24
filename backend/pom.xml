@@ -101,7 +101,7 @@
         <javapoet.version>1.13.0</javapoet.version>
         <easyexcel.version>3.2.1</easyexcel.version>
         <spring-boot.version>3.3.1</spring-boot.version>
-        <fastball.version>0.6.0-SNAPSHOT</fastball.version>
+        <fastball.version>0.7.0-SNAPSHOT</fastball.version>
     </properties>
 
     <dependencyManagement>

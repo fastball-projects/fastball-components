@@ -32,11 +32,12 @@ public interface TreeProps extends ComponentProps {
     @NoArgsConstructor
     @AllArgsConstructor
     final class TreeFieldNames {
-        public static final TreeFieldNames DEFAULT = new TreeFieldNames("id", "title", "children", "id", "title");
+        public static final TreeFieldNames DEFAULT = new TreeFieldNames("id", "title", "children", "hasChildren", "id", "title");
 
         private String key;
         private String title;
         private String children;
+        private String hasChildren;
         private String searchDataKey;
         private String searchDataTitle;
     }

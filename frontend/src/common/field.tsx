@@ -94,6 +94,9 @@ export const processingField = (container: Element, componentKey: string, field:
     }
 
     column.initialValue = field.defaultValue
+    if (field.valueType === 'switch' && field.defaultValue !== undefined) {
+        column.initialValue = Boolean(field.defaultValue)
+    }
     if (field.valueType == 'multiSelect') {
         column.valueType = 'select'
         column.fieldProps = Object.assign(column.fieldProps || {}, { mode: "multiple" })

@@ -5,7 +5,7 @@ import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstan
 import { Data, FieldDependencyInfo, FormFieldInfo, FormProps } from '../../../types';
 import { FastballFieldProvider, buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
 import { Button, Spin } from 'antd';
-import dayjs from 'dayjs';
+import dayjs, { ManipulateType } from 'dayjs';
 import { EDIT_ID } from '../../common/components/SubTable';
 import ViewWrapper, { FastballViewPathKey } from '../../common/components/ViewWrapper';
 import { ComponentToPrint } from '../../common/components/Printer';
@@ -29,23 +29,29 @@ const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): 
     if (!values || !values[fieldDependencyInfo.field]) {
         return false;
     }
+    let targetValue: any = fieldDependencyInfo.value
+    const value = values[fieldDependencyInfo.field]
+    // 其他类型在 == 时会做类型处理, 比如数字类型, 但 Boolean 比较特殊, 因为 Java 的注解只能声明字符串来表达泛类型, 但是 true != 'true', false != 'false', 所以这里做了特殊处理
+    if (typeof value === 'boolean') {
+        targetValue = Boolean(targetValue)
+    }
     if (fieldDependencyInfo.condition === 'Equals') {
-        return values[fieldDependencyInfo.field] == fieldDependencyInfo.value;
+        return value == targetValue;
     }
     if (fieldDependencyInfo.condition === 'NotEquals') {
-        return values[fieldDependencyInfo.field] != fieldDependencyInfo.value;
+        return value != targetValue;
     }
     if (fieldDependencyInfo.condition === 'GreaterThan') {
-        return values[fieldDependencyInfo.field] > fieldDependencyInfo.value;
+        return value > targetValue;
     }
     if (fieldDependencyInfo.condition === 'GreaterThanOrEquals') {
-        return values[fieldDependencyInfo.field] >= fieldDependencyInfo.value;
+        return value >= targetValue;
     }
     if (fieldDependencyInfo.condition === 'LessThan') {
-        return values[fieldDependencyInfo.field] < fieldDependencyInfo.value;
+        return value < targetValue;
     }
     if (fieldDependencyInfo.condition === 'LessThanOrEquals') {
-        return values[fieldDependencyInfo.field] <= fieldDependencyInfo.value;
+        return value <= targetValue;
     }
     return false;
 }
@@ -153,13 +159,13 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
                     await this.formRef.current?.validateFields?.()
                     const formData = await this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
+                    const data: Data = Object.assign({}, this.state.dataSource, formData)
                     return [data, input];
                 }, loadInput: async () => {
                     await this.formRef.current?.validateFields?.()
                     // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
                     const formData = await this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
+                    const data: Data = Object.assign({}, this.state.dataSource, formData)
                     return data;
                 }
             });
@@ -209,9 +215,23 @@ class FastballForm extends React.Component<FormProps, FormState> {
             }
             formColumn.name = formColumn.dataIndex
             if (typeof formColumn.fieldProps !== 'function') {
-                formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                const fieldProps: ProFormColumnsType['fieldProps'] = {
                     name: formColumn.dataIndex,
-                })
+                }
+                if (field.subTableCreatorButtonText) {
+                    formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
+                        creatorButtonProps: {
+                            creatorButtonText: field.subTableCreatorButtonText
+                        }
+                    })
+                }
+                if (field.addonAfter?.length) {
+                    fieldProps.addonAfter = field.addonAfter
+                }
+                if (field.addonBefore?.length) {
+                    fieldProps.addonBefore = field.addonBefore
+                }
+                formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, fieldProps)
             }
             if (field.validationRules) {
                 formColumn.formItemProps = Object.assign(formColumn.formItemProps || {}, {
@@ -224,7 +244,57 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 })
             }
             if (!readonly && (field.valueType === 'dateTime' || field.valueType === 'date')) {
-                formColumn.initialValue = dayjs()
+                if (field.dateDefaultValue) {
+                    let date;
+                    if (field.dateDefaultValue.defaultValue === 'TODAY') {
+                        date = dayjs().startOf('day');
+                    } else if (field.dateDefaultValue.defaultValue === 'MONTH_START') {
+                        date = dayjs().startOf('month');
+                    } else if (field.dateDefaultValue.defaultValue === 'MONTH_END') {
+                        date = dayjs().endOf('month');
+                    } else if (field.dateDefaultValue.defaultValue === 'YEAR_START') {
+                        date = dayjs().startOf('year');
+                    } else if (field.dateDefaultValue.defaultValue === 'YEAR_END') {
+                        date = dayjs().endOf('year');
+                    } else if (field.dateDefaultValue.defaultValue === 'CURRENT_WEEK_MONDAY') {
+                        date = dayjs().startOf('week');
+                    } else if (field.dateDefaultValue.defaultValue === 'CURRENT_WEEK_TUESDAY') {
+                        date = dayjs().startOf('week').add(1, 'day');
+                    } else if (field.dateDefaultValue.defaultValue === 'CURRENT_WEEK_WEDNESDAY') {
+                        date = dayjs().startOf('week').add(2, 'day');
+                    } else if (field.dateDefaultValue.defaultValue === 'CURRENT_WEEK_THURSDAY') {
+                        date = dayjs().startOf('week').add(3, 'day');
+                    } else if (field.dateDefaultValue.defaultValue === 'CURRENT_WEEK_FRIDAY') {
+                        date = dayjs().startOf('week').add(4, 'day');
+                    } else if (field.dateDefaultValue.defaultValue === 'CURRENT_WEEK_SATURDAY') {
+                        date = dayjs().startOf('week').add(5, 'day');
+                    } else if (field.dateDefaultValue.defaultValue === 'CURRENT_WEEK_SUNDAY') {
+                        date = dayjs().startOf('week').add(6, 'day');
+                    } else {
+                        date = dayjs()
+                    }
+                    if (field.dateDefaultValue.offset) {
+                        // type DateOffsetUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS'
+                        let addUnit: ManipulateType = 'second';
+                        if (field.dateDefaultValue.offsetUnit === 'SECONDS') {
+                            addUnit = 'second'
+                        } else if (field.dateDefaultValue.offsetUnit === 'MINUTES') {
+                            addUnit = 'minute'
+                        } else if (field.dateDefaultValue.offsetUnit === 'HOURS') {
+                            addUnit = 'hour'
+                        } else if (field.dateDefaultValue.offsetUnit === 'DAYS') {
+                            addUnit = 'day'
+                        } else if (field.dateDefaultValue.offsetUnit === 'WEEKS') {
+                            addUnit = 'week'
+                        } else if (field.dateDefaultValue.offsetUnit === 'MONTHS') {
+                            addUnit = 'month'
+                        } else if (field.dateDefaultValue.offsetUnit === 'YEARS') {
+                            addUnit = 'year'
+                        }
+                        date = date.add(field.dateDefaultValue.offset, addUnit)
+                    }
+                    formColumn.initialValue = date
+                }
             }
             if (field.valueType === 'SubFields' && field.subFields) {
                 formColumn.valueType = 'group'
@@ -271,7 +341,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 const fieldFormItemProps = formColumn.formItemProps;
                 formColumn.formItemProps = (formInstance, config): any => {
                     const fieldKey = `${parentDataPath?.join('.')}:${config.rowIndex}:${field.dataIndex.join('.')}`
-                    if(!fieldChangeTimerMap[fieldKey]) {
+                    if (!fieldChangeTimerMap[fieldKey]) {
                         fieldChangeTimerMap[fieldKey] = setTimeout(() => fieldChangeFunc(field, config, formInstance, editableFormRef, parentDataPath), 300);
                     }
                     clearTimeout(fieldChangeTimerMap[fieldKey])
@@ -299,13 +369,6 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     const groupColumns = getGroupColumns(config);
                     return groupColumns;
                 };
-                if (field.subTableCreatorButtonText) {
-                    formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
-                        creatorButtonProps: {
-                            creatorButtonText: field.subTableCreatorButtonText
-                        }
-                    })
-                }
                 formColumn.columns = [subFieldColumn]
                 if (readonly || field.readonly) {
                     formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, {
@@ -358,11 +421,11 @@ class FastballForm extends React.Component<FormProps, FormState> {
     }
 
     render(): React.ReactNode {
-        const { componentKey, input, size = 'small', variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
+        const { componentKey, input, variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
         props['@class'] = null;
         const { dataSource } = this.state;
         const container = this.context?.container;
-        const proFormProps: ProFormProps = { size, grid: true, layout: "horizontal", rowProps: { gutter: [16, 16] }, scrollToFirstError: true };
+        const proFormProps: ProFormProps = { grid: true, layout: "vertical", rowProps: { gutter: [16, 16] }, scrollToFirstError: true };
 
         if (variableForm && __designMode !== 'design') {
             if (dataSource == null) {

@@ -6,6 +6,7 @@ export type TreeProps = {
         key: string
         title: string
         children: string
+        hasChildren: string
         searchDataKey: string
         searchDataTitle: string
     }

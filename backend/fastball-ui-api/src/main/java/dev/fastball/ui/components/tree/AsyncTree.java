@@ -16,6 +16,6 @@ public interface AsyncTree<T> extends Component {
      * @param parent  用于查询的父节点
      * @return 返回的数据
      */
-    @UIApi
+    @UIApi(needRecordFilter = true)
     DataResult<T> loadData(T parent);
 }

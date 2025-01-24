@@ -15,6 +15,6 @@ public interface Tree<T> extends Component {
      *
      * @return 返回的数据
      */
-    @UIApi
+    @UIApi(needRecordFilter = true)
     DataResult<T> loadData();
 }

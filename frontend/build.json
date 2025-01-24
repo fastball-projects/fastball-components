@@ -5,5 +5,13 @@
   "alias": {
     "@": "./src/components"
   },
-  "plugins": [["build-plugin-component-multiple"]]
+  "plugins": [
+    [
+      "build-plugin-component-multiple",
+      {
+        "themePackage": "@alifd/theme-2",
+        "addon": "@storybook/addon-outline"
+      }
+    ]
+  ]
 }

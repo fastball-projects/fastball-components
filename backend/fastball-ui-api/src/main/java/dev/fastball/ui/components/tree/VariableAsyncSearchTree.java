@@ -17,7 +17,7 @@ public interface VariableAsyncSearchTree<T, S, P> extends Component {
      * @param param  传入该组件的入参, 可用于组件间联动传递
      * @return 返回的数据
      */
-    @UIApi
+    @UIApi(needRecordFilter = true)
     DataResult<T> loadData(T parent, P param);
 
     /**

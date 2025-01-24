@@ -13,7 +13,9 @@ specifiers:
   antd: 5.22.2
   build-plugin-component-multiple: ^1.0.0-beta.5
   classnames: ^2.3.2
+  concat-map: 0.0.1
   dayjs: ^1.11.9
+  discontinuous-range: 1.0.0
   fastball-frontend-common: 0.2.2
   less-loader: ^7.3.0
   lodash: ^4.17.21
@@ -26,6 +28,7 @@ specifiers:
   react-to-print: ^2.14.12
   sass: ^1.57.1
   style-loader: ^2.0.0
+  window-size: 0.1.0
 
 dependencies:
   '@alilc/lowcode-engine': 1.3.2_uvvf4ocqmq3ip2kuhjoixyvvfm
@@ -37,7 +40,9 @@ dependencies:
   '@types/react': 18.3.16
   antd: 5.22.2_gjkhxvvboafp2pyyxr2wuvoqdu
   classnames: 2.5.1
+  concat-map: 0.0.1
   dayjs: 1.11.13
+  discontinuous-range: 1.0.0
   fastball-frontend-common: 0.2.2
   less-loader: 7.3.0
   lodash: 4.17.21
@@ -50,6 +55,7 @@ dependencies:
   react-to-print: 2.15.1_nnrd3gsncyragczmpvfhocinkq
   sass: 1.83.0
   style-loader: 2.0.0
+  window-size: 0.1.0
 
 devDependencies:
   '@alib/build-scripts': 0.1.32
@@ -10433,7 +10439,7 @@ packages:
     dev: false
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=, tarball: __tarballs/concat-map/0.0.1/__path/concat-map/-/concat-map-0.0.1/d8a96bd77fd68df7793a73036a3ba0d5405d477b.tgz}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concat-stream/1.6.2:
     resolution: {integrity: sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==}
@@ -11604,7 +11610,7 @@ packages:
     dev: true
 
   /discontinuous-range/1.0.0:
-    resolution: {integrity: sha1-44Mx8IRLukm5qctxx3FYWqsbxlo=, tarball: __tarballs/discontinuous-range/1.0.0/__path/discontinuous-range/-/discontinuous-range-1.0.0/e38331f0844bba49b9a9cb71c771585aab1bc65a.tgz}
+    resolution: {integrity: sha512-c68LpLbO+7kP/b1Hr1qs8/BJ09F5khZGTxqxZuhzxpmwJKOgRFHJWIb9/KmqnqHhLdO55aOxFH/EGBvUQbL/RQ==}
     dev: false
 
   /dns-equal/1.0.0:
@@ -26592,7 +26598,7 @@ packages:
     dev: true
 
   /window-size/0.1.0:
-    resolution: {integrity: sha1-VDjNLqk7IC76Ohn+iIeu58lPnJ0=, tarball: __tarballs/window-size/0.1.0/__path/window-size/-/window-size-0.1.0/5438cd2ea93b202efa3a19fe8887aee7c94f9c9d.tgz}
+    resolution: {integrity: sha512-1pTPQDKTdd61ozlKGNCjhNRd+KPmgLSGa3mZTHoOliaGcESD8G1PXhh7c1fgiPjVbNVfgy2Faw4BI8/m0cC8Mg==}
     engines: {node: '>= 0.8.0'}
     dev: false
 
