@@ -110,6 +110,7 @@ export type ActionInfo = {
     needArrayWrapper?: boolean
     closePopupOnSuccess?: boolean
     callback?: Function
+    errorCallback?: Function
     trigger?: ReactComponent
     data?: Data | Data[]
     loadData?: LoadDataType
@@ -244,6 +245,11 @@ export type TreeLookupProps = {
     lookup: TreeLookupActionInfo
     multiple?: boolean
 } & ProFieldFCRenderProps
+
+export type FieldValidationMessage = {
+    fieldIndex: string[]
+    errorMessages: string[]
+}
 
 export type LoadDataType = () => any
 

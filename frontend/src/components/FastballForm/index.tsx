@@ -2,7 +2,7 @@ import * as React from 'react'
 import { EditableFormInstance, ProSchema, ProCard } from '@fastball/pro-components'
 import { BetaSchemaForm } from '@fastball/pro-components';
 import type { ProFormColumnsType, DrawerFormProps, ModalFormProps, ProFormInstance } from '@fastball/pro-components';
-import { Data, FieldDependencyInfo, FormFieldInfo, FormProps } from '../../../types';
+import { ActionInfo, Data, FieldDependencyInfo, FieldValidationMessage, FormFieldInfo, FormProps } from '../../../types';
 import { FastballFieldProvider, buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
 import { Button, Spin } from 'antd';
 import dayjs, { ManipulateType } from 'dayjs';
@@ -123,51 +123,67 @@ class FastballForm extends React.Component<FormProps, FormState> {
 
     getActions() {
         const { componentKey, closePopup, showReset, input, actions, recordActions } = this.props;
-        const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
-            action.callback = () => {
-                this.formRef.current?.resetFields?.()
-                if (action.closePopupOnSuccess !== false && closePopup) {
-                    closePopup()
-                }
+        const buildActionCallback = (action: ActionInfo) => () => {
+            this.formRef.current?.resetFields?.()
+            if (action.closePopupOnSuccess !== false && closePopup) {
+                closePopup()
             }
+        }
+        const errorCallback = (error: any) => {
+            const validateFields: any[] = this.formRef.current?.getFieldsError().filter(f => f.errors?.length).map(f => ({ name: f.name, errors: [] })) || []
+            if (error.data) {
+                error.data.map((fieldMessage: FieldValidationMessage) => validateFields.push({
+                    name: fieldMessage.fieldIndex,
+                    errors: fieldMessage.errorMessages
+                }))
+                this.formRef.current?.setFields(validateFields)
+            }
+        }
+        const buildActionLoadData = (withInput?: boolean) => async () => {
+            await this.formRef.current?.validateFields?.()
+            // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
+            const formData = await this.formRef.current?.getFieldsValue?.()
+            let basicData = {}
+            if (withInput && input) {
+                basicData = input
+            }
+            const data: Data = Object.assign(basicData, this.state.dataSource, formData)
+            return [data, input];
+        }
+        const buildActionLoadInput = (withInput?: boolean) => async () => {
+            await this.formRef.current?.validateFields?.()
+            const formData = await this.formRef.current?.getFieldsValue?.()
+            let basicData = {}
+            if (withInput && input) {
+                basicData = input
+            }
+            const data: Data = Object.assign(basicData, this.state.dataSource, formData)
+            return data;
+        }
+        const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
+            action.callback = buildActionCallback(action)
             return buildAction({
                 ref: this.componentRef,
-                componentKey, ...action, needArrayWrapper: false, loadData: async () => {
-                    await this.formRef.current?.validateFields?.()
-                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
-                    const formData = await this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
-                    return [data, input];
-                }, loadInput: () => {
-                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
-                    const formData = this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, input, this.state.dataSource, formData)
-                    return data;
-                }
+                componentKey,
+                ...action,
+                needArrayWrapper: false,
+                errorCallback,
+                loadData: buildActionLoadData(true),
+                loadInput: buildActionLoadInput(true),
+                callback: buildActionCallback(action),
             });
         }) : []
         actions?.filter(filterVisibled).forEach(action => {
-            action.callback = () => {
-                this.formRef.current?.resetFields()
-                if (action.closePopupOnSuccess !== false && closePopup) {
-                    closePopup()
-                }
-            }
+            action.callback = buildActionCallback(action)
             const button = buildAction({
                 ref: this.componentRef,
-                componentKey, ...action, needArrayWrapper: false, loadData: async () => {
-                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
-                    await this.formRef.current?.validateFields?.()
-                    const formData = await this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, this.state.dataSource, formData)
-                    return [data, input];
-                }, loadInput: async () => {
-                    await this.formRef.current?.validateFields?.()
-                    // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
-                    const formData = await this.formRef.current?.getFieldsValue?.()
-                    const data: Data = Object.assign({}, this.state.dataSource, formData)
-                    return data;
-                }
+                componentKey,
+                ...action,
+                needArrayWrapper: false,
+                errorCallback,
+                loadData: buildActionLoadData(),
+                loadInput: buildActionLoadInput(),
+                callback: buildActionCallback(action),
             });
             buttons.push(button);
         })

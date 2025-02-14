@@ -23,7 +23,7 @@ export const buildJsonRequestInfo = (): RequestInit => {
         method: 'POST',
         headers: {
             Authorization: authorization,
-            [CurrentBusinessContextHeaderKey] : getCurrentBusinessContextId()
+            [CurrentBusinessContextHeaderKey]: getCurrentBusinessContextId()
         }
     }
     return request;
@@ -148,7 +148,7 @@ export const doApiAction = async (actionInfo: ApiActionInfo, file?: File | Blob)
         return await postDownload(url, data, file, actionInfo.callback)
     }
     url = `/api/fastball/component/${componentKey}/action/${actionKey}`
-    return await callApi(url, data, file, actionInfo.callback)
+    return await callApi(url, data, file, actionInfo.callback, actionInfo.errorCallback)
 }
 
 const postDownload = async (url: string, data?: any, file?: File | Blob, callback?: Function) => {
@@ -183,7 +183,7 @@ const postDownload = async (url: string, data?: any, file?: File | Blob, callbac
 }
 
 
-export const callApi = async (url: string, data?: any, file?: File | Blob, callback?: Function) => {
+export const callApi = async (url: string, data?: any, file?: File | Blob, callback?: Function, errorCallback?: Function) => {
     const requestInfo = buildJsonRequestInfo();
     const formData = new FormData();
     if (file) {
@@ -203,13 +203,15 @@ export const callApi = async (url: string, data?: any, file?: File | Blob, callb
             if (callback) {
                 callback()
             }
-            if(result.message) {
-               message.success(result.message);
+            if (result.message) {
+                message.success(result.message);
             }
             return result.data;
         }
         if (result.status === 401) {
             location.href = '/#/login?redirectUrl=' + location.href
+        } else if (errorCallback) {
+            errorCallback(result)
         } else {
             message.error(`Error ${result.status}: ${result.message}`);
         }

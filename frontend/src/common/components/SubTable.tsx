@@ -23,6 +23,25 @@ const buildEditableConfig = (
     if (readonly) {
         return {}
     }
+    const deleteItem = () => {
+        const formValue = editableFormRef?.current?.getFieldsValue();
+        if (!formValue) {
+            return;
+        }
+        let dataIndex: string[] = [];
+        if (parentName?.length) {
+            dataIndex = [...parentName]
+        }
+        if (Array.isArray(name)) {
+            dataIndex = [...dataIndex, ...name]
+        } else if (name) {
+            dataIndex.push(name);
+        }
+        const tableDataSource = getByPaths(formValue, dataIndex)
+        setByPaths(formValue, dataIndex, tableDataSource.filter((item: Record<string, any>) => item[EDIT_ID] !== record?.[EDIT_ID]))
+        console.log(tableDataSource, formValue, dataIndex)
+        editableFormRef?.current?.setFieldsValue(formValue);
+    }
     return {
         type: 'multiple',
         editableKeys,
@@ -40,30 +59,7 @@ const buildEditableConfig = (
             }
             return null
         }).filter(action => action != null) : [
-            <a
-                key="delete"
-                onClick={() => {
-                    const formValue = editableFormRef?.current?.getFieldsValue();
-                    if (!formValue) {
-                        return;
-                    }
-                    let dataIndex: string[] = [];
-                    if (parentName?.length) {
-                        dataIndex = [...parentName]
-                    }
-                    if (Array.isArray(name)) {
-                        dataIndex = [...dataIndex, ...name]
-                    } else if (name) {
-                        dataIndex.push(name);
-                    }
-                    const tableDataSource = getByPaths(formValue, dataIndex)
-                    setByPaths(formValue, dataIndex, tableDataSource.filter((item: Record<string, any>) => item[EDIT_ID] !== record?.[EDIT_ID]))
-                    console.log(tableDataSource, formValue, dataIndex)
-                    editableFormRef?.current?.setFieldsValue(formValue);
-                }}
-            >
-                删除
-            </a>,
+            <a key="delete" onClick={deleteItem}>删除</a>,
         ],
         onValuesChange: (record, recordList) => {
             onChange?.(recordList);

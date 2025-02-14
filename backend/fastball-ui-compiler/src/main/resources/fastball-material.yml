@@ -1,3 +1,4 @@
 materialName: FastballComponents
+platform: web
 npmPackage: fastball-components
-npmVersion: 0.7.0-1737446045
+npmVersion: 0.7.0-1739418676
