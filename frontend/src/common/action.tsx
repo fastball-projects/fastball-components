@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, message } from 'antd';
-import { getCurrentBusinessContextId, CurrentBusinessContextHeaderKey } from 'fastball-frontend-common';
+import { getCurrentBusinessContext, CurrentBusinessContextKeyHeaderKey, CurrentBusinessContextHeaderKey } from 'fastball-frontend-common';
 import type { ActionInfo, ApiActionInfo, PopupActionInfo, Data, PopupProps, LookupActionInfo, PrintActionInfo, PrintProps } from '../../types'
 import FastballPopup from './components/Popup'
 import FastballActionButton from './components/ActionButton';
@@ -19,11 +19,13 @@ export const buildJsonRequestInfo = (): RequestInit => {
             localStorage.removeItem(TOKEN_LOCAL_KEY)
         }
     }
+    const businessContext = getCurrentBusinessContext()
     const request = {
         method: 'POST',
         headers: {
             Authorization: authorization,
-            [CurrentBusinessContextHeaderKey]: getCurrentBusinessContextId()
+            [CurrentBusinessContextKeyHeaderKey]: businessContext?.businessContextKey,
+            [CurrentBusinessContextHeaderKey]: businessContext?.businessContextId,
         }
     }
     return request;

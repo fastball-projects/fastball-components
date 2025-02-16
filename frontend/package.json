@@ -1,6 +1,6 @@
 {
   "name": "fastball-components",
-  "version": "0.7.0-1739418676",
+  "version": "0.8.0-1739609269",
   "description": "Fastball UI components",
   "homepage": "https://github.com/fastball-projects/fastball-components",
   "main": "lib/index.js",
@@ -45,7 +45,7 @@
     "concat-map": "0.0.1",
     "dayjs": "^1.11.9",
     "discontinuous-range": "1.0.0",
-    "fastball-frontend-common": "0.2.2",
+    "fastball-frontend-common": "0.3.2",
     "less-loader": "^7.3.0",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
@@ -60,6 +60,6 @@
     "window-size": "0.1.0"
   },
   "componentConfig": {
-    "materialSchema": "https://unpkg.com/fastball-components@0.7.0-1739418676/build/lowcode/assets-prod.json"
+    "materialSchema": "https://unpkg.com/fastball-components@0.8.0-1739609269/build/lowcode/assets-prod.json"
   }
 }
