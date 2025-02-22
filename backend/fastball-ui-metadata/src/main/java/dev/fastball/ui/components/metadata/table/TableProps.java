@@ -5,6 +5,7 @@ import dev.fastball.meta.action.ActionInfo;
 import dev.fastball.meta.basic.FieldInfo;
 import dev.fastball.meta.component.ComponentProps;
 import dev.fastball.meta.component.ReferencedComponentInfo;
+import dev.fastball.ui.components.table.param.RecordTriggerType;
 import dev.fastball.ui.components.table.param.TableSize;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface TableProps extends ComponentProps {
     String headerTitle();
 
     String childrenFieldName();
+
+    RecordTriggerType recordTriggerType();
 
     boolean searchable();
 

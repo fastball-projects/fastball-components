@@ -36,7 +36,7 @@ const defaultFieldNames: TimelineProps['fieldNames'] = {
     color: 'color'
 }
 
-const Timeline: React.FC<TimelineProps> = ({ container, componentKey, onRecordClick, onDataLoad, __designMode, fieldNames, recordActions, data, input }) => {
+const Timeline: React.FC<TimelineProps> = ({ container, componentKey, onRecordTriggered: onRecordClick, onDataLoad, __designMode, fieldNames, recordActions, data, input }) => {
     const initData = __designMode === 'design' ? mockData : data
     const timeLineFieldNames = __designMode === 'design' ? defaultFieldNames : fieldNames
     const [timelineData, setTimelineData] = React.useState(initData);

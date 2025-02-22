@@ -2,6 +2,7 @@ package dev.fastball.ui.components.table.config;
 
 import dev.fastball.core.annotation.ViewAction;
 import dev.fastball.core.component.Component;
+import dev.fastball.ui.components.table.param.RecordTriggerType;
 import dev.fastball.ui.components.table.param.TableSize;
 
 import java.lang.annotation.ElementType;
@@ -29,6 +30,13 @@ public @interface TableConfig {
      * @return 属性表格的子记录字段名
      */
     String childrenFieldName() default "";
+
+    /**
+     * 记录触发的类型, 比如 Layout 类型的组件, 该 Table 为触发组件, 啧当点击记录时, 会触发该事件, 影响子组件的入参变化
+     *
+     * @return 记录触发的类型
+     */
+    RecordTriggerType recordTriggerType() default RecordTriggerType.OnRecordClick;
 
     /**
      * 是否支持关键字搜索, 如开启, 入参需要使用 {@link dev.fastball.ui.components.table.param.TableSearchParam} 包装

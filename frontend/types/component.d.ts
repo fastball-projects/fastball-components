@@ -25,5 +25,5 @@ export type MockDataComponent<P> = {
 
 export type MultiDataComponent = {
     query?: any
-    onRecordClick?: Function<Record>
+    onRecordTriggered?: Function<any>
 }

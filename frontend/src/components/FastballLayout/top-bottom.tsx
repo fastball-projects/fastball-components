@@ -7,9 +7,9 @@ import { TopAndBottomLayoutProps } from '../../../types'
 import "./index.scss"
 
 const TopAndBottom: React.FC<TopAndBottomLayoutProps> = (props: TopAndBottomLayoutProps) => {
-    const [record, setRecord] = React.useState(null)
-    const top = loadRefComponent(props.top, { onRecordClick: setRecord, onDataLoad: props.interlocking ? setRecord : null, __designMode: props.__designMode, input: props.input })
-    const bottom = loadRefComponent(props.bottom, { key: MD5(record), input: record, __designMode: props.__designMode })
+    const [input, setInput] = React.useState(null)
+    const top = loadRefComponent(props.top, { onRecordClick: setInput, onDataLoad: props.interlocking ? setInput : null, __designMode: props.__designMode, input: props.input })
+    const bottom = loadRefComponent(props.bottom, { key: MD5(input), input, __designMode: props.__designMode })
     return (
         <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel defaultSize={"50%"}>

@@ -18,6 +18,7 @@ export type TableRecordActionInfo = ApiActionInfo & PopupActionInfo
 export type TableProps = {
     headerTitle?: string
     childrenFieldName?: string
+    recordTriggerType?: RecordTriggerType
     lightQuery: boolean
     pageable: boolean
     showRowIndex: boolean
@@ -38,3 +39,5 @@ export type TableProps = {
 
 
 export type TableSize = 'small' | 'middle' | 'large'
+
+export type RecordTriggerType = 'OnRecordClick' | 'OnRecordDoubleClick' | 'OnRecordContextMenuClick' | 'OnRecordSelected'

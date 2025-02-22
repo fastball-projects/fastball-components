@@ -7,9 +7,9 @@ import { LeftAndRightLayoutProps } from '../../../types'
 import "./index.scss"
 
 const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayoutProps) => {
-    const [record, setRecord] = React.useState(null)
-    const left = loadRefComponent(props.left, { onRecordClick: setRecord, onDataLoad: props.interlocking ? setRecord : null, __designMode: props.__designMode, input: props.input })
-    const right = loadRefComponent(props.right, { key: MD5(record), __designMode: props.__designMode, input: record })
+    const [input, setInput] = React.useState(null)
+    const left = loadRefComponent(props.left, { onRecordTriggered: setInput, onDataLoad: props.interlocking ? setInput : null, __designMode: props.__designMode, input: props.input })
+    const right = loadRefComponent(props.right, { key: MD5(input), __designMode: props.__designMode, input })
     return (
         <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel defaultSize={props.leftWidth || "30%"}>

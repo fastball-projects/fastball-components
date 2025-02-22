@@ -81,6 +81,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
                 props.size(tableConfig.size());
             }
             props.keywordSearch(tableConfig.keywordSearch());
+            props.recordTriggerType(tableConfig.recordTriggerType());
             props.horizontalScroll(tableConfig.horizontalScroll());
             props.lightQuery(tableConfig.lightQuery());
             props.pageable(tableConfig.pageable());

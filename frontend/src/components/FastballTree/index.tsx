@@ -70,7 +70,7 @@ const FastballTree: FC<TreeProps> = (props: TreeProps) => {
     const [autoExpandParent, setAutoExpandParent] = useState(true);
     const [loading, setLoading] = useState(true);
 
-    const { componentKey, onRecordClick, __designMode, fieldNames, asyncTree, searchable, defaultExpandAll, recordActions, input } = props;
+    const { componentKey, onRecordTriggered: onRecordClick, __designMode, fieldNames, asyncTree, searchable, defaultExpandAll, recordActions, input } = props;
 
 
     const initLoadData = async () => {
