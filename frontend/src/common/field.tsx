@@ -14,7 +14,7 @@ import FastballTableForm from '../components/FastballTableForm';
 import Address from './components/Address';
 import LookupComponent from './components/Lookup';
 import TreeLookupComponent from './components/TreeLookup';
-import { preview, upload } from './upload';
+import { beforeUpload, preview, upload } from './upload';
 
 import { loadCache, setCache } from './cache';
 import SelectComponent from './components/Select';
@@ -406,6 +406,7 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
                 renderFormItem: (value, props) => {
                     const fieldProps = Object.assign({}, props?.fieldProps)
                     fieldProps.customRequest = upload;
+                    fieldProps.beforeUpload = beforeUpload;
                     fieldProps.previewFile = preview;
                     fieldProps.multiple = true;
                     fieldProps.listType = 'picture-card';
@@ -427,6 +428,7 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
                 renderFormItem: (value, props) => {
                     const fieldProps = Object.assign({}, props?.fieldProps)
                     fieldProps.customRequest = upload;
+                    fieldProps.beforeUpload = beforeUpload;
                     fieldProps.previewFile = preview;
                     fieldProps.multiple = true;
                     fieldProps.listType = 'picture-card';
