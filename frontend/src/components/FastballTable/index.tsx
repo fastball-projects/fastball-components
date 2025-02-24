@@ -4,7 +4,6 @@ import type {
   ProTableProps,
   ProColumns,
   ActionType as AntDProActionType,
-  GetComponentProps,
 } from "@fastball/pro-components";
 import type {
   Data,
@@ -23,8 +22,8 @@ import {
   FastballFieldProvider,
 } from "../../common";
 import { Dropdown, MenuProps, Space, Table } from "antd";
-import { DownOutlined, MenuOutlined, MoreOutlined } from "@ant-design/icons";
-import { FastballContext, FastballContextProvider } from "../FastballContext";
+import { MenuOutlined } from "@ant-design/icons";
+import { FastballContext } from "../FastballContext";
 import ViewWrapper from "../../common/components/ViewWrapper";
 
 type ProTableColumn<ValueType = "text"> = ProColumns<Data, ValueType>;
@@ -84,6 +83,7 @@ const FastballTable: MockDataComponent<TableProps> = ({
   const proTableColumns: ProTableColumn[] = [];
   const [searchState, setSearchState] = useState({});
   const [summaryFields, setSummaryFields] = useState([]);
+  const [allSelectedRows, setAllSelectedRows] = useState<Data[]>([]);
 
   if (!container) {
     container = useContext(FastballContext)?.container;
@@ -178,8 +178,11 @@ const FastballTable: MockDataComponent<TableProps> = ({
       checkStrictly: false,
       selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
       defaultSelectedRowKeys: [],
+      onChange: (_selectedRowKeys, selectedRows) => {
+        setAllSelectedRows(selectedRows);
+      },
     };
-    proTableProps.tableAlertOptionRender = ({ selectedRows }) => {
+    proTableProps.tableAlertOptionRender = () => {
       const multipleSelectionActions =
         selectionActions?.map((action) => {
           const { actionKey, actionName, refresh } = action;
@@ -189,7 +192,7 @@ const FastballTable: MockDataComponent<TableProps> = ({
           const actionInfo: ActionInfo = Object.assign({}, action, {
             trigger,
             componentKey,
-            data: selectedRows,
+            data: allSelectedRows,
           });
           if (refresh) {
             actionInfo.callback = () => ref.current?.reload();
@@ -204,7 +207,7 @@ const FastballTable: MockDataComponent<TableProps> = ({
         const actionInfo: ActionInfo = Object.assign({}, action, {
           trigger,
           componentKey,
-          data: selectedRows,
+          data: allSelectedRows,
         });
         if (refresh) {
           actionInfo.callback = () => ref.current?.reload();
@@ -263,7 +266,7 @@ const FastballTable: MockDataComponent<TableProps> = ({
           label: action,
         }));
         return (
-          <Space size={16}>
+          <Space size={12}>
             {firstAction}
             <Dropdown menu={{ items }}>
               <a onClick={(e) => e.preventDefault()}>
@@ -346,12 +349,13 @@ const FastballTable: MockDataComponent<TableProps> = ({
     } else if (recordTriggerType === "OnRecordSelected") {
       proTableProps.rowSelection = Object.assign(
         {
-            checkStrictly: false,
-            selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+          checkStrictly: false,
+          selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
         },
         proTableProps.rowSelection,
         {
           onChange: (_selectedRowKeys: React.Key[], selectedRows: Data[]) => {
+            setAllSelectedRows(selectedRows);
             onRecordTriggered(selectedRows);
           },
         }

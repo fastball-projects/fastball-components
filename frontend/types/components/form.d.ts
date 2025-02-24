@@ -20,6 +20,9 @@ export type FormProps = {
 export type FormFieldInfo = {
     addonBefore?: string
     addonAfter?: string
+    placeholder?: string
+    entireRow?: boolean
+    newRow?: boolean
     subTableCreatorButtonText?: String
     subTableRecordActions?: ActionInfo[]
     fieldDependencyInfoList?: FieldDependencyInfo[]

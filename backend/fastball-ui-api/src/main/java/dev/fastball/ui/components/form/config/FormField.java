@@ -22,6 +22,11 @@ public @interface FormField {
      */
     DisplayType editableDisplay() default DisplayType.Show;
 
+    /**
+     * @return 字段的占位符, 当输入框为空时显示
+     */
+    String placeholder() default "";
+
     String addonBefore() default "";
 
     String addonAfter() default "";

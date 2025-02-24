@@ -6,6 +6,7 @@ import dev.fastball.compile.exception.CompilerException;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.core.annotation.Field;
+import dev.fastball.core.annotation.FieldPlaceholder;
 import dev.fastball.core.component.Component;
 import dev.fastball.core.component.DownloadFile;
 import dev.fastball.meta.action.ActionInfo;
@@ -66,7 +67,7 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
                 props.showReset(false);
             }
         } else {
-            props.column(3);
+            props.column(2);
             props.showReset(true);
         }
         props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, FormFieldInfo::new, ((variableElement, formFieldInfo) -> afterFieldBuild(props, variableElement, formFieldInfo))));
@@ -201,6 +202,11 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
             }
             fieldInfo.setAddonBefore(formField.addonBefore());
             fieldInfo.setAddonAfter(formField.addonAfter());
+            fieldInfo.setPlaceholder(formField.placeholder());
+        }
+        FieldPlaceholder fieldPlaceholder = variableElement.getAnnotation(FieldPlaceholder.class);
+        if (fieldPlaceholder != null) {
+            fieldInfo.setPlaceholder(fieldPlaceholder.value());
         }
         FieldDependencies fieldDependencies = variableElement.getAnnotation(FieldDependencies.class);
         FieldDependency fieldDependency = variableElement.getAnnotation(FieldDependency.class);

@@ -13,7 +13,7 @@ import java.util.List;
  */
 @AutoValue
 public interface FormProps extends ComponentProps {
-    @PropertyDescription("Form column number, default 3")
+    @PropertyDescription("Form column number, default 2")
     int column();
 
     @PropertyDescription("表单标题")

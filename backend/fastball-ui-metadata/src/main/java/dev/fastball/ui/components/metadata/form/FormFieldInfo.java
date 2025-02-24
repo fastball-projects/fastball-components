@@ -25,4 +25,6 @@ public class FormFieldInfo extends FieldInfo {
     private String addonBefore;
 
     private String addonAfter;
+
+    private String placeholder;
 }
