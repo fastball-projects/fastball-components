@@ -180,7 +180,7 @@ public class JpaQueryModelProcessor implements FastballGenerateCompileGenerator 
     }};
 
     private FieldSpec buildBooleanField(String name, String title, MethodSpec.Builder toPredicateBuilder) {
-        TypeName typeName = ClassName.get(String.class);
+        TypeName typeName = ClassName.get(Boolean.class);
         AnnotationSpec fieldAnnotation = AnnotationSpec.builder(Field.class).addMember("title", "$S", title != null ? title : "").build();
         toPredicateBuilder
                 .beginControlFlow("if ($L != null)", name)

@@ -99,7 +99,7 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
             }
             compileComponentFields(props, tableConfig);
 
-            if(tableConfig.selectionViewActions().length > 0) {
+            if (tableConfig.selectionViewActions().length > 0) {
                 props.selectionViewActions(Arrays.stream(tableConfig.selectionViewActions())
                         .map(action -> buildViewActionInfo(action, props)).collect(Collectors.toList()));
             }
@@ -111,8 +111,12 @@ public abstract class AbstractTableCompiler<T extends Component> extends Abstrac
         props.selectionActions(actionInfoList);
 
         props.columns(props.columns().stream().sorted().collect(Collectors.toList()));
-        if (props.queryFields() != null && (tableConfig == null || tableConfig.queryable())) {
-            props.queryFields(props.queryFields().stream().sorted().collect(Collectors.toList()));
+        if (props.queryFields() != null) {
+            if ((tableConfig == null || tableConfig.queryable())) {
+                props.queryFields(props.queryFields().stream().sorted().collect(Collectors.toList()));
+            } else {
+                props.queryFields(Collections.emptyList());
+            }
         }
     }
 

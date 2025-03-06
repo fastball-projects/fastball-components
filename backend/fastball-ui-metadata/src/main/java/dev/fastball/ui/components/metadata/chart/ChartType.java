@@ -24,5 +24,9 @@ public enum ChartType {
     /**
      * 饼图
      */
-//    Pie
+    Pie,
+    /**
+     * 甜甜圈图
+     */
+    Donut
 }

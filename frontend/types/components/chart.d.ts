@@ -3,6 +3,10 @@ import { BasicComponentProps, MultiDataComponent } from '../component'
 
 export type ChartProps = {
     type: ChartType
+    title: string,
+    palette: string,
+    bordered: boolean,
+    borderColor: string,
     fieldNames: {
         xField: string
         yField: string
@@ -10,4 +14,4 @@ export type ChartProps = {
     }
 } & BasicComponentProps & MultiDataComponent
 
-export type ChartType = 'Line' | 'Area' | 'Column' | 'Bar' | 'Pie'
+export type ChartType = 'Line' | 'Area' | 'Column' | 'Bar' | 'Pie' | 'Donut'

@@ -16,7 +16,15 @@ public interface ChartProps extends ComponentProps {
 
     ChartType type();
 
+    String title();
+
     ChartFieldNames fieldNames();
+
+    String palette();
+
+    boolean bordered();
+
+    String borderColor();
 
 
     @Data

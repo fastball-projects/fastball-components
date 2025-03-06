@@ -14,6 +14,10 @@ interface GridLayoutProps extends LayoutProps {
 
     int rowHeight();
 
+    int colMargin();
+
+    int rowMargin();
+
     boolean resizable();
 
     boolean draggable();

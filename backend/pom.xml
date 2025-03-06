@@ -53,6 +53,7 @@
         <module>fastball-ui-builtin-jpa</module>
         <module>fastball-ui-builtin-excel</module>
         <module>fastball-ui-metadata</module>
+        <module>fastball-ui-core</module>
     </modules>
 
     <profiles>
@@ -95,6 +96,10 @@
     </profiles>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.source.skip>false</maven.source.skip>
+
         <javax.validation.version>2.0.1.Final</javax.validation.version>
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
         <auto-service.version>1.0.1</auto-service.version>
@@ -196,6 +201,11 @@
             <dependency>
                 <groupId>dev.fastball</groupId>
                 <artifactId>fastball-ui-metadata</artifactId>
+                <version>0.8.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.fastball</groupId>
+                <artifactId>fastball-ui-core</artifactId>
                 <version>0.8.0-SNAPSHOT</version>
             </dependency>
             <dependency>

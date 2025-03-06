@@ -15,6 +15,8 @@ public @interface FormConfig {
 
     int column() default 2;
 
+    FormLayout layout() default FormLayout.Vertical;
+
     String title() default "";
 
     boolean showReset() default true;

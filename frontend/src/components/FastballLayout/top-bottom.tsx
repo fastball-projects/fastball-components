@@ -11,7 +11,7 @@ const TopAndBottom: React.FC<TopAndBottomLayoutProps> = (props: TopAndBottomLayo
     const top = loadRefComponent(props.top, { onRecordClick: setInput, onDataLoad: props.interlocking ? setInput : null, __designMode: props.__designMode, input: props.input })
     const bottom = loadRefComponent(props.bottom, { key: MD5(input), input, __designMode: props.__designMode })
     return (
-        <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        <Splitter layout="vertical">
             <Splitter.Panel defaultSize={"50%"}>
                 <div className="layout-panel">
                     {top}

@@ -13,14 +13,14 @@ const LeftAndTopBottom: React.FC<LeftAndTopBottomLayoutProps> = (props: LeftAndT
     const bottom = loadRefComponent(props.bottom, { key: MD5(input), __designMode: props.__designMode, input })
     return (
 
-        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        <Splitter>
             <Splitter.Panel defaultSize={props.leftWidth || "30%"}>
                 <div className="layout-panel">
                     {left}
                 </div>
             </Splitter.Panel>
             <Splitter.Panel>
-                <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+                <Splitter layout="vertical">
                     <Splitter.Panel defaultSize={"50%"}>
                         <div className="layout-panel">
                             {top}

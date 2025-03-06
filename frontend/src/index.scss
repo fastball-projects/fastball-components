@@ -84,3 +84,23 @@
 .ant-input-number {
     width: 100%;
 }
+
+.ant-tree .ant-tree-treenode .ant-tree-switcher::before {
+    height: 34px;
+}
+
+.ant-tree .ant-tree-treenode .ant-tree-switcher {
+    align-content: center;
+}
+
+.ant-tree .ant-tree-treenode .ant-tree-node-content-wrapper {
+    padding-block: 5px;
+}
+
+.ant-card.fixed-height-card .ant-card-body {
+    height: calc(100% - 56px);
+}
+
+.ant-card.fixed-height-card.ant-card-small .ant-card-body {
+    height: calc(100% - 38px);
+}

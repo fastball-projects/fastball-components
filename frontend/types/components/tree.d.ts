@@ -25,5 +25,5 @@ export type TreeState = {
 export type ExpandedTreeData = {
     data: Data[]
     expandedKeys: React.Key[]
-    selectedRecord: Data
+    selectedRecord: TreeData
 }

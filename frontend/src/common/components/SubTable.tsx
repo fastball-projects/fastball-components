@@ -2,7 +2,7 @@ import { EditableFormInstance, ProColumns, RowEditableConfig } from '@fastball/p
 import { EditableProTable } from '@fastball/pro-components'
 import React, { useCallback, useEffect } from 'react';
 import { useState } from 'react';
-import { ActionInfo } from '../../../types';
+import { ActionInfo, Data } from '../../../types';
 import { buildAction } from '../action';
 import { filterVisibled } from '../field';
 import { getByPaths, setByPaths } from '../utils';
@@ -23,7 +23,7 @@ const buildEditableConfig = (
     if (readonly) {
         return {}
     }
-    const deleteItem = () => {
+    const deleteItem = (record?: Data) => () => {
         const formValue = editableFormRef?.current?.getFieldsValue();
         if (!formValue) {
             return;
@@ -59,7 +59,7 @@ const buildEditableConfig = (
             }
             return null
         }).filter(action => action != null) : [
-            <a key="delete" onClick={deleteItem}>删除</a>,
+            <a key="delete" onClick={deleteItem(record)}>删除</a>,
         ],
         onValuesChange: (record, recordList) => {
             onChange?.(recordList);
@@ -67,7 +67,7 @@ const buildEditableConfig = (
     }
 }
 
-const buildTableColumns = (columns: ProColumns[], recordActions?: ActionInfo[]) => {
+const buildTableColumns = (columns: ProColumns[], recordActions?: ActionInfo[], readonly?: boolean) => {
     const tableColumns: ProColumns[] = [{
         title: '序号',
         dataIndex: '__row_index',
@@ -88,7 +88,7 @@ const buildTableColumns = (columns: ProColumns[], recordActions?: ActionInfo[]) 
         tableColumns.push({
             title: '操作',
             fixed: 'right',
-            width: 80,
+            width: 100,
             valueType: 'option',
             render: (_dom, record) => recordActions ? recordActions.filter(filterVisibled).map((action) => {
                 const { actionKey, actionName, refresh } = action;
@@ -101,7 +101,7 @@ const buildTableColumns = (columns: ProColumns[], recordActions?: ActionInfo[]) 
                 return buildAction(actionInfo)
             }).filter(action => action != null) : []
         })
-    } else {
+    } else if(!readonly) {
         tableColumns.push({
             title: '操作',
             fixed: 'right',
@@ -166,7 +166,7 @@ const buildTableConfig = (
 
     return {
         columnKeys,
-        columns: buildTableColumns(columns, recordActions),
+        columns: buildTableColumns(columns, recordActions, readonly),
         editable: buildEditableConfig(editableKeys, name, parentName, recordActions, editableFormRef, readonly, onChange),
         value: newValues || []
     }

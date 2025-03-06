@@ -78,6 +78,8 @@ public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, L
             props.cols(gridLayout.cols());
             props.rowHeight(gridLayout.rowHeight());
             props.resizable(gridLayout.resizable());
+            props.colMargin(gridLayout.colMargin());
+            props.rowMargin(gridLayout.rowMargin());
             props.draggable(gridLayout.draggable());
             return props;
         }

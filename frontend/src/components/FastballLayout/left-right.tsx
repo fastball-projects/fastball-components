@@ -8,10 +8,11 @@ import "./index.scss"
 
 const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayoutProps) => {
     const [input, setInput] = React.useState(null)
+    const rightKey = input ? MD5(input) : 'right'
     const left = loadRefComponent(props.left, { onRecordTriggered: setInput, onDataLoad: props.interlocking ? setInput : null, __designMode: props.__designMode, input: props.input })
-    const right = loadRefComponent(props.right, { key: MD5(input), __designMode: props.__designMode, input })
+    const right = loadRefComponent(props.right, { key: rightKey, __designMode: props.__designMode, input })
     return (
-        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        <Splitter>
             <Splitter.Panel defaultSize={props.leftWidth || "30%"}>
                 <div className="layout-panel">
                     {left}

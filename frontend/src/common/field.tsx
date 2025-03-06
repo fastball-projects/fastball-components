@@ -33,7 +33,10 @@ const OnBlurTriggerChangeModeInputNumberWrapper = (text: any, props: ProFieldFCR
     const fieldProps = Object.assign({}, props?.fieldProps)
     const onBlur = fieldProps.onBlur
     fieldProps.onBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = Number(event.target.value)
+        let value: any = event.target.value
+        if(value != null && value != undefined && value != '') {
+            value = Number(event.target.value)
+        }
         onBlur?.(event)
         props.fieldProps.onChange?.(value)
     }
@@ -91,6 +94,11 @@ export const processingField = (container: Element, componentKey: string, field:
         column.cacheKey = parentDataIndex.join('.') + '.' + field.dataIndex.join('.')
     } else {
         column.cacheKey = field.dataIndex.join('.')
+    }
+    if (field.valueType === 'Digit') {
+        column.fieldProps = Object.assign(column.fieldProps || {}, {
+            precision: field.digitPrecision !== undefined ? field.digitPrecision : 2
+        })
     }
 
     column.initialValue = field.defaultValue
@@ -209,7 +217,12 @@ export const processingField = (container: Element, componentKey: string, field:
             if (cachedOptions != null) {
                 return cachedOptions;
             }
-            const lookupOptions = await doLookupAction(lookupAction, params, __designMode)
+            const { keywords, ...search } = params || {}
+            const requestBody = {
+                keywords,
+                search
+            }
+            const lookupOptions = await doLookupAction(lookupAction, requestBody, __designMode)
             setCache(lookupCacheKey, lookupOptions);
             return lookupOptions;
         }
@@ -322,7 +335,7 @@ export const buildTableColumns = (container: Element, componentKey: string, proT
     columns?.filter(filterEnabled).map(field => buildTableColumn(container, componentKey, proTableColumns, field)).filter(Boolean).forEach(field => proTableColumns.push(field));
 
     queryFields?.filter(filterEnabled).forEach(field => {
-        const proTableColumn: ProTableColumn = {};
+        const proTableColumn: ProTableColumn = { minWidth: 80 };
         Object.assign(proTableColumn, field, { hideInTable: true, hideInSetting: true });
         processingField(container, componentKey, field, proTableColumn, null, __designMode);
         proTableColumns.push(proTableColumn);
@@ -348,7 +361,7 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
             },
             Digit: {
                 render: (text, props) => {
-                    const precision = props?.fieldProps?.precision || 2
+                    const precision = props?.fieldProps?.precision != undefined ? props.fieldProps.precision : 2
                     return text?.toFixed(precision)
                 },
                 renderFormItem: OnBlurTriggerChangeModeInputNumberWrapper

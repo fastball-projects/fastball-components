@@ -20,14 +20,18 @@ export const buildJsonRequestInfo = (): RequestInit => {
         }
     }
     const businessContext = getCurrentBusinessContext()
+    const headers: {[key:string]:any} = {
+        Authorization: authorization,
+    }
+    if(businessContext?.businessContextId) {
+        headers[CurrentBusinessContextKeyHeaderKey] = businessContext?.businessContextKey
+        headers[CurrentBusinessContextHeaderKey] = businessContext?.businessContextId
+    }
     const request = {
         method: 'POST',
-        headers: {
-            Authorization: authorization,
-            [CurrentBusinessContextKeyHeaderKey]: businessContext?.businessContextKey,
-            [CurrentBusinessContextHeaderKey]: businessContext?.businessContextId,
-        }
+        headers
     }
+
     return request;
 }
 
@@ -213,7 +217,9 @@ export const callApi = async (url: string, data?: any, file?: File | Blob, callb
         if (result.status === 401) {
             location.href = '/#/login?redirectUrl=' + location.href
         } else if (errorCallback) {
-            errorCallback(result)
+            if(!errorCallback(result)) {
+                message.error(`Error ${result.status}: ${result.message}`);
+            }
         } else {
             message.error(`Error ${result.status}: ${result.message}`);
         }

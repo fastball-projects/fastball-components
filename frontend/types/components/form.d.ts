@@ -5,6 +5,7 @@ export type FormProps = {
     formRef?: React.RefObject<ProFormInstance>
     column?: number
     headerTitle?: string
+    layout?: FormLayout
     showReset: boolean
     variableForm: boolean
     readonly: boolean
@@ -69,3 +70,5 @@ export type ConditionComposeType = 'And' | 'Or'
 export type FieldDependencyType = 'Hidden' | 'Readonly'
 
 export type FormSize = 'small' | 'middle' | 'large'
+
+export type FormLayout = 'Vertical' | 'Horizontal'

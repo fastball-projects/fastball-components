@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ProTable } from "@fastball/pro-components";
 import type {
   ProTableProps,
@@ -84,6 +84,10 @@ const FastballTable: MockDataComponent<TableProps> = ({
   const [searchState, setSearchState] = useState({});
   const [summaryFields, setSummaryFields] = useState([]);
   const [allSelectedRows, setAllSelectedRows] = useState<Data[]>([]);
+
+  useEffect(() => {
+    ref.current?.reload();
+  }, [input]);
 
   if (!container) {
     container = useContext(FastballContext)?.container;

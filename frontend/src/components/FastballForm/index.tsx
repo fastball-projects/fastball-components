@@ -6,6 +6,7 @@ import { ActionInfo, Data, FieldDependencyInfo, FieldValidationMessage, FormFiel
 import { FastballFieldProvider, buildAction, doApiAction, filterEnabled, filterVisibled, getByPaths, processingField, setByPaths } from '../../common';
 import { Button, Spin } from 'antd';
 import dayjs, { ManipulateType } from 'dayjs';
+import { MD5 } from 'object-hash'
 import { EDIT_ID } from '../../common/components/SubTable';
 import ViewWrapper, { FastballViewPathKey } from '../../common/components/ViewWrapper';
 import { ComponentToPrint } from '../../common/components/Printer';
@@ -75,6 +76,22 @@ const buildGetParent = (formInstance: ProFormInstance, parentDataPath?: string[]
     }
     return formInstance.getFieldValue(parentDataPath.slice(0, parentDataPath.length - parentLevel));
 };
+
+const buildExpressionParams = (fields:string[], parentDataPath?: string[]) => {
+    const fieldsNameParams =  fields.join(', ')
+    if(!parentDataPath?.length) {
+        return fieldsNameParams
+    }
+    let params = ''
+    parentDataPath.forEach((path) => {
+        params += `${path}: { `
+    })
+    params += fieldsNameParams
+    parentDataPath.forEach(() => {
+        params += '}'
+    })
+    return params
+}
 const fieldChangeFunc = (field: FormFieldInfo, config: ProSchema<any>, formInstance: ProFormInstance, editableFormRef?: React.RefObject<EditableFormInstance>, parentDataPath?: string[]) => {
     const { dataIndex, rowIndex } = config;
     if (editableFormRef?.current && rowIndex !== undefined) {
@@ -82,19 +99,29 @@ const fieldChangeFunc = (field: FormFieldInfo, config: ProSchema<any>, formInsta
         if (!rowData) {
             return;
         }
-        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(buildGetParent(formInstance, parentDataPath), rowData);
-        if (getByPaths(rowData, dataIndex) !== value) {
-            setByPaths(rowData, dataIndex, value);
-            editableFormRef.current?.setRowData?.(rowIndex, rowData);
+        const value = eval(`($$getParent, {${buildExpressionParams(field.expression.fields, parentDataPath)}}) => ${field.expression.expression};`)(buildGetParent(formInstance, parentDataPath), rowData);
+        const oldValue = getByPaths(rowData, dataIndex)
+        if(oldValue !== value) {
+            const valueHash = value !== undefined ? MD5(value) : undefined
+            const oldValueHash = oldValue !== undefined ? MD5(oldValue) : undefined
+            if(valueHash !== oldValueHash) {
+                setByPaths(rowData, dataIndex, value);
+                editableFormRef.current?.setRowData?.(rowIndex, rowData);
+            }
         }
         // const dataPath = [rowIndex, ...dataIndex]
         // editableFormRef.current?.setFieldValue(dataPath, value)
     } else if (formInstance) {
         const rowData = formInstance.getFieldsValue?.() || {};
-        const value = eval(`($$getParent, {${field.expression.fields.join(", ")}}) => ${field.expression.expression};`)(buildGetParent(formInstance, parentDataPath), rowData);
-        if (getByPaths(rowData, dataIndex) !== value) {
-            setByPaths(rowData, dataIndex, value);
-            formInstance.setFieldsValue?.(rowData);
+        const value = eval(`($$getParent, {${buildExpressionParams(field.expression.fields, parentDataPath)}}) => ${field.expression.expression};`)(buildGetParent(formInstance, parentDataPath), rowData);
+        const oldValue = getByPaths(rowData, dataIndex)
+        if(oldValue !== value) {
+            const valueHash = value !== undefined ? MD5(value) : undefined
+            const oldValueHash = oldValue !== undefined ? MD5(oldValue) : undefined
+            if(valueHash !== oldValueHash) {
+                setByPaths(rowData, dataIndex, value);
+                formInstance.setFieldsValue?.(rowData);
+            }
         }
     }
 }
@@ -129,7 +156,7 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 closePopup()
             }
         }
-        const errorCallback = (error: any) => {
+        const errorCallback = (error: any): boolean => {
             const validateFields: any[] = this.formRef.current?.getFieldsError().filter(f => f.errors?.length).map(f => ({ name: f.name, errors: [] })) || []
             if (error.data) {
                 error.data.map((fieldMessage: FieldValidationMessage) => validateFields.push({
@@ -137,27 +164,21 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     errors: fieldMessage.errorMessages
                 }))
                 this.formRef.current?.setFields(validateFields)
+                return true;
             }
+            return false
         }
         const buildActionLoadData = (withInput?: boolean) => async () => {
             await this.formRef.current?.validateFields?.()
             // const formData = await this.formRef.current?.validateFieldsReturnFormatValue?.()
             const formData = await this.formRef.current?.getFieldsValue?.()
-            let basicData = {}
-            if (withInput && input) {
-                basicData = input
-            }
-            const data: Data = Object.assign(basicData, this.state.dataSource, formData)
+            const data: Data = Object.assign({}, this.state.dataSource, formData)
             return [data, input];
         }
         const buildActionLoadInput = (withInput?: boolean) => async () => {
             await this.formRef.current?.validateFields?.()
             const formData = await this.formRef.current?.getFieldsValue?.()
-            let basicData = {}
-            if (withInput && input) {
-                basicData = input
-            }
-            const data: Data = Object.assign(basicData, this.state.dataSource, formData)
+            const data: Data = Object.assign({}, this.state.dataSource, formData)
             return data;
         }
         const buttons = recordActions ? recordActions.filter(filterVisibled).map(action => {
@@ -254,11 +275,6 @@ class FastballForm extends React.Component<FormProps, FormState> {
                     rules: field.validationRules
                 })
             }
-            if (field.valueType === 'Digit') {
-                formColumn.fieldProps = Object.assign(formColumn.formItemProps || {}, {
-                    precision: field.digitPrecision || 2
-                })
-            }
             if (!readonly && (field.valueType === 'dateTime' || field.valueType === 'date')) {
                 if (field.dateDefaultValue) {
                     let date;
@@ -353,14 +369,18 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 }
             }
             if (field.expression) {
-                formColumn.dependencies = field.expression.fields;
+                if(parentDataPath?.length) {
+                    formColumn.dependencies = field.expression.fields.map(field => [...parentDataPath, field]);
+                } else {
+                    formColumn.dependencies = field.expression.fields;
+                }
                 const fieldFormItemProps = formColumn.formItemProps;
                 formColumn.formItemProps = (formInstance, config): any => {
                     const fieldKey = `${parentDataPath?.join('.')}:${config.rowIndex}:${field.dataIndex.join('.')}`
-                    if (!fieldChangeTimerMap[fieldKey]) {
-                        fieldChangeTimerMap[fieldKey] = setTimeout(() => fieldChangeFunc(field, config, formInstance, editableFormRef, parentDataPath), 300);
+                    if(fieldChangeTimerMap[fieldKey]) {
+                        clearTimeout(fieldChangeTimerMap[fieldKey])
                     }
-                    clearTimeout(fieldChangeTimerMap[fieldKey])
+                    fieldChangeTimerMap[fieldKey] = setTimeout(() => fieldChangeFunc(field, config, formInstance, editableFormRef, parentDataPath), 100);
                     return fieldFormItemProps;
                 }
             }
@@ -437,12 +457,17 @@ class FastballForm extends React.Component<FormProps, FormState> {
     }
 
     render(): React.ReactNode {
-        const { componentKey, input, variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
+        const { componentKey, input, layout, variableForm, setActions, onDataLoad, valueChangeHandlers, __designMode, ...props } = this.props;
         props['@class'] = null;
         const { dataSource } = this.state;
         const container = this.context?.container;
-        const proFormProps: ProFormProps = { grid: true, layout: "vertical", rowProps: { gutter: [16, 16] }, scrollToFirstError: true };
+        const proFormProps: ProFormProps = { grid: true, rowProps: { gutter: [16, 16] }, scrollToFirstError: true };
 
+        if (layout === 'Horizontal') {
+            proFormProps.layout = 'horizontal'
+        } else {
+            proFormProps.layout = 'vertical'
+        }
         if (variableForm && __designMode !== 'design') {
             if (dataSource == null) {
                 const loadData = async () => {

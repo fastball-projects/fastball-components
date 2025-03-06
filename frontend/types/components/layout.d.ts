@@ -30,6 +30,8 @@ export type GridLayoutProps = {
     layoutType?: 'Grid'
     cols: number
     rowHeight: number
+    colMargin: number
+    rowMargin: number
     draggable: boolean
     resizable: boolean
     cells: GridCell[]
@@ -51,6 +53,21 @@ export type GridCell = {
     width: number
     height: number
     component: ReferencedComponent
+}
+
+export type StatisticsProps = {
+    variableStatistics: boolean
+    palette: string
+    fields: StatisticsFieldInfo[]
+} & BasicComponentProps
+
+export type StatisticsFieldInfo = {
+    name: string;
+    title: string;
+    precision: number;
+    color: string;
+    prefix: string;
+    suffix: string;
 }
 
 export type LayoutType = 'LeftAndRight' | 'TopAndBottom' | 'LeftAndTopBottom' | 'Grid';

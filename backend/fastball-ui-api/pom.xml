@@ -23,9 +23,14 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
             <groupId>dev.fastball</groupId>
             <artifactId>fastball-core</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

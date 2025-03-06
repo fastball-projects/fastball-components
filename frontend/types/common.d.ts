@@ -5,6 +5,13 @@ import { ValidationRule } from './validation'
 
 export type Data = { [key: string]: unknown }
 
+export type TreeData = { 
+    key: string, 
+    title: string, 
+    children?: TreeData[], 
+    data: Data
+ }
+
 export type TableData = { children?: TableData[] } & Data
 
 export type Displayable = {

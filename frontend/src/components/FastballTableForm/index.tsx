@@ -42,6 +42,7 @@ type TableFormState = {
     dataSource: TableData[]
     dataSourceMap: Record<string, TableData>
     selectedRowKeyMap: Record<string, boolean>
+    selectedRowKeys:  React.Key[]
     formOpen: boolean
     dataIndex: number
 }
@@ -61,7 +62,7 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
 
     constructor(props: TableFormProps) {
         super(props)
-        this.state = { dataSource: [], dataSourceMap: {}, selectedRowKeyMap: {}, formOpen: false, dataIndex: 0 }
+        this.state = { dataSource: [], dataSourceMap: {}, selectedRowKeyMap: {}, selectedRowKeys:[], formOpen: false, dataIndex: 0 }
         if (props.setActions) {
             props.setActions(this.getActions())
         }
@@ -205,12 +206,12 @@ class FastballTableForm extends React.Component<TableFormProps, TableFormState> 
         if (rowSelectable) {
             const selectedRowKeyMap = this.state.selectedRowKeyMap;
             rowSelection = {
-                selectedRowKeys: Object.keys(selectedRowKeyMap).filter(key => selectedRowKeyMap[key]),
+                selectedRowKeys: this.state.selectedRowKeys,
                 type: 'checkbox',
                 onChange: (selectedRowKeys: React.Key[], selectedRows: Data[]) => {
-                    const selectedRowKeyMap: Record<string, boolean> = {};
-                    selectedRowKeys.forEach(k => selectChildren(this.state.dataSourceMap[k], selectedRowKeyMap))
-                    this.setState({ selectedRowKeyMap })
+                    // const selectedRowKeyMap: Record<string, boolean> = {};
+                    // selectedRowKeys.forEach(k => selectChildren(this.state.dataSourceMap[k], selectedRowKeyMap))
+                    this.setState({ selectedRowKeys })
                 },
                 getCheckboxProps: (record: Data) => ({
                     defaultChecked: true,

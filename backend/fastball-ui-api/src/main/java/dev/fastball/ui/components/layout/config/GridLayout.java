@@ -29,6 +29,16 @@ public @interface GridLayout {
     int rowHeight() default 32;
 
     /**
+     * @return 网格的列之间的间距
+     */
+    int colMargin() default 16;
+
+    /**
+     * @return 网格的行之间的间距
+     */
+    int rowMargin() default 16;
+
+    /**
      * @return 是否可以改变大小
      */
     boolean resizable() default false;

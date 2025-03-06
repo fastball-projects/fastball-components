@@ -12,15 +12,7 @@ import dev.fastball.core.component.DownloadFile;
 import dev.fastball.meta.action.ActionInfo;
 import dev.fastball.meta.action.ApiActionInfo;
 import dev.fastball.meta.basic.FieldInfo;
-import dev.fastball.ui.components.form.config.FieldDependencies;
-import dev.fastball.ui.components.form.config.FieldDependency;
-import dev.fastball.ui.components.form.config.FormConfig;
-import dev.fastball.ui.components.form.config.FormField;
-import dev.fastball.ui.components.form.config.FormFieldConfig;
-import dev.fastball.ui.components.form.config.FormListConfig;
-import dev.fastball.ui.components.form.config.SubTableRecordAction;
-import dev.fastball.ui.components.form.config.SubTableRecordViewAction;
-import dev.fastball.ui.components.form.config.ValueChangeHandler;
+import dev.fastball.ui.components.form.config.*;
 import dev.fastball.ui.components.metadata.form.FieldConfigOverrideInfo;
 import dev.fastball.ui.components.metadata.form.FieldDependencyInfo;
 import dev.fastball.ui.components.metadata.form.FormFieldInfo;
@@ -62,12 +54,14 @@ public abstract class AbstractFormCompiler<T extends Component> extends Abstract
         if (config != null) {
             props.showReset(config.showReset());
             props.column(config.column());
+            props.layout(config.layout());
             if (config.readonly()) {
                 props.readonly(true);
                 props.showReset(false);
             }
         } else {
             props.column(2);
+            props.layout(FormLayout.Vertical);
             props.showReset(true);
         }
         props.fields(TypeCompileUtils.compileTypeFields(genericTypes.get(0), compileContext.getProcessingEnv(), props, FormFieldInfo::new, ((variableElement, formFieldInfo) -> afterFieldBuild(props, variableElement, formFieldInfo))));
