@@ -1,7 +1,7 @@
 package dev.fastball.component.builtin.jpa.query;
 
-import dev.fastball.components.common.query.SortOrder;
-import dev.fastball.components.common.query.TableSearchParam;
+import dev.fastball.components.common.metadata.sort.SortOrder;
+import dev.fastball.components.common.metadata.query.TableSearchParam;
 import dev.fastball.orm.jpa.JpaBaseEntity;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

@@ -58,7 +58,8 @@ export const doLookupAction = async (actionInfo: LookupActionInfo, data?: Data, 
     const resp = await window.fetch(`/api/fastball/lookup/${actionInfo.lookupKey}`, requestInfo)
     const json = await resp.text();
     if (json) {
-        return JSON.parse(json);
+        const result = JSON.parse(json);
+        return result.data;
     }
     // const actionRequest = { actionInfo, data }
     // const actionCacheHash = MD5(actionRequest);

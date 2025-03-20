@@ -3,7 +3,7 @@ package dev.fastball.components.table;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
-import dev.fastball.components.common.query.TableSearchParam;
+import dev.fastball.components.common.metadata.query.TableSearchParam;
 import dev.fastball.core.annotation.UIApi;
 import dev.fastball.core.component.Component;
 import dev.fastball.core.component.DataResult;

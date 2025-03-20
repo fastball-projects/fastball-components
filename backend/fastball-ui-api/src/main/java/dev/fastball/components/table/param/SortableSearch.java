@@ -1,6 +1,6 @@
 package dev.fastball.components.table.param;
 
-import dev.fastball.components.common.query.SortOrder;
+import dev.fastball.components.common.metadata.sort.SortOrder;
 
 import java.util.Map;
 

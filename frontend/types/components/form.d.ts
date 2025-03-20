@@ -14,8 +14,6 @@ export type FormProps = {
     actions?: ActionInfo[]
     recordActions?: ActionInfo[]
     valueChangeHandlers?: ValueChangeHandler[]
-    data?: Data
-    initialValues?: Data
 } & BasicComponentProps & PopupComponentProps
 
 export type FormFieldInfo = {
