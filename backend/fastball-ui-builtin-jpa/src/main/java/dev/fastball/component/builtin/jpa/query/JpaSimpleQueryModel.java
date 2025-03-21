@@ -1,6 +1,6 @@
 package dev.fastball.component.builtin.jpa.query;
 
-import dev.fastball.components.common.metadata.query.SearchParam;
+import dev.fastball.components.common.query.SearchParam;
 import dev.fastball.core.querymodel.QType;
 import lombok.Getter;
 import lombok.Setter;

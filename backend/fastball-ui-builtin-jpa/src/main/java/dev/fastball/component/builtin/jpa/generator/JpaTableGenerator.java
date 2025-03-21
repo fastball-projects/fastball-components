@@ -3,7 +3,7 @@ package dev.fastball.component.builtin.jpa.generator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import dev.fastball.compile.FastballPreCompileGenerator;
-import dev.fastball.components.common.metadata.query.TableSearchParam;
+import dev.fastball.components.common.query.TableSearchParam;
 import dev.fastball.core.annotation.*;
 import dev.fastball.core.component.DataResult;
 import dev.fastball.component.builtin.jpa.BuiltinGenerator;

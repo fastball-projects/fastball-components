@@ -6,7 +6,7 @@ import dev.fastball.compile.CompileContext;
 import dev.fastball.compile.utils.ElementCompileUtils;
 import dev.fastball.compile.utils.TypeCompileUtils;
 import dev.fastball.components.common.config.SelectionAction;
-import dev.fastball.components.common.metadata.query.TableSearchParam;
+import dev.fastball.components.common.query.TableSearchParam;
 import dev.fastball.components.table.config.*;
 import dev.fastball.components.table.metadata.TableProps_AutoValue;
 import dev.fastball.core.component.Component;

@@ -39,7 +39,7 @@ public @interface TableConfig {
     RecordTriggerType recordTriggerType() default RecordTriggerType.OnRecordClick;
 
     /**
-     * 是否支持关键字搜索, 如开启, 入参需要使用 {@link dev.fastball.components.common.metadata.query.TableSearchParam} 包装
+     * 是否支持关键字搜索, 如开启, 入参需要使用 {@link dev.fastball.components.common.query.TableSearchParam} 包装
      *
      * @return 是否支持关键字搜索
      */
