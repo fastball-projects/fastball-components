@@ -9,15 +9,12 @@ import dev.fastball.components.layout.LayoutComponent;
 import dev.fastball.components.layout.config.GridLayout;
 import dev.fastball.components.layout.config.LeftAndRight;
 import dev.fastball.components.layout.config.LeftAndTopBottom;
-import dev.fastball.components.layout.config.TabsLayout;
 import dev.fastball.components.layout.config.TopAndBottom;
 import dev.fastball.components.layout.metadata.GridCellProps_AutoValue;
 import dev.fastball.components.layout.metadata.GridLayoutProps_AutoValue;
 import dev.fastball.components.layout.metadata.LayoutProps;
 import dev.fastball.components.layout.metadata.LeftAndRightLayoutProps_AutoValue;
 import dev.fastball.components.layout.metadata.LeftAndTopBottomLayoutProps_AutoValue;
-import dev.fastball.components.layout.metadata.TabItemProps_AutoValue;
-import dev.fastball.components.layout.metadata.TabsLayoutProps_AutoValue;
 import dev.fastball.components.layout.metadata.TopAndBottomLayoutProps_AutoValue;
 
 import java.util.Arrays;
@@ -83,20 +80,6 @@ public class LayoutCompiler extends AbstractComponentCompiler<LayoutComponent, L
             props.draggable(gridLayout.draggable());
             return props;
         }
-        TabsLayout tabsLayout = compileContext.getComponentElement().getAnnotation(TabsLayout.class);
-        if (tabsLayout != null) {
-            TabsLayoutProps_AutoValue props = new TabsLayoutProps_AutoValue();
-            props.defaultActiveTab(tabsLayout.defaultActiveTab());
-            List<TabItemProps_AutoValue> items = Arrays.stream(tabsLayout.items()).map(item -> {
-                TabItemProps_AutoValue tabItemProps = new TabItemProps_AutoValue();
-                tabItemProps.label(item.label());
-                tabItemProps.component(getReferencedComponentInfo(props, item::component));
-                return tabItemProps;
-            }).collect(Collectors.toList());
-            props.items(items);
-            return props;
-        }
-
         String message = String.format("LayoutComponent [%s] must add annotation @LeftAndRight, @TopAndBottom, @LeftAndTopBottom or @GridLayout", compileContext.getComponentElement().getQualifiedName());
         throw new CompilerException(message);
     }

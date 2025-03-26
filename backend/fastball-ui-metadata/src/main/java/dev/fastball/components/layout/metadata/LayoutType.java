@@ -8,6 +8,5 @@ public enum LayoutType {
     Grid,
     LeftAndRight,
     TopAndBottom,
-    LeftAndTopBottom,
-    Tabs
+    LeftAndTopBottom
 }

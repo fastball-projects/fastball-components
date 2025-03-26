@@ -28,8 +28,6 @@ public class LayoutPropsDeserializer extends StdDeserializer<LayoutProps> {
             layoutPropsClass = LeftAndRightLayoutProps_AutoValue.class;
         } else if (layoutType == LayoutType.LeftAndTopBottom) {
             layoutPropsClass = LeftAndTopBottomLayoutProps_AutoValue.class;
-        } else if (layoutType == LayoutType.Tabs) {
-            layoutPropsClass = TabsLayoutProps_AutoValue.class;
         } else {
             throw new IllegalArgumentException("Unsupported layout type: " + layoutType);
         }
