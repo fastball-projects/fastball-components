@@ -5,19 +5,16 @@ import type { TabsProps } from 'antd';
 import { TabsLayoutProps } from "../../../types";
 import { loadRefComponent } from "../../common";
 
-import "./index.scss"
-
-const TabsLayout: React.FC<TabsLayoutProps> = ({ items, defaultActiveTab, input }) => {
+const TabsLayout: React.FC<TabsLayoutProps> = ({ items, defaultActiveTab, keepAlive, input }) => {
     const [tabsItems, setTabsItems] = React.useState<TabsProps['items']>([]);
     useEffect(() => {
         setTabsItems(items.map((item, index) => ({
             key: index.toString(),
             label: item.label,
-            children: loadRefComponent(item.component, { __designMode: false, input })
+            children: loadRefComponent(item.component, { __designMode: false, input: Object.assign({}, input, item.input) })
         })));
     }, []);
-
-    return <Tabs defaultActiveKey={defaultActiveTab.toString()} items={tabsItems} />
+    return <Tabs destroyInactiveTabPane={!keepAlive} defaultActiveKey={defaultActiveTab.toString()} items={tabsItems} />
 };
 
 export default TabsLayout;

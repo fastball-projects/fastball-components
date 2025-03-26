@@ -40,11 +40,13 @@ export type GridLayoutProps = {
 export type TabsLayoutProps = {
     items: TabItemProps[]
     defaultActiveTab: number
+    keepAlive: boolean
 } & LayoutProps
 
 export type TabItemProps = {
     label: string
     component: ReferencedComponent
+    input?: any
 }
 
 export type GridCell = {
