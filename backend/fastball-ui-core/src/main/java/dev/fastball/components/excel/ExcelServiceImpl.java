@@ -1,7 +1,11 @@
 package dev.fastball.components.excel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dev.fastball.components.excel.model.ImportHistoryRecord;
+import dev.fastball.components.excel.model.ImportState;
+import dev.fastball.core.field.Attachment;
 import dev.fastball.core.field.FieldValidationMessage;
+import dev.fastball.core.intergration.storage.ObjectStorageService;
 import dev.fastball.meta.basic.*;
 import dev.fastball.meta.utils.JsonUtils;
 import dev.fastball.components.excel.model.ImportRecord;
@@ -9,6 +13,7 @@ import dev.fastball.components.excel.model.RecordImportResult;
 import dev.fastball.components.excel.utils.ExcelImportUtils;
 import dev.fastball.components.excel.metadata.ExcelFieldInfo;
 import dev.fastball.components.excel.metadata.ExcelImportMetadata;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
@@ -26,16 +31,23 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static dev.fastball.components.FastballWebComponentConstants.Excel.RECORD_TYPE_META_FILE_SUFFIX;
 import static dev.fastball.components.FastballWebComponentConstants.FASTBALL_WEB_RESOURCE_PREFIX;
+import static dev.fastball.components.excel.ExcelConstants.CONTENT_TYPE;
+import static dev.fastball.components.excel.ExcelConstants.EXCEL_EXTENSION;
 
 
+@RequiredArgsConstructor
 public class ExcelServiceImpl implements ExcelService, InitializingBean, ApplicationContextAware {
 
     private final Map<Class<?>, ExcelImportMetadata> metadataMap = new ConcurrentHashMap<>();
+    private final ObjectStorageService objectStorageService;
     private ApplicationContext context;
+    private final Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Override
     public ByteArrayInputStream buildTemplate(Class<?> clazz) {
@@ -97,13 +109,14 @@ public class ExcelServiceImpl implements ExcelService, InitializingBean, Applica
 
 
     @Override
-    public ByteArrayInputStream buildImportResultFile(Class<?> clazz, File excelFile, List<RecordImportResult> results) {
+    public void handleImportResult(Class<?> clazz, File excelFile, String fileName, List<RecordImportResult> results, ImportHistoryRecord historyRecord) {
         ExcelImportMetadata metadata = getMetadata(clazz);
         int fieldSize = metadata.getFields().size();
         try (XSSFWorkbook workbook = new XSSFWorkbook(excelFile)) {
             XSSFCellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.RED.getIndex());
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            int errorCount = 0;
             for (int i = 0; i < results.size(); i++) {
                 XSSFSheet sheet = workbook.getSheetAt(0);
                 XSSFRow row = sheet.getRow(i + 2);
@@ -112,20 +125,34 @@ public class ExcelServiceImpl implements ExcelService, InitializingBean, Applica
                     cell = row.createCell(fieldSize);
                 }
                 RecordImportResult recordImportResult = results.get(i);
-                if(recordImportResult == null) {
+                if (recordImportResult == null) {
                     cell.setCellValue("未知错误, 记录导入结果为空");
                     row.setRowStyle(cellStyle);
+                    errorCount++;
                 } else if (!recordImportResult.isSuccessful()) {
                     String errorMessages = results.get(i).getMessages().stream().map(msg -> String.join("\n", msg.getErrorMessages())).collect(Collectors.joining("\n"));
                     cell.setCellValue(errorMessages);
                     row.setRowStyle(cellStyle);
+                    errorCount++;
                 }
             }
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
-            workbook.close();
-            return new ByteArrayInputStream(outputStream.toByteArray());
+            InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            String resultFileName = objectStorageService.generateObjectName("public") + EXCEL_EXTENSION;
+            objectStorageService.upload(inputStream, resultFileName);
+            String resultFileUrl = objectStorageService.getObjectUrl(resultFileName);
+            historyRecord.setResultFile(Attachment.builder().url(resultFileUrl).name("导入结果-" + fileName).type(CONTENT_TYPE).build());
+            historyRecord.setFailCount(errorCount);
+            historyRecord.setSuccessCount(results.size() - errorCount);
+            if (errorCount == 0) {
+                historyRecord.setState(ImportState.SUCCESS);
+            } else if (errorCount == results.size()) {
+                historyRecord.setState(ImportState.FAIL);
+            } else {
+                historyRecord.setState(ImportState.PARTIAL_SUCCESS);
+            }
         } catch (IOException | InvalidFormatException e) {
             throw new RuntimeException(e);
         }
@@ -162,14 +189,37 @@ public class ExcelServiceImpl implements ExcelService, InitializingBean, Applica
                         }
                     }
                 }
-                String json = JsonUtils.toJson(record);
-                T typeRecord = JsonUtils.fromJson(json, dataType);
-                records.add(ImportRecord.valid(typeRecord));
+                if (!record.isEmpty()) {
+                    String json = JsonUtils.toJson(record);
+                    T typeRecord = JsonUtils.fromJson(json, dataType);
+                    records.add(ImportRecord.valid(typeRecord));
+                }
             }
         } catch (InvalidFormatException | IOException e) {
             records.add(ImportRecord.invalid(null, List.of(new FieldValidationMessage("", "文件解析失败"))));
         }
         return records;
+    }
+
+    @Override
+    public ImportHistoryRecord buildHistoryRecord(File excelFile, String fileName) {
+        ImportHistoryRecord record = new ImportHistoryRecord();
+        record.setImportTime(new Date());
+        record.setState(ImportState.IMPORTING);
+        try (InputStream excelFileInput = new FileInputStream(excelFile)) {
+            String importFileName = objectStorageService.generateObjectName("public") + EXCEL_EXTENSION;
+            objectStorageService.upload(excelFileInput, importFileName);
+            String importFileUrl = objectStorageService.getObjectUrl(importFileName);
+            record.setImportFile(Attachment.builder().url(importFileUrl).name(fileName).type(CONTENT_TYPE).build());
+            return record;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void executeImport(Runnable task) {
+        executor.execute(task);
     }
 
     @Override

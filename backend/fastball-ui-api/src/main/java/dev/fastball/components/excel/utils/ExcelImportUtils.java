@@ -1,12 +1,12 @@
 package dev.fastball.components.excel.utils;
 
 import dev.fastball.components.excel.ExcelService;
+import dev.fastball.components.excel.model.ImportHistoryRecord;
 import dev.fastball.components.excel.model.ImportRecord;
 import dev.fastball.components.excel.model.RecordImportResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 
 public class ExcelImportUtils {
@@ -17,8 +17,8 @@ public class ExcelImportUtils {
         return service.buildTemplate(clazz);
     }
 
-    public static ByteArrayInputStream buildImportResultFile(Class<?> clazz, File excelFile, List<RecordImportResult> results) {
-        return service.buildImportResultFile(clazz, excelFile, results);
+    public static void handleImportResult(Class<?> clazz, File excelFile, String fileName, List<RecordImportResult> results, ImportHistoryRecord historyRecord) {
+        service.handleImportResult(clazz, excelFile, fileName, results, historyRecord);
     }
 
     public static <T> List<ImportRecord<T>> convertRecords(Class<?> clazz, Class<T> dataType, File excelFile) {
@@ -27,5 +27,13 @@ public class ExcelImportUtils {
 
     public static void setService(ExcelService service) {
         ExcelImportUtils.service = service;
+    }
+
+    public static ImportHistoryRecord buildHistoryRecord(File excelFile, String fileName) {
+        return service.buildHistoryRecord(excelFile, fileName);
+    }
+
+    public static void executeImport(Runnable task) {
+        service.executeImport(task);
     }
 }

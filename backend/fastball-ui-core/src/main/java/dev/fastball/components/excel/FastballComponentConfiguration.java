@@ -1,5 +1,6 @@
 package dev.fastball.components.excel;
 
+import dev.fastball.core.intergration.storage.ObjectStorageService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class FastballComponentConfiguration {
 
     @Bean
-    public ExcelServiceImpl excelService() {
-        return new ExcelServiceImpl();
+    public ExcelServiceImpl excelService(ObjectStorageService objectStorageService) {
+        return new ExcelServiceImpl(objectStorageService);
     }
 }

@@ -414,7 +414,10 @@ export const FastballFieldProvider: FC<FastballFieldProviderProps> = ({ children
             },
             Attachment: {
                 render: (value) => {
-                    return <Image width={104} src={value?.url} />
+                    if(value.imageInfo) {
+                        return <Image width={104} src={value?.url} />
+                    }
+                    return <a target="_blank" href={value.url}>{value.name}</a>
                 },
                 renderFormItem: (value, props) => {
                     const fieldProps = Object.assign({}, props?.fieldProps)
