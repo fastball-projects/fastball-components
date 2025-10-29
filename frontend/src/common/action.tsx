@@ -216,7 +216,7 @@ export const callApi = async (url: string, data?: any, file?: File | Blob, callb
             return result.data;
         }
         if (result.status === 401) {
-            location.href = '/#/login?redirectUrl=' + location.href
+            location.hash = '#/login?redirectUrl=' + location.hash
         } else if (errorCallback) {
             if(!errorCallback(result)) {
                 message.error(`Error ${result.status}: ${result.message}`);

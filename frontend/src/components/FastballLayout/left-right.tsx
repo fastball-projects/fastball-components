@@ -4,7 +4,7 @@ import { Splitter } from 'antd'
 import { MD5 } from 'object-hash'
 import { loadRefComponent } from '../../common'
 import { LeftAndRightLayoutProps } from '../../../types'
-import "./index.scss"
+import "./index.css"
 
 const LeftAndRight: React.FC<LeftAndRightLayoutProps> = (props: LeftAndRightLayoutProps) => {
     const [input, setInput] = React.useState(null)

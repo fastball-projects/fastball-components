@@ -46,8 +46,11 @@ public abstract class JpaQueryModel<T> {
         }
         if (start != null) {
             return criteriaBuilder.greaterThanOrEqualTo(root.get(fieldName), start);
+        } else if(end != null) {
+            return criteriaBuilder.lessThanOrEqualTo(root.get(fieldName), end);
+        } else {
+            return null;
         }
-        return criteriaBuilder.lessThanOrEqualTo(root.get(fieldName), end);
     }
 
 }

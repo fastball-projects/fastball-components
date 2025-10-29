@@ -4,7 +4,7 @@ import { MD5 } from 'object-hash'
 import { Splitter } from 'antd'
 import { loadRefComponent } from '../../common'
 import { TopAndBottomLayoutProps } from '../../../types'
-import "./index.scss"
+import "./index.css"
 
 const TopAndBottom: React.FC<TopAndBottomLayoutProps> = (props: TopAndBottomLayoutProps) => {
     const [input, setInput] = React.useState(null)

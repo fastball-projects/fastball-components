@@ -27,14 +27,18 @@ const checkCondition = (fieldDependencyInfo: FieldDependencyInfo, values: any): 
     if (fieldDependencyInfo.condition === 'NotEmpty') {
         return !!values[fieldDependencyInfo.field];
     }
-    if (!values || !values[fieldDependencyInfo.field]) {
+    if (!values) {
         return false;
     }
     let targetValue: any = fieldDependencyInfo.value
     const value = values[fieldDependencyInfo.field]
     // 其他类型在 == 时会做类型处理, 比如数字类型, 但 Boolean 比较特殊, 因为 Java 的注解只能声明字符串来表达泛类型, 但是 true != 'true', false != 'false', 所以这里做了特殊处理
     if (typeof value === 'boolean') {
-        targetValue = Boolean(targetValue)
+        if(targetValue === 'true') {
+            targetValue = true
+        } else {
+            targetValue = false
+        }
     }
     if (fieldDependencyInfo.condition === 'Equals') {
         return value == targetValue;
@@ -267,6 +271,9 @@ class FastballForm extends React.Component<FormProps, FormState> {
                 }
                 if (field.addonBefore?.length) {
                     fieldProps.addonBefore = field.addonBefore
+                }
+                if(field.placeholder) {
+                    fieldProps.placeholder = field.placeholder
                 }
                 formColumn.fieldProps = Object.assign(formColumn.fieldProps || {}, fieldProps)
             }

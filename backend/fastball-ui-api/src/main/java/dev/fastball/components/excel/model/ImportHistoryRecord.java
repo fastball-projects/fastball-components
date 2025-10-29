@@ -2,6 +2,7 @@ package dev.fastball.components.excel.model;
 
 import dev.fastball.core.annotation.Field;
 import dev.fastball.core.field.Attachment;
+import dev.fastball.meta.basic.DisplayType;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,6 +10,8 @@ import java.util.Date;
 
 @Data
 public class ImportHistoryRecord {
+    @Field(title = "导入记录ID", display = DisplayType.Hidden)
+    private String id;
     @Field(title = "导入时间")
     private Date importTime;
     @Field(title = "导入总条数")

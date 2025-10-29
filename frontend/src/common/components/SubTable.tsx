@@ -78,8 +78,7 @@ const buildTableColumns = (columns: ProColumns[], recordActions?: ActionInfo[], 
     columns.forEach(column => {
         if (column.valueType === 'Attachment') {
             tableColumns.push({ ...column, width: 120 })
-        }
-        if (column.valueType !== 'SubTable' && column.valueType !== 'group') {
+        } else if (column.valueType !== 'SubTable' && column.valueType !== 'group') {
             tableColumns.push({ ...column })
         }
     })
